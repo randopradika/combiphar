@@ -22,7 +22,7 @@ export default function Csr({ page, esg, health, sports }) {
         <>
             <Head title={page?.metaTitle || `${t.nav.csr} — Combiphar`} />
 
-            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `linear-gradient(150deg,rgba(63,110,59,.5),rgba(58,24,96,.6)),url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                 <div className="container">
                     <span className="banner__crumb"><a href={homeUrl}>Home</a> &rsaquo; {t.nav.csr}</span>
                     <h1 className="display">{page?.bannerTitle || t.nav.csr}</h1>

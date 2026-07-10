@@ -72,13 +72,13 @@ export default function Home({ page, impacts, milestones, categories, articles }
                         <Link className="btn btn--outline-light" href={nav.products}>{t.learn_more}</Link>
                     </div>
                     <div className="bento rv">
-                        {categories.map((c, i) => (
-                            <Link key={i} className={'bcard' + (i === 0 ? ' bcard--wide' : '') + (i === 2 ? ' bcard--sq' : '')} href={nav.products}>
-                                {c.image && <div className="bcard__art" style={{ backgroundImage: `url('${c.image}')` }}></div>}
-                                <h3>{c.name}</h3>
-                                <span className="bcard__arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
-                            </Link>
-                        ))}
+                    {categories.map((c, i) => (
+                        <Link key={i} className={'bcard' + (i === 0 ? ' bcard--wide' : '') + (i === 2 ? ' bcard--sq' : '')} href={nav.products}>
+                        {c.image && <div className="bcard__art" style={{ backgroundImage: `url('${c.image}')` }}></div>}
+                        <h3>{c.name}</h3>
+                        <span className="bcard__arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+                        </Link>
+                    ))}
                     </div>
                 </div>
             </section>
@@ -111,7 +111,9 @@ export default function Home({ page, impacts, milestones, categories, articles }
             <section
                 className="cta"
                 aria-label="CTA"
-                style={page?.ctaImage ? { backgroundImage: `linear-gradient(140deg,rgba(58,24,96,.7),rgba(42,0,90,.85)),url('${page.ctaImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                style={page?.ctaImage ? { backgroundImage: `url('${page.ctaImage}')`, backgroundSize: 'cover', backgroundPosition: 'bottom' } : {
+          backgroundImage: 'linear-gradient(140deg, rgba(58,24,96,.7), rgba(42,0,90,.85))',
+        }}
             >
                 <h2 className="display rv">{page?.ctaTitle || 'Growing Through a Journey to Build a Healthy Tomorrow'}</h2>
             </section>

@@ -25,7 +25,7 @@ export default function Products({ page, categories, shops }) {
         <>
             <Head title={page?.metaTitle || `${t.nav.products} — Combiphar`} />
 
-            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `linear-gradient(150deg,rgba(91,45,142,.55),rgba(58,24,96,.6)),url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                 <div className="container">
                     <span className="banner__crumb"><a href={homeUrl}>Home</a> &rsaquo; {t.nav.products}</span>
                     <h1 className="display">{page?.bannerTitle || t.nav.products}</h1>
@@ -64,9 +64,19 @@ export default function Products({ page, categories, shops }) {
                         </div>
                         <div className="grid grid--4" style={{ marginTop: 24 }}>
                             {visible.map((p, i) => (
-                                <article className="pcard rv" key={i} onClick={() => setDetail({ ...p, cat: cat.name })}>
-                                    <div className="pcard__img" style={p.image ? { backgroundImage: `url('${p.image}')` } : {}}></div>
-                                    <div className="pcard__body"><span className="cat">{cat.name}</span><h3>{p.name}</h3></div>
+                                <article
+                                    className="pcard rv"
+                                    key={i}
+                                    onClick={() => setDetail({ ...p, cat: cat.name })}
+                                >
+                                    <div className="pcard__body">
+                                        <h3>{p.name}</h3>
+                                        {p.description && <p className="pcard__desc">{p.description}</p>}
+                                    </div>
+
+                                    <div className="pcard__img">
+                                        {p.image && <img src={p.image} alt={p.name} />}
+                                    </div>
                                 </article>
                             ))}
                         </div>

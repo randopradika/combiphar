@@ -30,7 +30,7 @@ export default function News({ page, health, corporate }) {
         <>
             <Head title={page?.metaTitle || `${t.nav.news} — Combiphar`} />
 
-            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `linear-gradient(150deg,rgba(192,86,127,.5),rgba(58,24,96,.6)),url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                 <div className="container">
                     <span className="banner__crumb"><a href={homeUrl}>Home</a> &rsaquo; {t.nav.news}</span>
                     <h1 className="display">{page?.bannerTitle || (en ? 'News & Health Info' : 'Berita & Info Kesehatan')}</h1>

@@ -21,7 +21,7 @@ export default function Contact({ page, vacancies }) {
         <>
             <Head title={`${t.nav.contact} — Combiphar`} />
 
-            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `linear-gradient(150deg,rgba(94,127,184,.5),rgba(58,24,96,.6)),url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                 <div className="container">
                     <span className="banner__crumb"><a href={homeUrl}>Home</a> &rsaquo; {t.nav.contact}</span>
                     <h1 className="display">{t.nav.contact}</h1>

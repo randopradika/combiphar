@@ -34,7 +34,7 @@ export default function Investor({ page, annual, sustainability, financial, disc
         <>
             <Head title={page?.metaTitle || 'Investor Relations — Combiphar'} />
 
-            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `linear-gradient(120deg,rgba(107,90,142,.5),rgba(58,24,96,.6)),url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                 <div className="container">
                     <span className="banner__crumb"><a href={homeUrl}>Home</a> &rsaquo; {t.nav.investor}</span>
                     <h1 className="display">Investor Relations</h1>

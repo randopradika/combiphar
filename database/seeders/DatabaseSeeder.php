@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -11,9 +12,15 @@ class DatabaseSeeder extends Seeder
     {
         User::updateOrCreate(
             ['email' => 'admin@combiphar.test'],
-            ['name' => 'Admin', 'password' => bcrypt('password')],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+            ]
         );
 
-        $this->call(CmsSeeder::class);
+        $this->call([
+            CmsSeeder::class,
+            MockupContentSeeder::class,
+        ]);
     }
 }

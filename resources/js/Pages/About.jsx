@@ -48,7 +48,7 @@ export default function About({ page, milestones, commissioners, directors, awar
         <>
             <Head title={page?.metaTitle || `${t.nav.about} — Combiphar`} />
 
-            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `linear-gradient(120deg,rgba(74,31,122,.55),rgba(43,0,90,.5)),url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+            <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                 <div className="container">
                     <span className="banner__crumb"><a href={homeUrl}>Home</a> &rsaquo; {t.nav.about}</span>
                     <h1 className="display">{page?.bannerTitle || 'Championing a Healthy Tomorrow'}</h1>
