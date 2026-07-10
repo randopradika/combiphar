@@ -1,0 +1,47 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: combiphar-app:latest
+    container_name: combiphar-app
+    ports:
+      - "80:80"
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
+      - node_modules:/var/www/html/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - combiphar
+
+  mysql:
+    image: mysql:8.0
+    container_name: combiphar-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: combiphar
+      MYSQL_USER: combiphar
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - combiphar
+
+volumes:
+  vendor:
+  node_modules:
+  mysql-data:
+
+networks:
+  combiphar:

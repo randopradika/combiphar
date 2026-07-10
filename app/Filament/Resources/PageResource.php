@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Resources\PageResource\RelationManagers;
+use App\Models\Page;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class PageResource extends Resource
+{
+    protected static ?string $model = Page::class;
+
+    protected static ?string $navigationGroup = 'Halaman';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('slug')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('meta_title_id')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('meta_title_en')
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('meta_description_id')
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('meta_description_en')
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('banner_title_id')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('banner_title_en')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('banner_subtitle_id')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('banner_subtitle_en')
+                    ->maxLength(255),
+                Forms\Components\FileUpload::make('banner_image')
+                    ->image()
+                    ->helperText('Banner untuk halaman selain Beranda (About, Products, dll).'),
+                Forms\Components\Section::make('Media Halaman Beranda (Home)')
+                    ->description('Diisi hanya untuk halaman dengan slug "home".')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\FileUpload::make('hero_image')->label('Hero image')->image()->imageEditor(),
+                        Forms\Components\TextInput::make('hero_line1_id')->label('Hero line 1 (ID)')->default('Championing a'),
+                        Forms\Components\TextInput::make('hero_line1_en')->label('Hero line 1 (EN)')->default('Championing a'),
+                        Forms\Components\TextInput::make('hero_line2_id')->label('Hero line 2 - accent (ID)')->default('Healthy Tomorrow'),
+                        Forms\Components\TextInput::make('hero_line2_en')->label('Hero line 2 - accent (EN)')->default('Healthy Tomorrow'),
+                        Forms\Components\FileUpload::make('manifesto_image')->label('Manifesto background')->image()->imageEditor(),
+                        Forms\Components\TextInput::make('manifesto_title_id')->label('Manifesto title (ID)'),
+                        Forms\Components\TextInput::make('manifesto_title_en')->label('Manifesto title (EN)'),
+                        Forms\Components\TextInput::make('manifesto_video')->label('Manifesto video URL')->url()->helperText('YouTube / Vimeo / MP4 link'),
+                        Forms\Components\FileUpload::make('cta_image')->label('CTA background')->image()->imageEditor(),
+                        Forms\Components\Textarea::make('cta_title_id')->label('CTA text (ID)')->rows(2),
+                        Forms\Components\Textarea::make('cta_title_en')->label('CTA text (EN)')->rows(2),
+                    ]),
+                Forms\Components\Section::make('Konten Halaman Tentang Kami (About)')
+                    ->description('Diisi hanya untuk halaman dengan slug "about".')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\Textarea::make('intro_id')->label('Intro (ID)')->rows(3),
+                        Forms\Components\Textarea::make('intro_en')->label('Intro (EN)')->rows(3),
+                        Forms\Components\Textarea::make('vision_id')->label('Visi (ID)')->rows(2),
+                        Forms\Components\Textarea::make('vision_en')->label('Vision (EN)')->rows(2),
+                        Forms\Components\Textarea::make('mission_id')->label('Misi (ID)')->rows(2),
+                        Forms\Components\Textarea::make('mission_en')->label('Mission (EN)')->rows(2),
+                        Forms\Components\Textarea::make('values_id')->label('Nilai (ID)')->rows(2),
+                        Forms\Components\Textarea::make('values_en')->label('Values (EN)')->rows(2),
+                        Forms\Components\TextInput::make('stat1_value')->label('Stat 1 value (e.g. 1,600+)'),
+                        Forms\Components\TextInput::make('stat1_label_id')->label('Stat 1 label (ID)'),
+                        Forms\Components\TextInput::make('stat1_label_en')->label('Stat 1 label (EN)'),
+                        Forms\Components\TextInput::make('stat2_value')->label('Stat 2 value (e.g. 7)'),
+                        Forms\Components\TextInput::make('stat2_label_id')->label('Stat 2 label (ID)'),
+                        Forms\Components\TextInput::make('stat2_label_en')->label('Stat 2 label (EN)'),
+                    ]),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('slug')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('meta_title_id')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('meta_title_en')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('banner_title_id')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('banner_title_en')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('banner_subtitle_id')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('banner_subtitle_en')
+                    ->searchable(),
+                Tables\Columns\ImageColumn::make('banner_image'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListPages::route('/'),
+            'create' => Pages\CreatePage::route('/create'),
+            'edit' => Pages\EditPage::route('/{record}/edit'),
+        ];
+    }
+}
