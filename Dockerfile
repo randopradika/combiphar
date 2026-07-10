@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git unzip curl ca-certificates \
         libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libonig-dev libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql gd zip bcmath exif intl \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring gd zip bcmath exif intl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
