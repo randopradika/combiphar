@@ -52,7 +52,7 @@ export default function About({ page, milestones, commissioners, directors, awar
     ];
 
     return (
-        <>
+        <div className="page-about">
             <Head title={page?.metaTitle || `${t.nav.about} — Combiphar`} />
 
             <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
@@ -153,7 +153,8 @@ export default function About({ page, milestones, commissioners, directors, awar
                         {visibleOffices.map((o, i) => (
                             <div className="office-card rv" key={i}>
                                 <h4>{o.name}</h4>
-                                <p>{o.description}{o.phone && <><br />Phone: {o.phone}</>}</p>
+                                {o.category && <span className="office-card__label">{o.category}</span>}
+                                <p>{o.description}{o.phone && <><br /><strong>Phone:</strong> {o.phone}</>}</p>
                             </div>
                         ))}
                     </div>
@@ -232,7 +233,7 @@ export default function About({ page, milestones, commissioners, directors, awar
                     </div>
                 </>)}
             </Modal>
-        </>
+        </div>
     );
 }
 
