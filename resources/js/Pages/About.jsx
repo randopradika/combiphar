@@ -56,23 +56,28 @@ export default function About({ page, milestones, commissioners, directors, awar
             <Head title={page?.metaTitle || `${t.nav.about} — Combiphar`} />
 
             <section className="banner banner--about" style={page?.bannerImage ? { backgroundImage: `url('${page.bannerImage}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
-                <div className="container">
-                    <span className="banner__crumb"><a href={homeUrl}>Home</a> &rsaquo; {t.nav.about}</span>
-                    <h1 className="display">{page?.bannerTitle || 'Championing a Healthy Tomorrow'}</h1>
+                <div className="container banner__inner">
+                    <p className="banner__intro">{page?.bannerSubtitle || (en
+                        ? 'With over 53 years of professional experience in the pharmaceutical industry, marked by sustainable growth and the acquisition of major companies, Combiphar represents the purpose of:'
+                        : 'Dengan pengalaman lebih dari 53 tahun di industri farmasi, ditandai dengan pertumbuhan berkelanjutan dan akuisisi berbagai perusahaan besar, Combiphar mewakili tujuan:')}</p>
+                    <h1 className="banner__title display">
+                        <span className="banner__title-l1">{page?.bannerTitle || 'Championing a'}</span>
+                        <span className="banner__title-l2">{page?.bannerTitle2 || 'Healthy Tomorrow'}</span>
+                    </h1>
                 </div>
             </section>
 
-            {page?.intro && (
-                <section className="section"><div className="container"><p className="about-intro rv">{page.intro}</p></div></section>
-            )}
+            <section className="section"><div className="container"><p className="about-intro rv">{page?.intro || (en
+                ? 'Since 1971, Combiphar has been part of people’s everyday lives through a wide range of health products, faithfully accompanying the journey to a healthier life through integrated health solutions — from prevention and recovery to a healthy lifestyle. Rooted in genuine care and enduring trust, we continue to grow together with Indonesia.'
+                : 'Sejak 1971, Combiphar telah menjadi bagian dari kehidupan sehari-hari masyarakat melalui ragam produk kesehatan dan setia menemani perjalanan hidup sehat, melalui solusi kesehatan terintegrasi mulai dari pencegahan, pemulihan, hingga gaya hidup sehat. Berakar pada kepedulian yang tulus dan kepercayaan yang tak lekang oleh waktu, kami terus bertumbuh bersama Indonesia.')}</p></div></section>
 
             {milestones.length > 0 && (
-                <section className="section darkzone">
+                <section className="section section--history">
                     <div className="container journey-head rv">
-                        <span className="eyebrow eyebrow--lavender">{t.nav.about}</span>
+                        <span className="eyebrow eyebrow--magenta">{t.nav.about}</span>
                         <h2 className="display">{en ? 'Our History & Purpose' : 'Sejarah & Tujuan Kami'}</h2>
                     </div>
-                    <MilestoneSlider items={milestones} />
+                    <MilestoneSlider items={milestones} variant="card" />
                 </section>
             )}
 

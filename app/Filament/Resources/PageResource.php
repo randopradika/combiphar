@@ -47,6 +47,12 @@ class PageResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('banner_title_en')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('banner_title2_id')
+                    ->label('Banner title line 2 (ID)')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('banner_title2_en')
+                    ->label('Banner title line 2 (EN)')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('banner_subtitle_id')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('banner_subtitle_en')

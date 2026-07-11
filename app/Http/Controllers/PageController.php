@@ -35,6 +35,7 @@ class PageController extends Controller
             'metaTitle' => $p->tr('meta_title'),
             'metaDescription' => $p->tr('meta_description'),
             'bannerTitle' => $p->tr('banner_title'),
+            'bannerTitle2' => $p->tr('banner_title2'),
             'bannerSubtitle' => $p->tr('banner_subtitle'),
             'bannerImage' => $this->img($p->banner_image),
             'heroImage' => $this->img($p->hero_image),

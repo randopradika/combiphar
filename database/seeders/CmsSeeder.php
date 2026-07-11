@@ -66,6 +66,16 @@ class CmsSeeder extends Seeder
             ]);
         }
 
+        // Figma banner tagline + intro copy for the About page.
+        Page::where('slug', 'about')->update([
+            'banner_title_id' => 'Championing a', 'banner_title_en' => 'Championing a',
+            'banner_title2_id' => 'Healthy Tomorrow', 'banner_title2_en' => 'Healthy Tomorrow',
+            'banner_subtitle_id' => 'Dengan pengalaman lebih dari 53 tahun di industri farmasi, ditandai dengan pertumbuhan berkelanjutan dan akuisisi berbagai perusahaan besar, Combiphar mewakili tujuan:',
+            'banner_subtitle_en' => 'With over 53 years of professional experience in the pharmaceutical industry, marked by sustainable growth and the acquisition of major companies, Combiphar represents the purpose of:',
+            'intro_id' => 'Sejak 1971, Combiphar telah menjadi bagian dari kehidupan sehari-hari masyarakat melalui ragam produk kesehatan dan setia menemani perjalanan hidup sehat, melalui solusi kesehatan terintegrasi mulai dari pencegahan, pemulihan, hingga gaya hidup sehat. Berakar pada kepedulian yang tulus dan kepercayaan yang tak lekang oleh waktu, kami terus bertumbuh bersama Indonesia.',
+            'intro_en' => 'Since 1971, Combiphar has been part of people’s everyday lives through a wide range of health products, faithfully accompanying the journey to a healthier life through integrated health solutions — from prevention and recovery to a healthy lifestyle. Rooted in genuine care and enduring trust, we continue to grow together with Indonesia.',
+        ]);
+
         // ---- Home page (hero / manifesto / CTA) ----
         // Uses the hero/CTA fields instead of a banner; images are uploaded via the CMS.
         Page::create([

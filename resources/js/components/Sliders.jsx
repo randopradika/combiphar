@@ -65,7 +65,8 @@ export function ImpactSlider({ items }) {
     );
 }
 
-export function MilestoneSlider({ items }) {
+export function MilestoneSlider({ items, variant }) {
+    const card = variant === 'card';
     const track = useRef(null);
     const [active, setActive] = useState(0);
     const currentRef = useRef(0);
@@ -102,20 +103,30 @@ export function MilestoneSlider({ items }) {
     const cur = items[active] || items[0] || {};
 
     return (
-        <div className="milestone rv" onMouseEnter={pause} onMouseLeave={resume}>
+        <div className={'milestone rv' + (card ? ' milestone--card' : '')} onMouseEnter={pause} onMouseLeave={resume}>
             <div className="container">
                 <div className="milestone__track" ref={track} onScroll={onScroll}>
                     {items.map((m, i) => (
                         <figure className={'milestone__slide' + (i === active ? ' is-active' : '')} key={i}>
-                            <div className="milestone__img" style={m.photo ? { backgroundImage: `url('${m.photo}')` } : {}}></div>
+                            {card ? (
+                                <div className="hcard">
+                                    <div className="hcard__body">
+                                        <div className="hcard__year">{m.year}</div>
+                                        <p className="hcard__text">{m.caption}</p>
+                                    </div>
+                                    <div className="hcard__img" style={m.photo ? { backgroundImage: `url('${m.photo}')` } : {}}></div>
+                                </div>
+                            ) : (
+                                <div className="milestone__img" style={m.photo ? { backgroundImage: `url('${m.photo}')` } : {}}></div>
+                            )}
                         </figure>
                     ))}
                 </div>
                 <div className="milestone__bar"><span className="milestone__bar-fill" style={{ width: `${((active + 1) / items.length) * 100}%` }}></span></div>
                 <div className="milestone__foot">
-                    <div className="milestone__year display">{cur.year}</div>
+                    {!card && <div className="milestone__year display">{cur.year}</div>}
                     <div className="milestone__foot-right">
-                        <p className="milestone__caption">{cur.caption}</p>
+                        {!card && <p className="milestone__caption">{cur.caption}</p>}
                         <div className="milestone__nav">
                             <button className="arrow-btn arrow-btn--sm" onClick={() => go(active - 1)} aria-label="Previous"><ArrowLeft /></button>
                             <button className="arrow-btn arrow-btn--sm" onClick={() => go(active + 1)} aria-label="Next"><ArrowRight /></button>
