@@ -74,6 +74,12 @@ class CmsSeeder extends Seeder
             'banner_subtitle_en' => 'With over 53 years of professional experience in the pharmaceutical industry, marked by sustainable growth and the acquisition of major companies, Combiphar represents the purpose of:',
             'intro_id' => 'Sejak 1971, Combiphar telah menjadi bagian dari kehidupan sehari-hari masyarakat melalui ragam produk kesehatan dan setia menemani perjalanan hidup sehat, melalui solusi kesehatan terintegrasi mulai dari pencegahan, pemulihan, hingga gaya hidup sehat. Berakar pada kepedulian yang tulus dan kepercayaan yang tak lekang oleh waktu, kami terus bertumbuh bersama Indonesia.',
             'intro_en' => 'Since 1971, Combiphar has been part of people’s everyday lives through a wide range of health products, faithfully accompanying the journey to a healthier life through integrated health solutions — from prevention and recovery to a healthy lifestyle. Rooted in genuine care and enduring trust, we continue to grow together with Indonesia.',
+            'vision_id' => 'Visi Combiphar adalah menjadi perusahaan terkemuka di bidang perawatan kesehatan yang menyentuh kehidupan konsumen melalui peningkatan kesehatan individu dan komunitas.',
+            'vision_en' => 'Combiphar’s vision is to become a leading healthcare company that touches consumers’ lives by improving the health of individuals and communities.',
+            'mission_id' => 'Mengupayakan tingkat kualitas kesehatan konsumen yang lebih baik melalui produk dan layanan berkualitas serta terjangkau dengan mempromosikan gaya hidup sehat.',
+            'mission_en' => 'To improve consumers’ health and quality of life through quality, affordable products and services while promoting a healthy lifestyle.',
+            'values_id' => 'AIM: Antusias dan cerdas dalam mencapai hasil, Integritas, kerjasama sinergis & harmonis, Memenangkan hati pelanggan.',
+            'values_en' => 'AIM: Ambitious and smart in achieving results, Integrity and synergistic, harmonious teamwork, Meeting the hearts of our customers.',
         ]);
 
         // ---- Home page (hero / manifesto / CTA) ----

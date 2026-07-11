@@ -4,7 +4,7 @@ import SiteLayout from '../Layouts/SiteLayout';
 import Modal from '../components/Modal';
 import { MilestoneSlider } from '../components/Sliders';
 
-const Arrow = () => <svg viewBox="0 0 48 32" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 8h34m0 0-10-6m10 6-10 6"/><path d="M30 24h14"/></svg>;
+const Arrow = () => <svg viewBox="0 0 78 78" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M74 4 4 74"/><path d="M4 44v30h30"/></svg>;
 
 // Brand colours for the marketplace tiles (Figma 577:2954).
 const SHOP_COLORS = { shopee: '#F1592D', blibli: '#1B91D0', tokopedia: '#84C468', lazada: '#0C0F84', tiktok: '#000000', orami: '#FF5556' };
