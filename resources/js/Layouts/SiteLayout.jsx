@@ -3,18 +3,30 @@ import { useEffect, useState } from 'react';
 
 function useReveal(url) {
     useEffect(() => {
-        const els = document.querySelectorAll('.rv:not(.is-in)');
+        const reveal = (el) => el.classList.add('is-in');
+        const els = Array.from(document.querySelectorAll('.rv:not(.is-in)'));
+        if (!els.length) return;
         if (!('IntersectionObserver' in window)) {
-            els.forEach((el) => el.classList.add('is-in'));
+            els.forEach(reveal);
             return;
         }
+        // threshold:0 fires as soon as any part enters — height-independent, so tall
+        // sections (which happen on narrow/mobile viewports) reveal reliably.
         const io = new IntersectionObserver((entries) => {
             entries.forEach((e) => {
-                if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+                if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); }
             });
-        }, { threshold: 0.12 });
+        }, { rootMargin: '0px 0px -10% 0px', threshold: 0 });
         els.forEach((el) => io.observe(el));
-        return () => io.disconnect();
+        // Safety net: reveal anything already on-screen the observer didn't catch.
+        const t = setTimeout(() => {
+            els.forEach((el) => {
+                if (el.classList.contains('is-in')) return;
+                const r = el.getBoundingClientRect();
+                if (r.top < window.innerHeight && r.bottom > 0) { reveal(el); io.unobserve(el); }
+            });
+        }, 600);
+        return () => { io.disconnect(); clearTimeout(t); };
     }, [url]);
 }
 
@@ -70,19 +82,40 @@ export default function SiteLayout({ children, navMode = 'solid' }) {
             </header>
 
             <div className={'mobilemenu' + (menuOpen ? ' open' : '')}>
-                <div className="mobilemenu__top">
-                    <img src="/img/logo-combiphar-white.svg" alt="Combiphar" />
+                <div className="mobilemenu__bar">
+                    <Link className="mobilemenu__logo" href={homeUrl} aria-label="Combiphar" onClick={() => setMenuOpen(false)}>
+                        <img src="/img/logo-header.svg" alt="Combiphar" />
+                    </Link>
                     <button className="mobilemenu__close" aria-label={t.close} onClick={() => setMenuOpen(false)}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
                     </button>
                 </div>
-                <nav aria-label="Mobile menu">
-                    {menu.map((s) => (
-                        <Link key={s} href={nav[s]} onClick={() => setMenuOpen(false)}>{t.nav[s]}</Link>
-                    ))}
-                </nav>
-                <div className="mobilemenu__lang">
-                    <a href={altUrls.id}>ID</a><span className="sep"></span><a href={altUrls.en}>EN</a>
+                <div className="mobilemenu__panel">
+                    <nav aria-label="Mobile menu">
+                        {menu.map((s) => (
+                            <Link key={s} href={nav[s]} className={routeName === s ? 'active' : ''} onClick={() => setMenuOpen(false)}>{t.nav[s]}</Link>
+                        ))}
+                    </nav>
+                    <div className="mobilemenu__foot">
+                        <div className="mobilemenu__brand">
+                            <img src="/img/logo-combiphar-white.svg" alt="Combiphar" />
+                            <img src="/img/logo-combicare-white.svg" alt="Combi Care Center" />
+                        </div>
+                        <hr className="mobilemenu__divider" />
+                        <p className="mobilemenu__social-label">{t.follow_us}</p>
+                        <div className="mobilemenu__social">
+                            <a className="ic" href="#" aria-label="Facebook"></a>
+                            <a className="ic" href="#" aria-label="Instagram"></a>
+                            <a className="ic" href="#" aria-label="YouTube"></a>
+                            <a className="ic" href="#" aria-label="LinkedIn"></a>
+                            <a className="ic" href="#" aria-label="TikTok"></a>
+                        </div>
+                        <hr className="mobilemenu__divider" />
+                        <p className="mobilemenu__copy">All Rights Reserved to <strong>Combiphar</strong></p>
+                        <div className="mobilemenu__lang">
+                            <a href={altUrls.id} className={locale === 'id' ? 'active' : ''}>ID</a><span className="sep"></span><a href={altUrls.en} className={locale === 'en' ? 'active' : ''}>EN</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 

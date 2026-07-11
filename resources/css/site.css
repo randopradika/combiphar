@@ -1030,3 +1030,47 @@ html,body{overflow-x:hidden}
 /* Fix: outrank legacy span:last-child magenta rule (specificity 0,2,1) */
 .hero__title span.l1{color:#3E1D81}
 .hero__title span.l2{color:#3E1D81}
+/* ==========================================================================
+   Mobile navbar + slide-in menu (Figma 646:2163 navbar / 646:2529 menu)
+   ========================================================================== */
+@media (max-width:960px){
+    :root{--nav-h:85px}
+    /* Solid white bar (even on the overlay home nav), centred logo, burger right */
+    .nav,.nav--overlay,.nav--overlay.nav--scrolled{background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    .nav__inner{position:relative}
+    .nav__logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+    .nav__logo img,.nav--overlay:not(.nav--scrolled) .nav__logo .logo-color{height:43px;display:inline-block}
+    .nav__menu,.nav__lang,.nav__search{display:none}
+    .nav__tools{margin-left:auto}
+    .nav__burger,.nav--overlay:not(.nav--scrolled) .nav__burger{display:block;color:#3E1D81}
+}
+/* Slide-in menu: white top bar + purple rounded panel */
+.mobilemenu{background:#fff;color:#fff;padding:0}
+.mobilemenu__bar{flex:none;height:85px;display:flex;align-items:center;justify-content:center;position:relative;background:#fff}
+.mobilemenu__logo img{height:43px;display:block}
+.mobilemenu__close{position:absolute;right:24px;top:50%;transform:translateY(-50%);color:var(--magenta)}
+.mobilemenu__close svg{width:26px;height:26px}
+.mobilemenu__panel{flex:1;min-height:0;background:#592B8E;border-radius:40px 40px 0 0;overflow-y:auto;display:flex;flex-direction:column;padding:36px 24px 40px;text-align:center}
+.mobilemenu__panel nav{margin:0;display:flex;flex-direction:column}
+.mobilemenu__panel nav a{font-family:var(--font-body);font-weight:400;font-size:20px;color:#fff;line-height:1.4;padding:14px 0;border-bottom:0}
+.mobilemenu__panel nav a.active{text-decoration:underline;text-underline-offset:6px}
+.mobilemenu__foot{margin-top:auto;padding-top:34px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.mobilemenu__brand{display:flex;align-items:center;gap:18px}
+.mobilemenu__brand img{height:46px}
+.mobilemenu__divider{width:100%;border:0;border-top:1px solid rgba(255,255,255,.35);margin:6px 0}
+.mobilemenu__social-label{font-size:16px;color:#fff}
+.mobilemenu__social{display:flex;gap:14px}
+.mobilemenu__social .ic{width:40px;height:40px;border-radius:50%;background:#D9D9D9;display:block}
+.mobilemenu__copy{font-size:16px;color:#fff}
+.mobilemenu__copy strong{font-weight:700}
+.mobilemenu__lang{display:flex;align-items:center;gap:12px;font-family:var(--font-body);font-weight:700;color:#fff;margin-top:4px}
+.mobilemenu__lang .sep{width:1px;height:14px;background:rgba(255,255,255,.4)}
+.mobilemenu__lang a{opacity:.55}
+.mobilemenu__lang a.active{opacity:1}
+/* ==========================================================================
+   Hero (mobile only, <=640px) — start below the fixed navbar; image fills section
+   ========================================================================== */
+@media (max-width:640px){
+    .hero--photo{padding-top:var(--nav-h)}
+    .hero--photo .hero__img{width:100%;height:calc(100vh - var(--nav-h));height:calc(100svh - var(--nav-h));object-fit:cover;object-position:center top}
+}
