@@ -1,5 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import SiteLayout from '../Layouts/SiteLayout';
 import Modal from '../components/Modal';
 
@@ -10,6 +10,10 @@ export default function Products({ page, categories, shops }) {
     const [query, setQuery] = useState('');
     const [sort, setSort] = useState('az');
     const [detail, setDetail] = useState(null);
+    useEffect(() => {
+        const els = document.querySelectorAll(".rv")
+        els.forEach((el) => el.classList.add("is-in"))
+      }, [active])
 
     const cat = categories[active];
     const visible = useMemo(() => {

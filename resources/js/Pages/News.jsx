@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SiteLayout from '../Layouts/SiteLayout';
 
 function Cards({ items, readMore }) {
@@ -25,6 +25,10 @@ export default function News({ page, health, corporate }) {
     const { props: { t, locale, homeUrl } } = usePage();
     const en = locale === 'en';
     const [tab, setTab] = useState('health');
+    useEffect(() => {
+        const els = document.querySelectorAll(".rv")
+        els.forEach((el) => el.classList.add("is-in"))
+      }, [tab])
 
     return (
         <>
