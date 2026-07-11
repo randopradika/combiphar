@@ -514,7 +514,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 /* ==========================================================================
    Milestone carousel (Figma: active 1093x654 colour, sides desaturated, bar)
    ========================================================================== */
-.milestone__track{display:flex;gap:30px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px}
+.milestone__track{display:flex;gap:clamp(14px,1.6vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px}
 .milestone__track::-webkit-scrollbar{display:none}
 .milestone__slide{flex:0 0 min(1093px,78%);scroll-snap-align:center}
 .milestone__img{height:clamp(300px,42vw,654px);border-radius:44px;background-color:#5B2D8E;background-image:linear-gradient(140deg,#8B5FB5,#3A1860);background-size:cover;background-position:center;background-blend-mode:luminosity;transition:background-color .45s ease}
@@ -524,7 +524,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .milestone__foot{width:min(1093px,100%);margin:22px auto 0;display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
 .milestone__year{font-size:clamp(48px,6vw,96px);color:#fff;line-height:1}
 .milestone__foot-right{display:flex;flex-direction:column;align-items:flex-end;gap:14px;max-width:540px}
-.milestone__caption{color:rgba(255,255,255,.9);text-align:right;font-size:clamp(18px,2.2vw,32px);line-height:1.5;min-height:calc(1.5em * 3)}
+.milestone__caption{color:rgba(255,255,255,.9);text-align:right;font-size:clamp(18px,2.2vw,32px);line-height:1.5}
 .milestone__nav{display:flex;gap:12px}
 .arrow-btn--sm{width:46px;height:46px}
 .milestone__nav .arrow-btn{width:30px;height:30px;border:0;background:#fff;color:var(--magenta)}
