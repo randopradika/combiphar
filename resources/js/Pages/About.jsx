@@ -203,11 +203,15 @@ export default function About({ page, milestones, commissioners, directors, awar
                 </div></section>
             )}
 
-            <Modal open={!!board} onClose={() => setBoard(null)} closeLabel={t.close}>
+            <Modal open={!!board} onClose={() => setBoard(null)} flush closeLabel={t.close}>
                 {board && (
-                    <div className="pmodal__grid">
-                        <div className="pmodal__img" style={{ aspectRatio: '3/4', ...(board.photo ? { backgroundImage: `url('${board.photo}')` } : {}) }}></div>
-                        <div><h3>{board.name}</h3><p className="bm-role">{board.role}</p><p>{board.bio}</p></div>
+                    <div className="bmodal">
+                        <div className="bmodal__img" style={board.photo ? { backgroundImage: `url('${board.photo}')` } : {}}></div>
+                        <div className="bmodal__body">
+                            <h3 className="bmodal__name">{board.name}</h3>
+                            {board.role && <p className="bmodal__role">{board.role}</p>}
+                            <div className="bmodal__bio" dangerouslySetInnerHTML={{ __html: board.bio || '' }} />
+                        </div>
                     </div>
                 )}
             </Modal>

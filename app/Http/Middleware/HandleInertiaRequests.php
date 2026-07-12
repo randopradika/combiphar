@@ -29,7 +29,7 @@ class HandleInertiaRequests extends Middleware
                 return ['id' => $alt('id'), 'en' => $alt('en')];
             },
             'nav' => fn () => collect(['about', 'products', 'csr', 'investor', 'news', 'contact'])
-                ->mapWithKeys(fn ($s) => [$s => route($s)])->all(),
+                ->mapWithKeys(fn ($s) => [$s => route($s, ['locale' => app()->getLocale()])])->all(),
             'homeUrl' => fn () => url('/'),
             'flash' => fn () => ['contact_success' => (bool) session('contact_success')],
         ]);

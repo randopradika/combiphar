@@ -1858,6 +1858,27 @@ html,body{overflow-x:hidden}
 .mobilemenu__panel{flex:1;min-height:0;background:#592B8E;border-radius:32px 32px 0 0;overflow-y:auto;display:flex;flex-direction:column;padding:clamp(28px,7vw,48px) 24px 40px;text-align:center;box-shadow:0 -14px 40px rgba(0,0,0,.22)}
 .mobilemenu .footer__social{flex-direction:column;gap:14px;color:#fff}
 .mobilemenu .footer__social>span{font-size:16px}
+/* Board biography popup (Figma 577:2912) */
+.modal__box--flush{padding:0;overflow:hidden;max-width:min(1222px,94vw);width:100%}
+.bmodal{display:flex;height:min(82vh,758px)}
+.bmodal__img{flex:1 1 0;min-width:0;background:#3E1F65 center bottom/cover no-repeat}
+.bmodal__body{flex:1 1 0;min-width:0;background:#fff;padding:clamp(28px,3vw,56px) clamp(24px,3vw,52px);overflow-y:auto;position:relative}
+.bmodal__name{font-family:var(--font-display);font-weight:400;font-size:clamp(28px,3.2vw,48px);color:#662B8F;line-height:1.04;margin:0 0 clamp(6px,1vw,12px);padding-right:70px}
+.bmodal__role{font-family:var(--font-body);color:var(--magenta);font-weight:600;margin:0 0 clamp(14px,1.6vw,22px)}
+.bmodal__bio{font-family:var(--font-body);font-weight:300;font-size:16px;line-height:1.75;color:#111}
+.bmodal__bio p{margin:0 0 16px}
+.bmodal__bio p:last-child{margin-bottom:0}
+.bmodal__bio ul,.bmodal__bio ol{margin:0 0 16px;padding-left:22px}
+.bmodal__bio ul{list-style:disc}
+.bmodal__bio ol{list-style:decimal}
+.bmodal__bio li{margin-bottom:6px}
+.bmodal__bio strong,.bmodal__bio b{font-weight:700}
+@media (max-width:760px){
+    .modal__box--flush{overflow-y:auto;max-height:92vh}
+    .bmodal{flex-direction:column;height:auto}
+    .bmodal__img{flex:none;height:clamp(280px,62vw,420px)}
+    .bmodal__body{overflow-y:visible}
+}
 /* ==========================================================================
    Hero (mobile only, <=640px) — start below the fixed navbar; image fills section
    ========================================================================== */

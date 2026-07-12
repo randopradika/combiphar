@@ -36,8 +36,8 @@ class PersonResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('role_en')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('bio_id')->label('Bio (ID)')->rows(4)->columnSpanFull(),
-                Forms\Components\Textarea::make('bio_en')->label('Bio (EN)')->rows(4)->columnSpanFull(),
+                Forms\Components\RichEditor::make('bio_id')->label('Bio (ID)')->columnSpanFull()->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo']),
+                Forms\Components\RichEditor::make('bio_en')->label('Bio (EN)')->columnSpanFull()->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo']),
                 Forms\Components\Select::make('group')
                     ->options([
                         'commissioners' => 'Board of Commissioners',
