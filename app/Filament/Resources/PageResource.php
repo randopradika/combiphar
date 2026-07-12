@@ -63,6 +63,7 @@ class PageResource extends Resource
                 Forms\Components\Section::make('Media Halaman Beranda (Home)')
                     ->description('Diisi hanya untuk halaman dengan slug "home".')
                     ->collapsible()
+                    ->visible(fn (?Page $record) => $record?->slug === 'home')
                     ->schema([
                         Forms\Components\FileUpload::make('hero_image')->label('Hero image')->image()->imageEditor(),
                         Forms\Components\TextInput::make('hero_line1_id')->label('Hero line 1 (ID)')->default('Championing a'),
@@ -80,6 +81,7 @@ class PageResource extends Resource
                 Forms\Components\Section::make('Konten Halaman Tentang Kami (About)')
                     ->description('Diisi hanya untuk halaman dengan slug "about".')
                     ->collapsible()
+                    ->visible(fn (?Page $record) => $record?->slug === 'about')
                     ->schema([
                         Forms\Components\Textarea::make('intro_id')->label('Intro (ID)')->rows(3),
                         Forms\Components\Textarea::make('intro_en')->label('Intro (EN)')->rows(3),
