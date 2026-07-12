@@ -209,7 +209,12 @@ class PageController extends Controller
             'page' => $this->page('contact'),
             'vacancies' => JobVacancy::where('is_open', true)->orderBy('sort')->get()->map(fn ($v) => [
                 'title' => $v->tr('title'), 'department' => $v->tr('department'),
-                'location' => $v->location, 'description' => $v->tr('description'),
+                'location' => $v->location, 'summary' => $v->tr('summary'),
+                'description' => $v->tr('description'),
+                'requirements' => $v->tr('requirements'), 'applyUrl' => $v->apply_url,
+            ]),
+            'faqs' => \App\Models\Faq::orderBy('sort')->get()->map(fn ($f) => [
+                'question' => $f->tr('question'), 'answer' => $f->tr('answer'),
             ]),
         ]);
     }

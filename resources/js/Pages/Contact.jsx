@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react"
 import SiteLayout from "../Layouts/SiteLayout"
 import Modal from "../components/Modal"
 
-export default function Contact({ page, vacancies }) {
+export default function Contact({ page, vacancies, faqs }) {
   const {
     props: { t, locale, homeUrl, flash },
   } = usePage()
@@ -47,25 +47,6 @@ export default function Contact({ page, vacancies }) {
       setVacancyPage(1)
     }
   }, [vacancyPage, totalVacancyPages])
-
-  const faqs = [
-    {
-      q: "Lorem ipsum dolor sit amet, consectetur adipiscing elit?",
-      a: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sed orci sed dolor sollicitudin eleifend vel vitae odio. Ut at dui eu augue blandit mollis.",
-    },
-    {
-      q: "Lorem ipsum dolor sit amet, consectetur adipiscing elit?",
-      a: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-    {
-      q: "Lorem ipsum dolor sit amet, consectetur adipiscing elit?",
-      a: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sed orci sed dolor sollicitudin eleifend vel vitae odio.",
-    },
-    {
-      q: "Lorem ipsum dolor sit amet, consectetur adipiscing elit?",
-      a: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-  ]
 
   const submit = (e) => {
     e.preventDefault()
@@ -125,8 +106,8 @@ export default function Contact({ page, vacancies }) {
     ),
   },
   {
-    en: 'Offering',
-    id: 'Penawaran',
+    en: 'Background Check',
+    id: 'Pemeriksaan Latar Belakang',
     icon: (
       <svg width="79" height="79" viewBox="0 0 79 79" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M69.5 35.5C69.5 54.2756 54.2756 69.5 35.5 69.5C16.7244 69.5 1.5 54.2756 1.5 35.5C1.5 16.7244 16.7244 1.5 35.5 1.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -137,14 +118,13 @@ export default function Contact({ page, vacancies }) {
     ),
   },
   {
-    en: 'Onboarding',
-    id: 'Onboarding',
+    en: 'Offering',
+    id: 'Penawaran',
     icon: (
-      <svg width="70" height="78" viewBox="0 0 70 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16.3889 39.5C1.5 39.5 1.5 46.123 1.5 54.3V58C1.5 68.212 1.5 76.5 20.1111 76.5H49.8889C64.7778 76.5 68.5 68.212 68.5 58V54.3C68.5 46.123 68.5 39.5 53.6111 39.5C49.8889 39.5 48.8467 40.277 46.9111 41.72L43.1144 45.716C38.7222 50.378 31.2778 50.378 26.8483 45.716L23.0889 41.72C21.1533 40.277 20.1111 39.5 16.3889 39.5Z" stroke="currentColor" strokeWidth="3" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M60.5 39.5V16.7C60.5 8.302 60.5 1.5 45.9286 1.5H24.0714C9.5 1.5 9.5 8.302 9.5 16.7V39.5" stroke="currentColor" strokeWidth="3" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
-        <path opacity="0.4" d="M29.5 28.5H42.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <path opacity="0.4" d="M26.5 17.5H45.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <svg width="72" height="78" viewBox="0 0 72 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M42 3H15C10.582 3 7 6.582 7 11V67C7 71.418 10.582 75 15 75H57C61.418 75 65 71.418 65 67V26L42 3Z" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M42 3V20C42 23.314 44.686 26 48 26H65" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path opacity="0.4" d="M23 47L32 56L50 38" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -231,12 +211,12 @@ export default function Contact({ page, vacancies }) {
                       </p>
                     )}
 
-                    {v.description && (
+                    {v.summary && (
                       <p className="vac-card__desc">
                         <strong>
                           {en ? "Responsibilities:" : "Tanggung Jawab:"}
                         </strong>{" "}
-                        {v.description}
+                        {v.summary}
                       </p>
                     )}
 
@@ -344,9 +324,6 @@ export default function Contact({ page, vacancies }) {
             <div className="container">
               <div className="contact-intro-grid">
                 <div className="contact-copy rv">
-                  <span className="eyebrow eyebrow--magenta">
-                    {en ? "Contact Us" : "Hubungi Kami"}
-                  </span>
                   <h2 className="display">Have a Question?</h2>
                   <p>
                     {en
@@ -504,7 +481,6 @@ export default function Contact({ page, vacancies }) {
             <div className="container faq-wrap">
               <div className="sec-head rv">
                 <h2 className="display">Frequently Asked Question (FAQ)</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
               </div>
 
               <div className="faq-list rv">
@@ -521,12 +497,16 @@ export default function Contact({ page, vacancies }) {
                         onClick={() => setOpenFaq(isOpen ? null : i)}
                         aria-expanded={isOpen}
                       >
-                        <span>{item.q}</span>
-                        <span className="faq-icon">{isOpen ? "−" : "+"}</span>
+                        <span>{item.question}</span>
+                        <span className="faq-icon" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 6l6 6-6 6" />
+                          </svg>
+                        </span>
                       </button>
                       {isOpen && (
                         <div className="faq-a">
-                          <p>{item.a}</p>
+                          <p>{item.answer}</p>
                         </div>
                       )}
                     </div>
@@ -565,27 +545,53 @@ export default function Contact({ page, vacancies }) {
         </div>
       </section>
 
-      <Modal open={!!vac} onClose={() => setVac(null)} closeLabel={t.close}>
+      <Modal open={!!vac} onClose={() => setVac(null)} closeLabel={t.close} wide>
         {vac && (
           <div className="vac-modal">
-            <h3>{vac.title}</h3>
-            <p
-              style={{
-                fontWeight: 600,
-                color: "var(--magenta)",
-                marginBottom: 14,
-              }}
-            >
-              {[vac.location, vac.department].filter(Boolean).join("  ·  ")}
-            </p>
-            <div
-              style={{
-                whiteSpace: "pre-line",
-                color: "var(--text-muted)",
-                lineHeight: 1.7,
-              }}
-            >
-              {vac.description}
+            <div className="vac-modal__head">
+              <div>
+                <h3>{vac.title}</h3>
+                {vac.location && (
+                  <p className="vac-modal__loc">
+                    <strong>{en ? "Location:" : "Lokasi:"}</strong> {vac.location}
+                  </p>
+                )}
+              </div>
+              {vac.applyUrl && (
+                <a
+                  className="vac-modal__apply"
+                  href={vac.applyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {en ? "Apply Now" : "Lamar Sekarang"}
+                </a>
+              )}
+            </div>
+
+            <div className="vac-modal__body">
+              {vac.description && (
+                <div className="vac-modal__section">
+                  <h4>{en ? "Responsibilities:" : "Tanggung Jawab:"}</h4>
+                  <div
+                    className="vac-modal__rich"
+                    dangerouslySetInnerHTML={{ __html: vac.description }}
+                  />
+                </div>
+              )}
+              {vac.requirements && (
+                <div className="vac-modal__section">
+                  <h4>
+                    {en
+                      ? "Skills, Qualifications & Experience Required:"
+                      : "Keterampilan, Kualifikasi, dan Pengalaman yang Dibutuhkan:"}
+                  </h4>
+                  <div
+                    className="vac-modal__rich"
+                    dangerouslySetInnerHTML={{ __html: vac.requirements }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -40,9 +40,35 @@ class JobVacancyResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('location')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description_id')
+                Forms\Components\TextInput::make('apply_url')
+                    ->label('Apply URL')
+                    ->url()
+                    ->maxLength(255)
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('description_en')
+                Forms\Components\Textarea::make('summary_id')
+                    ->label('Deskripsi Singkat / Kartu (ID)')
+                    ->rows(3)
+                    ->helperText('Ringkasan singkat yang tampil di kartu lowongan halaman Karir.')
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('summary_en')
+                    ->label('Short Description / Card (EN)')
+                    ->rows(3)
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('description_id')
+                    ->label('Tanggung Jawab (ID)')
+                    ->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo'])
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('description_en')
+                    ->label('Responsibilities (EN)')
+                    ->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo'])
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('requirements_id')
+                    ->label('Kualifikasi & Pengalaman (ID)')
+                    ->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo'])
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('requirements_en')
+                    ->label('Qualifications & Experience (EN)')
+                    ->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo'])
                     ->columnSpanFull(),
                 Forms\Components\Toggle::make('is_open')
                     ->required(),
