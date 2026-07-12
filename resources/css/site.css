@@ -1852,6 +1852,12 @@ html,body{overflow-x:hidden}
 .mobilemenu__lang .sep{width:1px;height:14px;background:rgba(255,255,255,.4)}
 .mobilemenu__lang a{opacity:.55}
 .mobilemenu__lang a.active{opacity:1}
+/* Mobile menu v2 — header stays, slide up from bottom, transparent bg (no white corners) */
+.mobilemenu{inset:var(--nav-h) 0 0 0;z-index:90;background:transparent;padding:0;visibility:visible;pointer-events:none;transform:translateY(100%);transition:transform .35s ease}
+.mobilemenu.open{transform:translateY(0);pointer-events:auto}
+.mobilemenu__panel{flex:1;min-height:0;background:#592B8E;border-radius:32px 32px 0 0;overflow-y:auto;display:flex;flex-direction:column;padding:clamp(28px,7vw,48px) 24px 40px;text-align:center;box-shadow:0 -14px 40px rgba(0,0,0,.22)}
+.mobilemenu .footer__social{flex-direction:column;gap:14px;color:#fff}
+.mobilemenu .footer__social>span{font-size:16px}
 /* ==========================================================================
    Hero (mobile only, <=640px) — start below the fixed navbar; image fills section
    ========================================================================== */
