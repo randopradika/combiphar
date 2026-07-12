@@ -10,6 +10,7 @@ export default function Products({ page, categories, shops }) {
 
   const en = locale === "en"
   const [active, setActive] = useState(0)
+  const [subFilter, setSubFilter] = useState("all")
   const [query, setQuery] = useState("")
   const [sort, setSort] = useState("az")
   const [detail, setDetail] = useState(null)
@@ -20,18 +21,28 @@ export default function Products({ page, categories, shops }) {
   useEffect(() => {
     const els = document.querySelectorAll(".rv")
     els.forEach((el) => el.classList.add("is-in"))
-  }, [active, query, sort, pageNo])
+  }, [active, subFilter, query, sort, pageNo])
 
   const cat = categories[active]
+  const subs = cat?.children ?? []
+  const activeSub = subFilter !== "all" ? subs[Number(subFilter)] : null
+  const heading = activeSub ? activeSub.name : cat?.name
+
+  // Default: every product in the category (its own + all sub-categories).
+  // A sub-category filter narrows to just that sub-category's products.
+  const source = useMemo(() => {
+    if (!cat) return []
+    if (activeSub) return activeSub.products ?? []
+    return [...(cat.products ?? []), ...subs.flatMap((s) => s.products ?? [])]
+  }, [cat, subs, activeSub])
 
   const visible = useMemo(() => {
-    if (!cat) return []
     const q = query.toLowerCase().trim()
-    const list = cat.products.filter((p) => p.name.toLowerCase().includes(q))
+    const list = source.filter((p) => p.name.toLowerCase().includes(q))
     list.sort((a, b) => a.name.localeCompare(b.name))
     if (sort === "za") list.reverse()
     return list
-  }, [cat, query, sort])
+  }, [source, query, sort])
 
   const totalPages = Math.max(1, Math.ceil(visible.length / perPage))
 
@@ -41,8 +52,12 @@ export default function Products({ page, categories, shops }) {
   }, [visible, pageNo])
 
   useEffect(() => {
+    setSubFilter("all")
+  }, [active])
+
+  useEffect(() => {
     setPageNo(1)
-  }, [active, query, sort])
+  }, [active, subFilter, query, sort])
 
   useEffect(() => {
     if (pageNo > totalPages) setPageNo(totalPages)
@@ -64,11 +79,11 @@ export default function Products({ page, categories, shops }) {
             : {}
         }
       >
-        <div className="container">
-          <span className="banner__crumb">
-            <a href={homeUrl}>Home</a> &rsaquo; {t.nav.products}
-          </span>
+        <div className="container banner__row">
           <h1 className="display">{page?.bannerTitle || t.nav.products}</h1>
+          {page?.bannerSubtitle && (
+            <p className="banner__row-sub">{page.bannerSubtitle}</p>
+          )}
         </div>
       </section>
 
@@ -94,18 +109,61 @@ export default function Products({ page, categories, shops }) {
       )}
 
       {cat && (
-        <section className="section">
-          <div className="container">
-            <div className="sec-head sec-head--product rv">
-              <h2 className="display">{cat.name}</h2>
+        <>
+          <section
+            className="cat-hero"
+            style={
+              cat.image
+                ? {
+                    backgroundImage: `url('${cat.image}')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }
+                : {}
+            }
+          >
+            <div className="cat-hero__overlay"></div>
+            <h2 className="cat-hero__title display">{cat.name}</h2>
+          </section>
+
+          <section className="section">
+            <div className="container">
               {cat.description && (
-                <div className="sec-head__aside">
-                  <p>{cat.description}</p>
-                </div>
+                <p className="cat-intro rv">{cat.description}</p>
               )}
-            </div>
+
+              <div className="sec-head rv">
+                <h2 className="display">{heading}</h2>
+              </div>
 
             <div className="toolbar toolbar--products rv">
+              {subs.length > 0 && (
+                <div className="toolbar__sort toolbar__category">
+                  <span className="toolbar__label">
+                    {en ? "Category:" : "Kategori:"}
+                  </span>
+                  <span className="selectbox selectbox--products">
+                    <select
+                      value={subFilter}
+                      onChange={(e) => {
+                        setSubFilter(e.target.value)
+                        setQuery("")
+                        setPageNo(1)
+                      }}
+                      aria-label={en ? "Sub-category" : "Sub-kategori"}
+                    >
+                      <option value="all">
+                        {en ? "All Categories" : "Semua Kategori"}
+                      </option>
+                      {subs.map((s, i) => (
+                        <option key={s.slug} value={i}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                </div>
+              )}
               <div className="toolbar__sort">
                 <span className="toolbar__label">
                   {en ? "Sort by:" : "Urutkan:"}
@@ -199,6 +257,7 @@ export default function Products({ page, categories, shops }) {
             )}
           </div>
         </section>
+        </>
       )}
 
       <Modal

@@ -135,11 +135,25 @@ class PageController extends Controller
     {
         return Inertia::render('Products', [
             'page' => $this->page('products'),
-            'categories' => ProductCategory::with(['products' => fn ($q) => $q->orderBy('sort')])->orderBy('sort')->get()
+            'categories' => ProductCategory::whereNull('parent_id')
+                ->with([
+                    'products' => fn ($q) => $q->orderBy('sort'),
+                    'children' => fn ($q) => $q->orderBy('sort'),
+                    'children.products' => fn ($q) => $q->orderBy('sort'),
+                ])
+                ->orderBy('sort')->get()
                 ->map(fn ($c) => [
                     'slug' => $c->slug, 'name' => $c->tr('name'), 'description' => $c->tr('description'),
+                    'image' => $this->img($c->image),
                     'products' => $c->products->map(fn ($p) => [
                         'name' => $p->tr('name'), 'description' => $p->tr('description'), 'image' => $this->img($p->image),
+                    ]),
+                    'children' => $c->children->map(fn ($ch) => [
+                        'slug' => $ch->slug, 'name' => $ch->tr('name'), 'description' => $ch->tr('description'),
+                        'image' => $this->img($ch->image),
+                        'products' => $ch->products->map(fn ($p) => [
+                            'name' => $p->tr('name'), 'description' => $p->tr('description'), 'image' => $this->img($p->image),
+                        ]),
                     ]),
                 ]),
             'shops' => $this->shops(),

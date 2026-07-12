@@ -590,6 +590,21 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .banner--about{text-align:left;min-height:56vh;display:flex;align-items:flex-end;padding:calc(var(--nav-h) + 40px) 0 clamp(48px,6vw,90px)}
 .banner__crumb{display:block;color:rgba(255,255,255,.85);font-size:14px;margin-bottom:14px}
 .banner__crumb a:hover{color:#fff;text-decoration:underline}
+/* Products banner: title left + subtitle right (Figma) */
+.banner__row{display:flex;justify-content:space-between;align-items:flex-end;gap:clamp(24px,4vw,80px);flex-wrap:wrap}
+.banner__row h1{margin:0}
+.banner__row-sub{max-width:600px;margin:0;color:#fff;font-family:var(--font-body);font-weight:300;font-size:clamp(14px,1.1vw,16px);line-height:1.85}
+@media (max-width:760px){.banner__row{flex-direction:column;align-items:flex-start;gap:16px}.banner__row-sub{max-width:none}}
+/* Products: per-category hero band (image + name) + centered intro */
+.cat-hero{position:relative;min-height:clamp(260px,32vw,540px);display:grid;place-items:center;text-align:center;background:var(--grad-brand);background-size:cover;background-position:center}
+.cat-hero__overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(42,0,90,.18),rgba(42,0,90,.5))}
+.cat-hero__title{position:relative;z-index:1;color:#fff;font-size:clamp(32px,4vw,64px);margin:0;padding:0 24px}
+.cat-intro{max-width:900px;margin:0 auto clamp(30px,4vw,56px);text-align:center;color:var(--purple-700);font-family:var(--font-body);font-weight:400;font-size:clamp(18px,1.4vw,24px);line-height:1.7}
+/* Sub-category tabs (children of the active category) */
+.subcats{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:0 auto clamp(24px,3vw,44px)}
+.subcats button{padding:10px 24px;border-radius:999px;border:1px solid #E2D9EE;background:#fff;color:var(--purple-700);font-family:var(--font-body);font-size:15px;transition:background .2s,color .2s,border-color .2s}
+.subcats button:hover{border-color:var(--magenta);color:var(--magenta)}
+.subcats button.on{background:var(--purple-600);border-color:var(--purple-600);color:#fff}
 .about-intro{max-width:1000px;margin:0 auto;text-align:center;font-size:clamp(18px,1.5vw,23px);color:var(--purple-800);line-height:1.7}
 
 /* Visi Misi Nilai */
@@ -781,6 +796,11 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
   justify-content: flex-end;
   gap: 12px;
   flex: 0 0 auto;
+}
+
+/* Category dropdown sits on the left; sort + search stay on the right. */
+.toolbar--products .toolbar__category {
+  margin-right: auto;
 }
 
 .toolbar--products .toolbar__label {

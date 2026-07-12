@@ -32,6 +32,13 @@ class ProductCategoryResource extends Resource
                 Forms\Components\TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('parent_id')
+                    ->label('Induk Kategori')
+                    ->helperText('Kosongkan untuk kategori utama; pilih induk untuk menjadikannya sub-kategori.')
+                    ->relationship('parent', 'name_id', fn (Builder $query) => $query->whereNull('parent_id'))
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
                 Forms\Components\TextInput::make('name_id')
                     ->required()
                     ->maxLength(255),
@@ -56,6 +63,10 @@ class ProductCategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('parent.name_id')
+                    ->label('Induk')
+                    ->placeholder('— utama —')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name_id')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name_en')
