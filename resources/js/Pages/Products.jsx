@@ -148,7 +148,7 @@ export default function Products({ page, categories, shops }) {
               </label>
             </div>
 
-            <div className="grid grid--4" style={{ marginTop: 24 }}>
+            <div className="grid grid--4" style={{ marginTop: 80 }}>
               {pagedItems.map((p, i) => (
                 <article
                   className="pcard rv"
