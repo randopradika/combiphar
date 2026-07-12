@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import SiteLayout from '../Layouts/SiteLayout';
 
 function CsrList({ items, learnMore }) {
@@ -10,9 +10,11 @@ function CsrList({ items, learnMore }) {
                     <div className="csr-card__panel">
                         <h3>{p.title}</h3>
                         {p.body && <p>{p.body}</p>}
-                        {p.link && (
+                        {p.url ? (
+                            <Link className="csr-card__btn" href={p.url}>{learnMore}</Link>
+                        ) : p.link ? (
                             <a className="csr-card__btn" href={p.link} target="_blank" rel="noopener noreferrer">{learnMore}</a>
-                        )}
+                        ) : null}
                     </div>
                 </article>
             ))}

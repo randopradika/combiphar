@@ -14,6 +14,7 @@ Route::prefix('{locale}')
         Route::get('about', [PageController::class, 'about'])->name('about');
         Route::get('products', [PageController::class, 'products'])->name('products');
         Route::get('csr', [PageController::class, 'csr'])->name('csr');
+        Route::get('csr/{slug}', [PageController::class, 'csrShow'])->name('csr.show');
         Route::get('news', [PageController::class, 'news'])->name('news');
         Route::get('news/{slug}', [PageController::class, 'newsShow'])->name('news.show');
         Route::get('investor', [PageController::class, 'investor'])->name('investor');

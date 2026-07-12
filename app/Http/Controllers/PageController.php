@@ -162,10 +162,11 @@ class PageController extends Controller
 
     public function csr()
     {
-        $all = CsrProgram::orderBy('sort')->get();
+        $all = CsrProgram::whereNull('parent_id')->orderBy('sort')->get();
         $map = fn ($rows) => $rows->values()->map(fn ($p) => [
             'title' => $p->tr('title'), 'body' => $p->tr('body'), 'image' => $this->img($p->image),
             'link' => $p->link,
+            'url' => $p->slug ? route('csr.show', ['locale' => app()->getLocale(), 'slug' => $p->slug]) : null,
         ]);
 
         return Inertia::render('Csr', [
@@ -173,6 +174,25 @@ class PageController extends Controller
             'esg' => $map($all->where('category', 'esg')),
             'health' => $map($all->where('category', 'health_campaign')),
             'sports' => $map($all->where('category', 'sports')),
+        ]);
+    }
+
+    public function csrShow(string $locale, string $slug)
+    {
+        $program = CsrProgram::where('slug', $slug)->firstOrFail();
+
+        return Inertia::render('CsrDetail', [
+            'program' => [
+                'title' => $program->tr('title'),
+                'body' => $program->tr('content') ?: $program->tr('body'),
+                'image' => $this->img($program->image),
+                'category' => $program->category,
+            ],
+            'topics' => $program->children->map(fn ($c) => [
+                'title' => $c->tr('title'),
+                'body' => $c->tr('content') ?: $c->tr('body'),
+                'slug' => $c->slug,
+            ]),
         ]);
     }
 

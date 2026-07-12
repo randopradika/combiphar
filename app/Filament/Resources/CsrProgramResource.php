@@ -42,9 +42,32 @@ class CsrProgramResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('title_en')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('slug')
+                    ->label('Slug (halaman detail, opsional)')
+                    ->helperText('Isi untuk membuat halaman detail di /csr/{slug}; tombol "Pelajari Lebih Lanjut" akan mengarah ke sana.')
+                    ->maxLength(255),
+                Forms\Components\Select::make('parent_id')
+                    ->label('Induk (jadikan sub-topik dari program lain)')
+                    ->helperText('Kosongkan untuk kartu utama; pilih induk (mis. Governance) untuk menjadi sub-topik di halaman detailnya.')
+                    ->relationship('parent', 'title_id', fn (Builder $query) => $query->whereNull('parent_id'))
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
                 Forms\Components\Textarea::make('body_id')
+                    ->label('Deskripsi Kartu / Excerpt (ID)')
+                    ->helperText('Teks singkat yang tampil di kartu CSR.')
+                    ->rows(3)
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('body_en')
+                    ->label('Card Excerpt (EN)')
+                    ->rows(3)
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('content_id')
+                    ->label('Isi Halaman Detail (ID)')
+                    ->helperText('Konten lengkap untuk halaman detail /csr/{slug}.')
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('content_en')
+                    ->label('Detail Page Content (EN)')
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
