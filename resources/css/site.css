@@ -4,6 +4,14 @@
    Component styles are added per-section as pages are built.
    ========================================================================== */
 
+@font-face {
+  font-family: 'FS Albert';
+  src: url('/fonts/FSAlbert-Regular.otf') format('opentype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Purple scale */
   --purple-950:#2A005A;
@@ -28,7 +36,7 @@
   --grad-card-light:linear-gradient(145deg,#FFFFFF 0%,#F3E9FC 70%,#EDDBF7 100%);
 
   /* Typography */
-  --font-display:'Quicksand',sans-serif;
+  --font-display:'FS Albert','Albert Sans',sans-serif;
   --font-body:'Barlow',sans-serif;
 
   /* Radius & shadow */
@@ -999,18 +1007,25 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .page-about .loc-head h3{color:#5A3D7E}
 
 .modal__box--wide{max-width:1120px}
-.fac-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px;margin-top:26px}
-.fac-card{background:var(--surface);border-radius:var(--radius-img);padding:16px}
-.fac-card__img{aspect-ratio:4/3;border-radius:14px;background:linear-gradient(140deg,#8B5FB5,#3A1860);background-size:cover;background-position:center;margin-bottom:14px}
-.fac-card h4{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--purple-900)}
-.fac-card h4 small{color:var(--text-muted);font-weight:500}
-.fac-card .plant{color:var(--magenta);font-weight:600;font-size:13px;margin:6px 0}
-.fac-card .dose{color:var(--text-muted);font-size:13px;line-height:1.5}
-.accr-title{margin:34px 0 16px;text-align:center;font-family:var(--font-display);font-weight:700;color:var(--purple-900)}
-.accr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-.accr-grid div{background:var(--surface);border-radius:12px;padding:14px 16px;font-size:13px}
-.accr-grid b{display:block;color:var(--purple-800);margin-bottom:2px}
-.accr-grid span{color:var(--text-muted)}
+.fac-modal{text-align:center}
+.fac-modal__title{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,3vw,40px);color:var(--purple-600);line-height:1.15;margin:0 auto 14px;max-width:640px}
+.fac-modal__sub{font-family:var(--font-body);font-size:16px;color:var(--text);max-width:660px;margin:0 auto}
+.fac-modal__sub b{color:var(--magenta);font-weight:700}
+.fac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px 24px;margin-top:34px}
+.fac-card{text-align:center}
+.fac-card__img{aspect-ratio:16/10;border-radius:16px;background:linear-gradient(140deg,#8B5FB5,#3A1860);background-size:cover;background-position:center;margin-bottom:14px}
+.fac-card h4{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--magenta);margin:0 0 6px}
+.fac-card .plant{font-family:var(--font-body);font-weight:700;font-size:15px;color:var(--text);margin:0 0 8px}
+.fac-card .plant small{color:var(--text-muted);font-weight:500;font-size:13px}
+.fac-card .cat{font-family:var(--font-body);font-weight:700;font-size:13px;color:var(--text);margin:0 0 2px}
+.fac-card .dose{color:var(--text-muted);font-size:12px;line-height:1.5;margin:0}
+.accr-title{margin:52px 0 0;text-align:center;font-family:var(--font-display);font-weight:700;font-size:clamp(26px,2.6vw,34px);color:var(--purple-600)}
+.accr-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:18px 16px;text-align:left;margin-top:26px}
+.accr-grid div{background:none;border-radius:0;padding:14px 0 0;font-size:11px;border-top:1px solid #E7E3ED}
+.accr-grid b{display:block;color:var(--magenta);font-weight:700;margin-bottom:4px;font-size:11px;line-height:1.25}
+.accr-grid span{color:var(--text-muted);line-height:1.3}
+@media (max-width:900px){.fac-grid{grid-template-columns:repeat(2,1fr)}.accr-grid{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:560px){.fac-grid{grid-template-columns:1fr}.accr-grid{grid-template-columns:repeat(2,1fr)}}
 /* Real Figma world map */
 .world-map{padding:0;background:none;overflow:visible}
 .world-map__img{display:block;width:100%;height:auto;border-radius:var(--radius-card)}
@@ -1910,7 +1925,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 /* ==========================================================================
    Figma 1:1 fidelity pass (fonts, type scale, heading colours, cards)
    ========================================================================== */
-:root{--font-display:'Albert Sans',sans-serif;--heading:#3E1D81}
+:root{--font-display:'FS Albert','Albert Sans',sans-serif;--heading:#3E1D81}
 .display{font-weight:600;letter-spacing:-.015em}
 h1.display,.h1{font-size:clamp(40px,6vw,88px)}
 h2.display,.h2{font-size:clamp(32px,4.6vw,64px)}

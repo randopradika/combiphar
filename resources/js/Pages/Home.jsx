@@ -110,7 +110,7 @@ export default function Home({ page, impacts, milestones, productBanners = [], a
             <section
                 className="cta"
                 aria-label="CTA"
-                style={page?.ctaImage ? { backgroundImage: `url('${page.ctaImage}')`, backgroundSize: 'cover', backgroundPosition: 'bottom' } : {
+                style={page?.ctaImage ? { backgroundImage: `url('${page.ctaImage}')`, backgroundSize: 'cover', backgroundPosition: 'top' } : {
           backgroundImage: 'linear-gradient(140deg, rgba(58,24,96,.7), rgba(42,0,90,.85))',
         }}
             >

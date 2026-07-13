@@ -115,7 +115,8 @@ class PageController extends Controller
             'shops' => $this->shops(),
             'facilities' => Facility::orderBy('sort')->get()->map(fn ($f) => [
                 'name' => $f->name, 'region' => $f->region, 'plants' => $f->plants,
-                'area' => $f->area, 'detail' => $f->tr('detail'), 'image' => $this->img($f->image),
+                'area' => $f->area, 'category' => $f->tr('category'), 'detail' => $f->tr('detail'),
+                'image' => $this->img($f->image),
             ]),
             'accreditations' => Accreditation::orderBy('sort')->get()->map(fn ($a) => [
                 'name' => $a->name, 'issuer' => $a->issuer,

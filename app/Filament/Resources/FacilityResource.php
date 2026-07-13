@@ -38,9 +38,17 @@ class FacilityResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('area')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('category_id')
+                    ->label('Kategori Produk (ID)')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('category_en')
+                    ->label('Kategori Produk (EN)')
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('detail_id')
+                    ->label('Bentuk Sediaan / Dosage (ID)')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('detail_en')
+                    ->label('Bentuk Sediaan / Dosage (EN)')
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),

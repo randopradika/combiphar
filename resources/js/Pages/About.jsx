@@ -217,26 +217,33 @@ export default function About({ page, milestones, commissioners, directors, awar
             </Modal>
 
             <Modal open={facOpen} onClose={() => setFacOpen(false)} wide closeLabel={t.close}>
-                <h3 style={{ textAlign: 'center' }}>{en ? 'Internationally Standardized Production Facilities' : 'Fasilitas Produksi Berstandar Internasional'}</h3>
-                <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>{en ? 'Our facilities serve local & global markets including contract manufacturing.' : 'Fasilitas kami melayani pasar lokal dan global termasuk contract manufacturing.'}</p>
-                {facilities.length > 0 && (
-                    <div className="fac-grid">
-                        {facilities.map((f, i) => (
-                            <div className="fac-card" key={i}>
-                                <div className="fac-card__img" style={f.image ? { backgroundImage: `url('${f.image}')` } : {}}></div>
-                                <h4>{f.name}{f.region && <small>, {f.region}</small>}</h4>
-                                <p className="plant">{f.plants}{f.area && <small> &mdash; {f.area}</small>}</p>
-                                <p className="dose">{f.detail}</p>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {accreditations.length > 0 && (<>
-                    <h4 className="accr-title">{en ? 'Various Accreditations' : 'Berbagai Akreditasi'}</h4>
-                    <div className="accr-grid">
-                        {accreditations.map((a, i) => <div key={i}><b>{a.name}</b>{a.issuer && <span>{a.issuer}</span>}</div>)}
-                    </div>
-                </>)}
+                <div className="fac-modal">
+                    <h3 className="fac-modal__title">{en ? 'Internationally Standardized Production Facility' : 'Fasilitas Produksi Berstandar Internasional'}</h3>
+                    <p className="fac-modal__sub">
+                        {en
+                            ? <>Our manufacturing <b>facilities serve local &amp; global markets</b> including contract manufacturing</>
+                            : <>Fasilitas kami <b>melayani pasar lokal &amp; global</b> termasuk contract manufacturing</>}
+                    </p>
+                    {facilities.length > 0 && (
+                        <div className="fac-grid">
+                            {facilities.map((f, i) => (
+                                <div className="fac-card" key={i}>
+                                    <div className="fac-card__img" style={f.image ? { backgroundImage: `url('${f.image}')` } : {}}></div>
+                                    <h4>{f.name}{f.region && <>, {f.region}</>}</h4>
+                                    <p className="plant">{f.plants}{f.area && <small> - {f.area}</small>}</p>
+                                    {f.category && <p className="cat">{f.category}</p>}
+                                    {f.detail && <p className="dose">{f.detail}</p>}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {accreditations.length > 0 && (<>
+                        <h4 className="accr-title">{en ? 'Various Accreditation' : 'Berbagai Akreditasi'}</h4>
+                        <div className="accr-grid">
+                            {accreditations.map((a, i) => <div key={i}><b>{a.name}</b>{a.issuer && <span>{a.issuer}</span>}</div>)}
+                        </div>
+                    </>)}
+                </div>
             </Modal>
         </div>
     );
