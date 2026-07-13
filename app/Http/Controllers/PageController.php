@@ -89,6 +89,9 @@ class PageController extends Controller
             'categories' => ProductCategory::orderBy('sort')->get()->map(fn ($c) => [
                 'name' => $c->tr('name'), 'image' => $this->img($c->image),
             ]),
+            'productBanners' => \App\Models\ProductBanner::orderBy('sort')->take(3)->get()->map(fn ($b) => [
+                'title' => $b->tr('title'), 'image' => $this->img($b->image), 'link' => $b->link,
+            ]),
             'articles' => Article::published()->latest('published_at')->take(3)->get()->map(fn ($a) => $this->articleCard($a)),
         ]);
     }
@@ -239,6 +242,7 @@ class PageController extends Controller
             'sustainability' => $map($docs->where('category', 'sustainability')),
             'financial' => $map($docs->where('category', 'financial')),
             'disclosures' => $map($docs->where('category', 'disclosure')),
+            'presentations' => $map($docs->where('category', 'presentation')),
         ]);
     }
 

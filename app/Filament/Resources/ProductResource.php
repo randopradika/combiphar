@@ -29,9 +29,27 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('product_category_id')
+                Forms\Components\Select::make('top_category_id')
+                    ->label('Kategori')
+                    ->options(fn () => \App\Models\ProductCategory::whereNull('parent_id')->orderBy('sort')->pluck('name_id', 'id'))
                     ->required()
-                    ->numeric(),
+                    ->live()
+                    ->afterStateHydrated(function (Forms\Set $set, ?\App\Models\Product $record) {
+                        if ($record && $record->category) {
+                            $set('top_category_id', $record->category->parent_id ?? $record->category->id);
+                        }
+                    })
+                    ->afterStateUpdated(function (Forms\Set $set, $state) {
+                        $hasChildren = \App\Models\ProductCategory::where('parent_id', $state)->exists();
+                        $set('product_category_id', $hasChildren ? null : $state);
+                    }),
+                Forms\Components\Select::make('product_category_id')
+                    ->label('Sub-Kategori')
+                    ->helperText('Pilih sub-kategori (hanya untuk kategori yang memiliki sub-kategori).')
+                    ->options(fn (Forms\Get $get) => \App\Models\ProductCategory::where('parent_id', $get('top_category_id'))->orderBy('sort')->pluck('name_id', 'id'))
+                    ->visible(fn (Forms\Get $get) => $get('top_category_id') && \App\Models\ProductCategory::where('parent_id', $get('top_category_id'))->exists())
+                    ->required(fn (Forms\Get $get) => $get('top_category_id') && \App\Models\ProductCategory::where('parent_id', $get('top_category_id'))->exists())
+                    ->dehydrated(true),
                 Forms\Components\TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
@@ -46,10 +64,7 @@ class ProductResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
-                Forms\Components\TextInput::make('sort')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
 
@@ -57,8 +72,8 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('product_category_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('category.name_id')
+                    ->label('Kategori')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
@@ -80,7 +95,11 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category')
+                    ->label('Kategori')
+                    ->relationship('category', 'name_id')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

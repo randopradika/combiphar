@@ -36,6 +36,7 @@ class CsrProgramResource extends Resource
                         'sports' => 'Sports',
                     ])
                     ->required()
+                    ->live()
                     ->default('esg'),
                 Forms\Components\TextInput::make('title_id')
                     ->required()
@@ -52,7 +53,8 @@ class CsrProgramResource extends Resource
                     ->relationship('parent', 'title_id', fn (Builder $query) => $query->whereNull('parent_id'))
                     ->searchable()
                     ->preload()
-                    ->nullable(),
+                    ->nullable()
+                    ->visible(fn (Forms\Get $get) => $get('category') !== 'sports'),
                 Forms\Components\Textarea::make('body_id')
                     ->label('Deskripsi Kartu / Excerpt (ID)')
                     ->helperText('Teks singkat yang tampil di kartu CSR.')
@@ -65,20 +67,19 @@ class CsrProgramResource extends Resource
                 Forms\Components\RichEditor::make('content_id')
                     ->label('Isi Halaman Detail (ID)')
                     ->helperText('Konten lengkap untuk halaman detail /csr/{slug}.')
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->visible(fn (Forms\Get $get) => $get('category') !== 'sports'),
                 Forms\Components\RichEditor::make('content_en')
                     ->label('Detail Page Content (EN)')
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->visible(fn (Forms\Get $get) => $get('category') !== 'sports'),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
                 Forms\Components\TextInput::make('link')
                     ->label('Link "Pelajari Lebih Lanjut" (opsional)')
                     ->url()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('sort')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
 

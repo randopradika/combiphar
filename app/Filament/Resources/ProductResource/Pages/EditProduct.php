@@ -16,4 +16,14 @@ class EditProduct extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (empty($data['product_category_id'] ?? null)) {
+            $data['product_category_id'] = $data['top_category_id'] ?? null;
+        }
+        unset($data['top_category_id']);
+
+        return $data;
+    }
 }

@@ -72,10 +72,7 @@ class JobVacancyResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\Toggle::make('is_open')
                     ->required(),
-                Forms\Components\TextInput::make('sort')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
 

@@ -25,6 +25,11 @@ class InvestorDocumentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -49,10 +54,7 @@ class InvestorDocumentResource extends Resource
                     ->numeric(),
                 Forms\Components\FileUpload::make('file_id')->label('File (ID)')->acceptedFileTypes(['application/pdf'])->downloadable(),
                 Forms\Components\FileUpload::make('file_en')->label('File (EN)')->acceptedFileTypes(['application/pdf'])->downloadable(),
-                Forms\Components\TextInput::make('sort')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
 

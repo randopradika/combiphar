@@ -43,10 +43,7 @@ class FaqResource extends Resource
                     ->label('Answer (EN)')
                     ->rows(4)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('sort')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
 

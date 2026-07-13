@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import SiteLayout from '../Layouts/SiteLayout';
 import { ImpactSlider, MilestoneSlider } from '../components/Sliders';
 
-export default function Home({ page, impacts, milestones, categories, articles }) {
+export default function Home({ page, impacts, milestones, productBanners = [], articles }) {
     const { props: { t, nav } } = usePage();
     const [cueHidden, setCueHidden] = useState(false);
 
@@ -72,10 +72,10 @@ export default function Home({ page, impacts, milestones, categories, articles }
                         <Link className="btn btn--outline-light" href={nav.products}>{t.learn_more}</Link>
                     </div>
                     <div className="bento rv">
-                    {categories.map((c, i) => (
-                        <Link key={i} className={'bcard' + (i === 0 ? ' bcard--wide' : '') + (i === 2 ? ' bcard--sq' : '')} href={nav.products}>
-                        {c.image && <div className="bcard__art" style={{ backgroundImage: `url('${c.image}')` }}></div>}
-                        <h3>{c.name}</h3>
+                    {productBanners.map((b, i) => (
+                        <Link key={i} className={'bcard' + (i === 0 ? ' bcard--wide' : '') + (i === 2 ? ' bcard--sq' : '')} href={b.link || nav.products}>
+                        {b.image && <div className="bcard__art" style={{ backgroundImage: `url('${b.image}')` }}></div>}
+                        <h3>{b.title}</h3>
                         </Link>
                     ))}
                     </div>
