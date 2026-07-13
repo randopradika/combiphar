@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Served behind a TLS-terminating proxy (dev/prod hosting): trust the
+        // X-Forwarded-* headers so route()/url() generate https:// URLs.
+        $middleware->trustProxies(at: '*');
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
