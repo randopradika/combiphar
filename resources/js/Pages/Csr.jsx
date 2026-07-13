@@ -70,18 +70,25 @@ export default function Csr({ page, esg, health, sports }) {
                 <section className="section"><div className="container">
                     <div className="sec-head sec-head--product rv"><h2 className="display">Sports</h2><p>{en ? 'Encouraging an active, achieving spirit through real support for the growth of Indonesian sports.' : 'Mendorong semangat aktif dan berprestasi melalui dukungan nyata terhadap perkembangan olahraga Indonesia.'}</p></div>
                     <div className="sport-grid">
-                        {sports.map((p, i) => (
-                            <a className="sport-card rv" key={i} href={p.link || undefined} target={p.link ? '_blank' : undefined} rel={p.link ? 'noopener noreferrer' : undefined}>
-                                <div className="sport-card__img" style={p.image ? { backgroundImage: `url('${p.image}')` } : {}}></div>
-                                <div className="sport-card__overlay"></div>
-                                <div className="sport-card__foot">
-                                    <h3>{p.title}</h3>
-                                    <span className="sport-card__arrow" aria-hidden="true">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                                    </span>
-                                </div>
-                            </a>
-                        ))}
+                        {sports.map((p, i) => {
+                            const inner = (
+                                <>
+                                    <div className="sport-card__img" style={p.image ? { backgroundImage: `url('${p.image}')` } : {}}></div>
+                                    <div className="sport-card__overlay"></div>
+                                    <div className="sport-card__foot">
+                                        <h3>{p.title}</h3>
+                                        <span className="sport-card__arrow" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                                        </span>
+                                    </div>
+                                </>
+                            );
+                            return p.url ? (
+                                <Link className="sport-card rv" key={i} href={p.url}>{inner}</Link>
+                            ) : (
+                                <a className="sport-card rv" key={i} href={p.link || undefined} target={p.link ? '_blank' : undefined} rel={p.link ? 'noopener noreferrer' : undefined}>{inner}</a>
+                            );
+                        })}
                     </div>
                 </div></section>
             )}

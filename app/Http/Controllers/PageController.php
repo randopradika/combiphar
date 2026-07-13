@@ -209,6 +209,22 @@ class PageController extends Controller
     {
         $program = CsrProgram::where('slug', $slug)->firstOrFail();
 
+        if ($program->category === 'sports') {
+            return Inertia::render('SportsDetail', [
+                'program' => [
+                    'title' => $program->tr('title'),
+                    'subtitle' => $program->tr('body'),
+                    'image' => $this->img($program->image),
+                ],
+                'teams' => $program->children->map(fn ($c) => [
+                    'title' => $c->tr('title'),
+                    'body' => $c->tr('content') ?: $c->tr('body'),
+                    'logo' => $this->img($c->image),
+                    'gallery' => collect($c->gallery ?? [])->map(fn ($g) => $this->img($g))->values(),
+                ]),
+            ]);
+        }
+
         return Inertia::render('CsrDetail', [
             'program' => [
                 'title' => $program->tr('title'),

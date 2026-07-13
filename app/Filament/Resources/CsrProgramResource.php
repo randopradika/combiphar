@@ -25,6 +25,12 @@ class CsrProgramResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    /** ESG + Health Campaign only. Sports are managed in SportResource. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('category', '!=', 'sports');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -33,10 +39,8 @@ class CsrProgramResource extends Resource
                     ->options([
                         'esg' => 'ESG (Environmental, Social, Governance)',
                         'health_campaign' => 'Health Campaign',
-                        'sports' => 'Sports',
                     ])
                     ->required()
-                    ->live()
                     ->default('esg'),
                 Forms\Components\TextInput::make('title_id')
                     ->required()
@@ -53,8 +57,7 @@ class CsrProgramResource extends Resource
                     ->relationship('parent', 'title_id', fn (Builder $query) => $query->whereNull('parent_id'))
                     ->searchable()
                     ->preload()
-                    ->nullable()
-                    ->visible(fn (Forms\Get $get) => $get('category') !== 'sports'),
+                    ->nullable(),
                 Forms\Components\Textarea::make('body_id')
                     ->label('Deskripsi Kartu / Excerpt (ID)')
                     ->helperText('Teks singkat yang tampil di kartu CSR.')
@@ -67,12 +70,10 @@ class CsrProgramResource extends Resource
                 Forms\Components\RichEditor::make('content_id')
                     ->label('Isi Halaman Detail (ID)')
                     ->helperText('Konten lengkap untuk halaman detail /csr/{slug}.')
-                    ->columnSpanFull()
-                    ->visible(fn (Forms\Get $get) => $get('category') !== 'sports'),
+                    ->columnSpanFull(),
                 Forms\Components\RichEditor::make('content_en')
                     ->label('Detail Page Content (EN)')
-                    ->columnSpanFull()
-                    ->visible(fn (Forms\Get $get) => $get('category') !== 'sports'),
+                    ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
                 Forms\Components\TextInput::make('link')

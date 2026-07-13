@@ -13,6 +13,10 @@ class CsrProgram extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'gallery' => 'array',
+    ];
+
     /** Parent program (null = top-level card). */
     public function parent(): BelongsTo
     {
