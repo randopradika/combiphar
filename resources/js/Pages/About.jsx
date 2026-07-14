@@ -73,7 +73,7 @@ export default function About({
   const en = locale === "en"
   const [board, setBoard] = useState(null)
   const [facOpen, setFacOpen] = useState(false)
-  const [city, setCity] = useState("")
+  const [city, setCity] = useState("Jabodetabek")
   const [cat, setCat] = useState("")
 
   const cities = useMemo(
@@ -362,6 +362,14 @@ export default function About({
                   ? "From Indonesia to the world — our products and partnerships now reach communities across four continents."
                   : "Setiap penghargaan adalah cerminan kepercayaan, dari konsumen, investor, dan mitra yang telah menemani perjalanan kami sejak 2016.")}
             </p>
+            <button
+              type="button"
+              className="presence-popup-link"
+              onClick={() => setFacOpen(true)}
+            >
+              {page?.presencePopupText ||
+                (en ? "View Production Facilities" : "Lihat Fasilitas Produksi")}
+            </button>
           </div>
           <div className="world-map rv">
             <img
@@ -374,16 +382,14 @@ export default function About({
               }
             />
             {pins.map((p, i) => (
-              <button
+              <span
                 key={i}
-                type="button"
                 className="map-pin"
                 style={{ left: p.l, top: p.tp }}
-                onClick={() => setFacOpen(true)}
-                aria-label={p.label}
+                aria-hidden="true"
               >
                 <img src={p.icon} alt="" />
-              </button>
+              </span>
             ))}
           </div>
           <div className="map-legend rv">

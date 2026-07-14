@@ -61,6 +61,7 @@ class PageController extends Controller
             'values' => $p->tr('values'),
             'presenceDesc' => $p->tr('presence_desc'),
             'presenceImage' => $this->img($p->presence_image),
+            'presencePopupText' => $p->tr('presence_popup_text'),
             'stat1Value' => $p->stat1_value,
             'stat1Label' => $p->tr('stat1_label'),
             'stat2Value' => $p->stat2_value,

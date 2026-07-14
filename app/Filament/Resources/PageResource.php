@@ -97,6 +97,8 @@ class PageResource extends Resource
                                 Forms\Components\FileUpload::make('presence_image')->label('Gambar Peta Dunia (World Map)')->image()->imageEditor()->helperText('Kosongkan untuk memakai peta default.'),
                                 Forms\Components\Textarea::make('presence_desc_id')->label('Deskripsi — teks "Setiap penghargaan..." (ID)')->rows(2),
                                 Forms\Components\Textarea::make('presence_desc_en')->label('Description (EN)')->rows(2),
+                                Forms\Components\TextInput::make('presence_popup_text_id')->label('Teks link Pop-up di bawah deskripsi (ID)')->helperText('Teks yang bisa diklik untuk membuka pop-up fasilitas produksi.'),
+                                Forms\Components\TextInput::make('presence_popup_text_en')->label('Pop-up link text (EN)'),
                                 Forms\Components\TextInput::make('stat1_value')->label('Statistik 1 — angka (mis. 1.600+)'),
                                 Forms\Components\TextInput::make('stat1_label_id')->label('Statistik 1 — label (ID)'),
                                 Forms\Components\TextInput::make('stat1_label_en')->label('Statistik 1 — label (EN)'),

@@ -1152,6 +1152,11 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .sport-gallery__item{aspect-ratio:527/395;border-radius:10px;background:#F3F2F3 center/cover no-repeat}
 @media(max-width:860px){.sport-detail__head{grid-template-columns:1fr;gap:16px}.sport-gallery{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.sport-gallery{grid-template-columns:1fr}}
+
+/* Skala Kami — clickable text that opens the facilities pop-up */
+.presence-popup-link{display:inline-block;margin-top:14px;background:none;border:0;padding:0;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:clamp(15px,1.1vw,16px);color:var(--magenta);text-decoration:underline;text-underline-offset:3px;transition:color .2s}
+.presence-popup-link:hover{color:var(--purple-600)}
+.world-map .map-pin{pointer-events:none}
 @media (max-width:680px){.sport-grid{grid-template-columns:1fr}}
 /* ==========================================================================
    News detail
