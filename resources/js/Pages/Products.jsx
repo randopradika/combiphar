@@ -15,6 +15,7 @@ export default function Products({ page, categories }) {
   const [sort, setSort] = useState("az")
   const [detail, setDetail] = useState(null)
   const [pageNo, setPageNo] = useState(1)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const perPage = 8
 
@@ -90,20 +91,53 @@ export default function Products({ page, categories }) {
       {categories.length > 0 && (
         <nav className="subnav" aria-label="Product categories">
           <div className="container subnav__inner">
-            {categories.map((c, i) => (
+            <div className="subnav__desktop">
+              {categories.map((c, i) => (
+                <button
+                  key={c.slug}
+                  type="button"
+                  className={i === active ? "on" : ""}
+                  onClick={() => {
+                    setActive(i)
+                    setQuery("")
+                    setPageNo(1)
+                  }}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+
+            <div className={"subnav__mobile" + (mobileOpen ? " is-open" : "")}>
               <button
-                key={c.slug}
                 type="button"
-                className={i === active ? "on" : ""}
-                onClick={() => {
-                  setActive(i)
-                  setQuery("")
-                  setPageNo(1)
-                }}
+                className="subnav__trigger"
+                aria-expanded={mobileOpen}
+                aria-haspopup="menu"
+                onClick={() => setMobileOpen((v) => !v)}
               >
-                {c.name}
+                {categories[active]?.name ?? "Categories"}
+                <span className="subnav__caret">▾</span>
               </button>
-            ))}
+
+              <div className="subnav__menu" role="menu">
+                {categories.map((c, i) => (
+                  <button
+                    key={c.slug}
+                    type="button"
+                    className={i === active ? "on" : ""}
+                    onClick={() => {
+                      setActive(i)
+                      setQuery("")
+                      setPageNo(1)
+                      setMobileOpen(false)
+                    }}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </nav>
       )}
@@ -136,127 +170,126 @@ export default function Products({ page, categories }) {
                 <h2 className="display">{heading}</h2>
               </div>
 
-            <div className="toolbar toolbar--products rv">
-              {subs.length > 0 && (
-                <div className="toolbar__sort toolbar__category">
+              <div className="toolbar toolbar--products rv">
+                {subs.length > 0 && (
+                  <div className="toolbar__sort toolbar__category">
+                    <span className="toolbar__label">
+                      {en ? "Category:" : "Kategori:"}
+                    </span>
+                    <span className="selectbox selectbox--products">
+                      <select
+                        value={subFilter}
+                        onChange={(e) => {
+                          setSubFilter(e.target.value)
+                          setQuery("")
+                          setPageNo(1)
+                        }}
+                        aria-label={en ? "Sub-category" : "Sub-kategori"}
+                      >
+                        <option value="all">
+                          {en ? "All Categories" : "Semua Kategori"}
+                        </option>
+                        {subs.map((s, i) => (
+                          <option key={s.slug} value={i}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
+                  </div>
+                )}
+                <div className="toolbar__sort">
                   <span className="toolbar__label">
-                    {en ? "Category:" : "Kategori:"}
+                    {en ? "Sort by:" : "Urutkan:"}
                   </span>
                   <span className="selectbox selectbox--products">
                     <select
-                      value={subFilter}
-                      onChange={(e) => {
-                        setSubFilter(e.target.value)
-                        setQuery("")
-                        setPageNo(1)
-                      }}
-                      aria-label={en ? "Sub-category" : "Sub-kategori"}
+                      value={sort}
+                      onChange={(e) => setSort(e.target.value)}
+                      aria-label={en ? "Sort" : "Urutkan"}
                     >
-                      <option value="all">
-                        {en ? "All Categories" : "Semua Kategori"}
-                      </option>
-                      {subs.map((s, i) => (
-                        <option key={s.slug} value={i}>
-                          {s.name}
-                        </option>
-                      ))}
+                      <option value="az">{en ? "A - Z" : "A - Z"}</option>
+                      <option value="za">{en ? "Z - A" : "Z - A"}</option>
                     </select>
                   </span>
                 </div>
-              )}
-              <div className="toolbar__sort">
-                <span className="toolbar__label">
-                  {en ? "Sort by:" : "Urutkan:"}
-                </span>
-                <span className="selectbox selectbox--products">
-                  <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                    aria-label={en ? "Sort" : "Urutkan"}
-                  >
-                    <option value="az">{en ? "A - Z" : "A - Z"}</option>
-                    <option value="za">{en ? "Z - A" : "Z - A"}</option>
-                  </select>
-                </span>
-              </div>
 
-              <label className="searchbox searchbox--products">
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={en ? "Search products ..." : "Cari produk ..."}
-                />
-                <span className="searchbox__btn" aria-hidden="true">
-                  <svg
-                    width="23"
-                    height="23"
-                    viewBox="0 0 23 23"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M17.6586 17.8L22 22M10.75 5.5C13.2353 5.5 15.25 7.51472 15.25 10M20.6 10.8C20.6 16.2124 16.2124 20.6 10.8 20.6C5.38761 20.6 1 16.2124 1 10.8C1 5.38761 5.38761 1 10.8 1C16.2124 1 20.6 5.38761 20.6 10.8Z"
-                      stroke="#F8F8F8"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-              </label>
-            </div>
-
-            <div className="grid grid--4" style={{ marginTop: 80 }}>
-              {pagedItems.map((p, i) => (
-                <article
-                  className="pcard rv"
-                  key={i}
-                  onClick={() => setDetail({ ...p, cat: cat.name })}
-                >
-                  <div className="pcard__body">
-                    <h3>{p.name}</h3>
-                    {p.summary && <p className="pcard__desc">{p.summary}</p>}
-                  </div>
-
-                  <div className="pcard__img">
-                    {p.image && <img src={p.image} alt={p.name} />}
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            {visible.length === 0 && (
-              <p className="toolbar-empty">
-                {en
-                  ? "No products match your search."
-                  : "Tidak ada produk yang cocok."}
-              </p>
-            )}
-
-            {visible.length > perPage && (
-              <div className="career-vacancies__pager rv">
-
-                <span>{en ? "Page:" : "Halaman:"}</span>
-
-                {Array.from({ length: totalPages }, (_, i) => {
-                  const page = i + 1
-                  return (
-                    <button
-                      key={page}
-                      type="button"
-                      className={pageNo === page ? "is-active" : ""}
-                      onClick={() => setPageNo(page)}
-                      aria-label={`${en ? "Page" : "Halaman"} ${page}`}
-                      aria-current={pageNo === page ? "page" : undefined}
+                <label className="searchbox searchbox--products">
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={en ? "Search products ..." : "Cari produk ..."}
+                  />
+                  <span className="searchbox__btn" aria-hidden="true">
+                    <svg
+                      width="23"
+                      height="23"
+                      viewBox="0 0 23 23"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      {page}
-                    </button>
-                  )
-                })}
+                      <path
+                        d="M17.6586 17.8L22 22M10.75 5.5C13.2353 5.5 15.25 7.51472 15.25 10M20.6 10.8C20.6 16.2124 16.2124 20.6 10.8 20.6C5.38761 20.6 1 16.2124 1 10.8C1 5.38761 5.38761 1 10.8 1C16.2124 1 20.6 5.38761 20.6 10.8Z"
+                        stroke="#F8F8F8"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                </label>
               </div>
-            )}
-          </div>
-        </section>
+
+              <div className="grid grid--4" style={{ marginTop: 80 }}>
+                {pagedItems.map((p, i) => (
+                  <article
+                    className="pcard rv"
+                    key={i}
+                    onClick={() => setDetail({ ...p, cat: cat.name })}
+                  >
+                    <div className="pcard__body">
+                      <h3>{p.name}</h3>
+                      {p.summary && <p className="pcard__desc">{p.summary}</p>}
+                    </div>
+
+                    <div className="pcard__img">
+                      {p.image && <img src={p.image} alt={p.name} />}
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {visible.length === 0 && (
+                <p className="toolbar-empty">
+                  {en
+                    ? "No products match your search."
+                    : "Tidak ada produk yang cocok."}
+                </p>
+              )}
+
+              {visible.length > perPage && (
+                <div className="career-vacancies__pager rv">
+                  <span>{en ? "Page:" : "Halaman:"}</span>
+
+                  {Array.from({ length: totalPages }, (_, i) => {
+                    const page = i + 1
+                    return (
+                      <button
+                        key={page}
+                        type="button"
+                        className={pageNo === page ? "is-active" : ""}
+                        onClick={() => setPageNo(page)}
+                        aria-label={`${en ? "Page" : "Halaman"} ${page}`}
+                        aria-current={pageNo === page ? "page" : undefined}
+                      >
+                        {page}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </section>
         </>
       )}
 

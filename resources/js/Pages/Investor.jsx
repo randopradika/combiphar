@@ -216,9 +216,7 @@ function StockSection() {
           <h2>Stock Information</h2>
         </div>
         <article className="stock stock--flat rv">
-          <p className="stock-note">
-            Widget here.
-          </p>
+          <p className="stock-note">Widget here.</p>
         </article>
       </div>
     </section>
@@ -326,10 +324,12 @@ export default function Investor({
   const {
     props: { t, locale, homeUrl },
   } = usePage()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const en = locale === "en"
 
   const investorTabs = [
+    { key: "hub", label: "Investor Relations" },
     { key: "stock", label: "Stock Information" },
     { key: "financial", label: "Financial Information" },
     { key: "annual", label: "Annual Report" },
@@ -375,23 +375,56 @@ export default function Investor({
         }
       >
         <div className="container banner__row">
-          <h1 className="display">{page?.bannerTitle || "Investor Relations"}</h1>
+          <h1 className="display">
+            {page?.bannerTitle || "Investor Relations"}
+          </h1>
           <p className="banner__row-sub">{page?.bannerSubtitle || ""}</p>
         </div>
       </section>
 
       <nav className="subnav" aria-label="Investor submenu">
         <div className="container subnav__inner">
-          {investorTabs.map((item) => (
+          <div className="subnav__desktop">
+            {investorTabs.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={activeTab === item.key ? "on" : ""}
+                onClick={() => setActiveTab(item.key)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          <div className={"subnav__mobile" + (mobileOpen ? " is-open" : "")}>
             <button
-              key={item.key}
               type="button"
-              className={activeTab === item.key ? "on" : ""}
-              onClick={() => setActiveTab(item.key)}
+              className="subnav__trigger"
+              aria-expanded={mobileOpen}
+              aria-haspopup="menu"
+              onClick={() => setMobileOpen((v) => !v)}
             >
-              {item.label}
+              {investorTabs.find((item) => item.key === activeTab)?.label}
+              <span className="subnav__caret">▾</span>
             </button>
-          ))}
+
+            <div className="subnav__menu" role="menu">
+              {investorTabs.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={activeTab === item.key ? "on" : ""}
+                  onClick={() => {
+                    setActiveTab(item.key)
+                    setMobileOpen(false)
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </nav>
 

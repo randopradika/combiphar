@@ -368,7 +368,9 @@ export default function About({
               onClick={() => setFacOpen(true)}
             >
               {page?.presencePopupText ||
-                (en ? "View Production Facilities" : "Lihat Fasilitas Produksi")}
+                (en
+                  ? "View Production Facilities"
+                  : "Lihat Fasilitas Produksi")}
             </button>
           </div>
           <div className="world-map rv">
@@ -470,7 +472,11 @@ export default function About({
                 </span>
               </div>
             </div>
-            <div className="grid grid--4" style={{ marginTop: 24 }}>
+
+            <div
+              className="grid grid--4 grid--offices"
+              style={{ marginTop: 24 }}
+            >
               {visibleOffices.map((o, i) => (
                 <div className="office-card" key={i}>
                   <h4>{o.name}</h4>
@@ -479,16 +485,14 @@ export default function About({
                   )}
                   <p>
                     {o.description}
-                    {o.phone && (
-                      <>
-                        <br />
-                        <strong>Phone:</strong> {o.phone}
-                      </>
-                    )}
+                    <br />
+                    <br />
+                    <strong>Phone:</strong> {o.phone ?? "N/A"}
                   </p>
                 </div>
               ))}
             </div>
+
             {visibleOffices.length === 0 && (
               <p className="toolbar-empty">
                 {en
