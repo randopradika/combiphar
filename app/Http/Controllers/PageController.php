@@ -60,6 +60,7 @@ class PageController extends Controller
             'mission' => $p->tr('mission'),
             'values' => $p->tr('values'),
             'presenceDesc' => $p->tr('presence_desc'),
+            'presenceImage' => $this->img($p->presence_image),
             'stat1Value' => $p->stat1_value,
             'stat1Label' => $p->tr('stat1_label'),
             'stat2Value' => $p->stat2_value,
@@ -118,6 +119,8 @@ class PageController extends Controller
             ]),
             'commissioners' => Person::where('group', 'commissioners')->orderBy('sort')->get()->map($person),
             'directors' => Person::where('group', 'directors')->orderBy('sort')->get()->map($person),
+            'auditCommittee' => Person::where('group', 'audit_committee')->orderBy('sort')->get()->map($person),
+            'corporateSecretary' => Person::where('group', 'corporate_secretary')->orderBy('sort')->get()->map($person),
             'awards' => Award::orderBy('sort')->get()->map(fn ($a) => [
                 'title' => $a->tr('title'), 'year' => $a->year, 'image' => $this->img($a->image),
             ]),

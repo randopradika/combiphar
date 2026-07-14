@@ -59,6 +59,8 @@ export default function About({
   milestones,
   commissioners,
   directors,
+  auditCommittee = [],
+  corporateSecretary = [],
   awards,
   shops,
   facilities,
@@ -234,7 +236,10 @@ export default function About({
         </section>
       )}
 
-      {(commissioners.length > 0 || directors.length > 0) && (
+      {(commissioners.length > 0 ||
+        directors.length > 0 ||
+        auditCommittee.length > 0 ||
+        corporateSecretary.length > 0) && (
         <section className="section">
           <div className="container">
             {commissioners.length > 0 && (
@@ -257,6 +262,30 @@ export default function About({
                   <h2 className="display">Board of Directors</h2>
                 </div>
                 <BoardGrid people={directors} onOpen={setBoard} />
+              </>
+            )}
+            {auditCommittee.length > 0 && (
+              <>
+                <div
+                  className="sec-head sec-head--center rv"
+                  style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                >
+                  <h2 className="display">
+                    {en ? "Audit Committee" : "Komite Audit"}
+                  </h2>
+                </div>
+                <BoardGrid people={auditCommittee} onOpen={setBoard} />
+              </>
+            )}
+            {corporateSecretary.length > 0 && (
+              <>
+                <div
+                  className="sec-head sec-head--center rv"
+                  style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                >
+                  <h2 className="display">Corporate Secretary</h2>
+                </div>
+                <BoardGrid people={corporateSecretary} onOpen={setBoard} />
               </>
             )}
           </div>
@@ -337,7 +366,7 @@ export default function About({
           <div className="world-map rv">
             <img
               className="world-map__img"
-              src="/img/world-map.png"
+              src={page?.presenceImage || "/img/world-map.png"}
               alt={
                 en
                   ? "Combiphar global presence map"

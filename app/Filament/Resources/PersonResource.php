@@ -42,6 +42,8 @@ class PersonResource extends Resource
                     ->options([
                         'commissioners' => 'Board of Commissioners',
                         'directors' => 'Board of Directors',
+                        'audit_committee' => 'Komite Audit',
+                        'corporate_secretary' => 'Corporate Secretary',
                     ])
                     ->required()
                     ->default('directors'),
