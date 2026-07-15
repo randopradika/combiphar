@@ -1490,7 +1490,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .mini-card:hover h4{color:var(--magenta)}
 
 /* News detail — Figma pass: plain banner, title below, share row, card sidebar */
-.detail-banner{margin-top:var(--nav-h);height:clamp(320px,40vw,600px);background:var(--grad-brand);background-size:cover;background-position:center}
+.detail-banner{height:clamp(320px,40vw,600px);background:var(--grad-brand);background-size:cover;background-position:center}
 .article-layout{grid-template-columns:minmax(0,1fr) 400px}
 .article__title{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,3.4vw,52px);line-height:1.12;color:var(--purple-700);max-width:22ch}
 .article__meta{display:flex;align-items:center;gap:10px;margin:16px 0 30px;color:var(--text-muted);font-size:15px}
