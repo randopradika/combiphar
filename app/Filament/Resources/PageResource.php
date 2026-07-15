@@ -73,7 +73,13 @@ class PageResource extends Resource
                         Forms\Components\FileUpload::make('manifesto_image')->label('Manifesto background')->image()->imageEditor(),
                         Forms\Components\TextInput::make('manifesto_title_id')->label('Manifesto title (ID)'),
                         Forms\Components\TextInput::make('manifesto_title_en')->label('Manifesto title (EN)'),
-                        Forms\Components\TextInput::make('manifesto_video')->label('Manifesto video URL')->url()->helperText('YouTube / Vimeo / MP4 link'),
+                        Forms\Components\FileUpload::make('manifesto_video_file')
+                            ->label('Manifesto video — upload MP4')
+                            ->acceptedFileTypes(['video/mp4'])
+                            ->directory('manifesto')
+                            ->maxSize(50 * 1024)
+                            ->helperText('Unggah file MP4 (maks 50 MB). Diprioritaskan; kosongkan untuk memakai URL di bawah.'),
+                        Forms\Components\TextInput::make('manifesto_video')->label('Manifesto video URL (opsional)')->url()->helperText('YouTube / Vimeo / MP4 link — dipakai hanya jika tidak ada file yang diunggah di atas.'),
                         Forms\Components\FileUpload::make('cta_image')->label('CTA background')->image()->imageEditor(),
                         Forms\Components\Textarea::make('cta_title_id')->label('CTA text (ID)')->rows(2),
                         Forms\Components\Textarea::make('cta_title_en')->label('CTA text (EN)')->rows(2),

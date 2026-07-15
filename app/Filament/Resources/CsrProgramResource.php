@@ -60,7 +60,7 @@ class CsrProgramResource extends Resource
                     ->nullable(),
                 Forms\Components\Textarea::make('body_id')
                     ->label('Deskripsi Kartu / Excerpt (ID)')
-                    ->helperText('Teks singkat yang tampil di kartu CSR.')
+                    ->helperText('Teks singkat yang tampil di kartu CSR. Juga dipakai sebagai subjudul di banner halaman detail (mis. Environmental).')
                     ->rows(3)
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('body_en')
@@ -76,8 +76,14 @@ class CsrProgramResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
+                Forms\Components\FileUpload::make('gallery')
+                    ->label('Galeri Foto (halaman detail)')
+                    ->helperText('Foto-foto grid di halaman detail /csr/{slug} (mis. Environmental). Jika diisi, halaman memakai tata letak galeri (banner + grid foto). Kosongkan untuk tata letak artikel biasa.')
+                    ->image()->multiple()->reorderable()->appendFiles()
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('link')
-                    ->label('Link "Pelajari Lebih Lanjut" (opsional)')
+                    ->label('Link "Pelajari Lebih Lanjut" / "See All" (opsional)')
+                    ->helperText('Tujuan tombol "Pelajari Lebih Lanjut" di kartu, dan link "See All / Lihat Semua" di bawah galeri halaman detail.')
                     ->url()
                     ->maxLength(255),
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),

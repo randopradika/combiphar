@@ -54,7 +54,7 @@ class PageController extends Controller
             'heroLine2' => $p->tr('hero_line2'),
             'manifestoImage' => $this->img($p->manifesto_image),
             'manifestoTitle' => $p->tr('manifesto_title'),
-            'manifestoVideo' => $p->manifesto_video,
+            'manifestoVideo' => $p->manifesto_video_file ? $this->img($p->manifesto_video_file) : $p->manifesto_video,
             'ctaImage' => $this->img($p->cta_image),
             'ctaTitle' => $p->tr('cta_title'),
             'intro' => $p->tr('intro'),
@@ -284,9 +284,12 @@ class PageController extends Controller
         return Inertia::render('CsrDetail', [
             'program' => [
                 'title' => $program->tr('title'),
+                'subtitle' => $program->tr('body'),
                 'body' => $program->tr('content') ?: $program->tr('body'),
                 'image' => $this->img($program->image),
                 'category' => $program->category,
+                'gallery' => collect($program->gallery ?? [])->map(fn ($g) => $this->img($g))->values(),
+                'seeAll' => $program->link,
             ],
             'topics' => $program->children->map(fn ($c) => [
                 'title' => $c->tr('title'),
