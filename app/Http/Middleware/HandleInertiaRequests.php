@@ -32,6 +32,18 @@ class HandleInertiaRequests extends Middleware
                 ->mapWithKeys(fn ($s) => [$s => route($s, ['locale' => app()->getLocale()])])->all(),
             'homeUrl' => fn () => url('/'),
             'flash' => fn () => ['contact_success' => (bool) session('contact_success')],
+            'footer' => function () {
+                $p = \App\Models\Page::where('slug', 'home')->first();
+
+                return [
+                    'facebook' => $p?->facebook_url,
+                    'instagram' => $p?->instagram_url,
+                    'youtube' => $p?->youtube_url,
+                    'linkedin' => $p?->linkedin_url,
+                    'tiktok' => $p?->tiktok_url,
+                    'copyright' => $p?->tr('footer_copyright'),
+                ];
+            },
         ]);
     }
 }
