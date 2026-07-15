@@ -117,16 +117,11 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('international_body_id')->label('International body (ID)')->rows(4),
                         Forms\Components\Textarea::make('international_body_en')->label('International body (EN)')->rows(4),
                     ]),
-                Forms\Components\Section::make('Footer — Media Sosial & Copyright')
-                    ->description('Tautan media sosial + teks copyright di footer (berlaku untuk seluruh situs). Diisi pada halaman "home".')
+                Forms\Components\Section::make('Footer — Copyright')
+                    ->description('Teks copyright di footer. Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
                     ->collapsible()
                     ->visible(fn (?Page $record) => $record?->slug === 'home')
                     ->schema([
-                        Forms\Components\TextInput::make('facebook_url')->label('Facebook URL')->url(),
-                        Forms\Components\TextInput::make('instagram_url')->label('Instagram URL')->url(),
-                        Forms\Components\TextInput::make('youtube_url')->label('YouTube URL')->url(),
-                        Forms\Components\TextInput::make('linkedin_url')->label('LinkedIn URL')->url(),
-                        Forms\Components\TextInput::make('tiktok_url')->label('TikTok URL')->url(),
                         Forms\Components\TextInput::make('footer_copyright_id')->label('Teks Copyright (ID)'),
                         Forms\Components\TextInput::make('footer_copyright_en')->label('Copyright text (EN)'),
                     ]),

@@ -217,44 +217,18 @@ export default function SiteLayout({ children, navMode = "solid" }) {
             <div className="footer__social">
               <span>{t.follow_us}</span>
               <div className="footer__icons">
-                <a className="ic" href={footer?.facebook || "#"} aria-label="Facebook">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.2-1.4 1.4-1.4h1.5V5.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8.1V14h2.4v7h3Z" />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.instagram || "#"} aria-label="Instagram">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
+                {(footer?.socials ?? []).map((s, i) => (
+                  <a
+                    key={i}
+                    className="ic"
+                    href={s.url || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.name}
                   >
-                    <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle
-                      cx="17.2"
-                      cy="6.8"
-                      r="1.1"
-                      fill="currentColor"
-                      stroke="none"
-                    />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.youtube || "#"} aria-label="YouTube">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8c1.5.4 7.8.4 7.8.4s6.3 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8ZM10 15.2V8.8l5.5 3.2-5.5 3.2Z" />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.linkedin || "#"} aria-label="LinkedIn">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6.5 8.8H3.6V20h2.9V8.8ZM5 7.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4ZM20.4 20v-5.9c0-3.2-1.7-4.7-4-4.7a3.4 3.4 0 0 0-3.1 1.7V8.8h-2.9V20h2.9v-5.9c0-1.5.7-2.4 2-2.4s1.9.9 1.9 2.4V20h3.2Z" />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.tiktok || "#"} aria-label="TikTok">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16.5 3c.3 2 1.5 3.4 3.5 3.6V9c-1.3.1-2.5-.3-3.5-1v5.9c0 3.2-2.4 5.1-5.1 4.7-2.3-.3-3.9-2.2-3.9-4.4 0-2.6 2.2-4.6 4.9-4.3v2.4c-.4-.1-.9-.2-1.3-.1-1 .2-1.7 1-1.6 2 .1 1 1 1.8 2 1.7 1.1 0 1.9-.9 1.9-2V3h3.1Z" />
-                  </svg>
-                </a>
+                    {s.icon && <img src={s.icon} alt={s.name || ""} />}
+                  </a>
+                ))}
               </div>
             </div>
             <hr className="mobilemenu__divider" />
@@ -289,44 +263,18 @@ export default function SiteLayout({ children, navMode = "solid" }) {
             <div className="footer__social">
               <span>{t.follow_us}</span>
               <div className="footer__icons">
-                <a className="ic" href={footer?.facebook || "#"} aria-label="Facebook">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.2-1.4 1.4-1.4h1.5V5.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8.1V14h2.4v7h3Z" />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.instagram || "#"} aria-label="Instagram">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
+                {(footer?.socials ?? []).map((s, i) => (
+                  <a
+                    key={i}
+                    className="ic"
+                    href={s.url || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.name}
                   >
-                    <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle
-                      cx="17.2"
-                      cy="6.8"
-                      r="1.1"
-                      fill="currentColor"
-                      stroke="none"
-                    />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.youtube || "#"} aria-label="YouTube">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.3 5 12 5 12 5s-6.3 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8c1.5.4 7.8.4 7.8.4s6.3 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8ZM10 15.2V8.8l5.5 3.2-5.5 3.2Z" />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.linkedin || "#"} aria-label="LinkedIn">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6.5 8.8H3.6V20h2.9V8.8ZM5 7.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4ZM20.4 20v-5.9c0-3.2-1.7-4.7-4-4.7a3.4 3.4 0 0 0-3.1 1.7V8.8h-2.9V20h2.9v-5.9c0-1.5.7-2.4 2-2.4s1.9.9 1.9 2.4V20h3.2Z" />
-                  </svg>
-                </a>
-                <a className="ic" href={footer?.tiktok || "#"} aria-label="TikTok">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16.5 3c.3 2 1.5 3.4 3.5 3.6V9c-1.3.1-2.5-.3-3.5-1v5.9c0 3.2-2.4 5.1-5.1 4.7-2.3-.3-3.9-2.2-3.9-4.4 0-2.6 2.2-4.6 4.9-4.3v2.4c-.4-.1-.9-.2-1.3-.1-1 .2-1.7 1-1.6 2 .1 1 1 1.8 2 1.7 1.1 0 1.9-.9 1.9-2V3h3.1Z" />
-                  </svg>
-                </a>
+                    {s.icon && <img src={s.icon} alt={s.name || ""} />}
+                  </a>
+                ))}
               </div>
             </div>
             <p className="footer__rights">

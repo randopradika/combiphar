@@ -36,11 +36,11 @@ class HandleInertiaRequests extends Middleware
                 $p = \App\Models\Page::where('slug', 'home')->first();
 
                 return [
-                    'facebook' => $p?->facebook_url,
-                    'instagram' => $p?->instagram_url,
-                    'youtube' => $p?->youtube_url,
-                    'linkedin' => $p?->linkedin_url,
-                    'tiktok' => $p?->tiktok_url,
+                    'socials' => \App\Models\SocialLink::orderBy('sort')->get()->map(fn ($s) => [
+                        'name' => $s->name,
+                        'url' => $s->url,
+                        'icon' => $s->icon ? \Illuminate\Support\Facades\Storage::url($s->icon) : null,
+                    ]),
                     'copyright' => $p?->tr('footer_copyright'),
                 ];
             },
