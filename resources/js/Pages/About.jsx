@@ -485,9 +485,13 @@ export default function About({
                   )}
                   <p>
                     {o.description}
-                    <br />
-                    <br />
-                    <strong>Phone:</strong> {o.phone ?? "N/A"}
+                    {o.phone?.trim() && (
+                      <>
+                        <br />
+                        <br />
+                        <strong>Phone:</strong> {o.phone}
+                      </>
+                    )}
                   </p>
                 </div>
               ))}
