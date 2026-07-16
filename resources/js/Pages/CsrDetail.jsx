@@ -111,13 +111,19 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
         // Photo gallery layout (Figma 646:1864): 3-col grid + "See All" link.
         <section className="section">
           <div className="container">
-            <div className="sport-gallery rv">
-              {gallery.map((img, i) => (
-                <div
-                  className="sport-gallery__item"
-                  key={i}
-                  style={{ backgroundImage: `url('${img}')` }}
-                ></div>
+            <div className="csr-gallery rv">
+              {gallery.map((g, i) => (
+                <figure className="csr-gallery__item" key={i}>
+                  <div
+                    className="csr-gallery__img"
+                    style={{ backgroundImage: `url('${g.image}')` }}
+                  ></div>
+                  {g.caption && (
+                    <figcaption className="csr-gallery__cap">
+                      {g.caption}
+                    </figcaption>
+                  )}
+                </figure>
               ))}
             </div>
             {program.seeAll && (

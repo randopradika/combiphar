@@ -1478,6 +1478,13 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .csr-seeall{display:flex;justify-content:flex-end;margin-top:clamp(18px,2vw,28px)}
 .csr-seeall a{color:var(--magenta);font-family:var(--font-body);font-size:16px;text-decoration:underline;text-underline-offset:3px}
 .csr-seeall a:hover{color:var(--purple-600)}
+/* CSR detail gallery grid with a per-image caption (CSR only; Sports keeps .sport-gallery) */
+.csr-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.csr-gallery__item{display:flex;flex-direction:column;gap:12px;margin:0}
+.csr-gallery__img{aspect-ratio:527/395;border-radius:10px;background:#F3F2F3 center/cover no-repeat}
+.csr-gallery__cap{color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.5}
+@media(max-width:860px){.csr-gallery{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.csr-gallery{grid-template-columns:1fr}}
 /* CSR Social Care detail (Figma 646:1929) — banner title + centered intro + program slider (reuses the Impact slider) */
 .csr-social-intro{max-width:1273px;margin:0 auto;text-align:center;color:#1e1e1e;font-family:var(--font-body);font-weight:400;font-size:clamp(20px,2.4vw,32px);line-height:1.4}
 .csr-social-intro :is(p,ul,ol){margin:0}

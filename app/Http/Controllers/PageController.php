@@ -289,7 +289,20 @@ class PageController extends Controller
                 'image' => $this->img($program->image),
                 'category' => $program->category,
                 'layout' => $program->layout,
-                'gallery' => collect($program->gallery ?? [])->map(fn ($g) => $this->img($g))->values(),
+                'gallery' => collect($program->gallery ?? [])->map(function ($g) {
+                    // New shape: {image, caption_id, caption_en}; legacy: plain path string.
+                    if (is_array($g)) {
+                        $loc = app()->getLocale();
+                        $caption = $g['caption_'.$loc] ?? null;
+                        if (! $caption) {
+                            $caption = $g['caption_'.config('app.fallback_locale')] ?? null;
+                        }
+
+                        return ['image' => $this->img($g['image'] ?? null), 'caption' => $caption];
+                    }
+
+                    return ['image' => $this->img($g), 'caption' => null];
+                })->values(),
                 'seeAll' => $program->link,
             ],
             'topics' => $program->children->map(fn ($c) => [

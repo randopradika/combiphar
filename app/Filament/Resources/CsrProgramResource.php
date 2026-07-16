@@ -86,10 +86,25 @@ class CsrProgramResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
-                Forms\Components\FileUpload::make('gallery')
+                Forms\Components\Repeater::make('gallery')
                     ->label('Galeri Foto (halaman detail)')
-                    ->helperText('Foto-foto grid di halaman detail /csr/{slug} (mis. Environmental). Jika diisi, halaman memakai tata letak galeri (banner + grid foto). Kosongkan untuk tata letak artikel biasa.')
-                    ->image()->multiple()->reorderable()->appendFiles()
+                    ->helperText('Foto-foto grid di halaman detail /csr/{slug} (mis. Environmental). Setiap foto punya keterangan (caption) sendiri. Jika diisi, halaman memakai tata letak galeri (banner + grid foto). Kosongkan untuk tata letak artikel biasa.')
+                    ->schema([
+                        Forms\Components\FileUpload::make('image')
+                            ->image()
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('caption_id')
+                            ->label('Keterangan (ID)')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('caption_en')
+                            ->label('Caption (EN)')
+                            ->maxLength(255),
+                    ])
+                    ->columns(2)
+                    ->reorderable()
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): ?string => $state['caption_id'] ?? null)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('link')
                     ->label('Link "Pelajari Lebih Lanjut" / "See All" (opsional)')
