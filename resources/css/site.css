@@ -203,7 +203,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .hero{position:relative;min-height:88vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:#fff;background:var(--grad-brand);overflow:hidden;padding:120px 24px 80px}
 .hero__title{position:relative;z-index:2}
 .hero__title .l1{display:block;color:var(--pink-300)}
-.hero__scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.hero__scroll{position:absolute;bottom: 65px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
 .hero__scroll .mouse{width:24px;height:38px;border:2px solid #fff;border-radius:14px;position:relative}
 .hero__scroll .mouse::after{content:"";position:absolute;top:7px;left:50%;transform:translateX(-50%);width:4px;height:8px;background:#fff;border-radius:2px;animation:scrolldot 1.6s infinite}
 @keyframes scrolldot{0%{opacity:1;top:7px}100%{opacity:0;top:18px}}
@@ -718,7 +718,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .impact__dots .dot{background:rgba(62,29,129,.25)}
 .impact__dots .dot.active{background:#3E1D81}
 /* Hero scroll cue: fixed centre-bottom of screen, fades out on scroll */
-.hero__scroll{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:50;transition:opacity .4s ease,visibility .4s ease}
+.hero__scroll{position:fixed;bottom:65px;left:50%;transform:translateX(-50%);z-index:50;transition:opacity .4s ease,visibility .4s ease}
 .hero__scroll.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
 /* Manifesto: clean image (no colour overlay), sized to Figma (1920 x 720) */
 .manifesto{aspect-ratio:1920 / 720;min-height:0}
@@ -2454,6 +2454,11 @@ h3.display,.h3{font-size:clamp(22px,2.2vw,34px)}
 .hero__scroll,.hero--photo .hero__scroll{color:#3E1D81}
 .hero__scroll .mouse{border-color:#3E1D81}
 .hero__scroll .mouse::after{background:#3E1D81}
+@media(max-width:680px){
+  .hero__scroll,.hero--photo .hero__scroll{color:var(--magenta)}
+.hero__scroll .mouse{border-color:var(--magenta)}
+.hero__scroll .mouse::after{background:var(--magenta)}
+}
 
 /* News cards: no card bg, image 514x320 r10, Barlow magenta title */
 .ncard{background:none;box-shadow:none;border-radius:0;overflow:visible}
