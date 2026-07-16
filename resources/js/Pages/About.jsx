@@ -339,6 +339,13 @@ export default function About({
                   <div className="stat-card">
                     <div className="num">{page.stat2Value}</div>
                     <p>{page.stat2Label}</p>
+                    <button
+                      type="button"
+                      className="presence-popup-link stat-card__link"
+                      onClick={() => setFacOpen(true)}
+                    >
+                      {en ? "View Facilities" : "Lihat Fasilitas"}
+                    </button>
                   </div>
                 )}
               </div>
@@ -362,16 +369,6 @@ export default function About({
                   ? "From Indonesia to the world — our products and partnerships now reach communities across four continents."
                   : "Setiap penghargaan adalah cerminan kepercayaan, dari konsumen, investor, dan mitra yang telah menemani perjalanan kami sejak 2016.")}
             </p>
-            <button
-              type="button"
-              className="presence-popup-link"
-              onClick={() => setFacOpen(true)}
-            >
-              {page?.presencePopupText ||
-                (en
-                  ? "View Production Facilities"
-                  : "Lihat Fasilitas Produksi")}
-            </button>
           </div>
           <div className="world-map rv">
             <img
