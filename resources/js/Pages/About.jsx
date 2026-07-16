@@ -339,13 +339,15 @@ export default function About({
                   <div className="stat-card">
                     <div className="num">{page.stat2Value}</div>
                     <p>{page.stat2Label}</p>
-                    <button
-                      type="button"
-                      className="presence-popup-link stat-card__link"
-                      onClick={() => setFacOpen(true)}
-                    >
-                      {en ? "View Facilities" : "Lihat Fasilitas"}
-                    </button>
+                    {facilities.length > 0 && (
+                      <button
+                        type="button"
+                        className="presence-popup-link stat-card__link"
+                        onClick={() => setFacOpen(true)}
+                      >
+                        {en ? "View Facilities" : "Lihat Fasilitas"}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

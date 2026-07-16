@@ -12,9 +12,9 @@ class SetLocale
     /** Supported locales. */
     public const SUPPORTED = ['id', 'en'];
 
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ?string $locale = null): Response
     {
-        $locale = $request->route('locale');
+        $locale = $locale ?: $request->route('locale');
 
         if (! in_array($locale, self::SUPPORTED, true)) {
             $locale = config('app.locale');

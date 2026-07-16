@@ -406,8 +406,8 @@ export default function SiteLayout({ children, navMode = "solid" }) {
                 {t.nav[s]}
               </Link>
             ))}
-            <Link href={`/${locale}/terms-of-use`}>{t.terms}</Link>
-            <Link href={`/${locale}/privacy-notice`}>{t.privacy}</Link>
+            <Link href={nav.terms}>{t.terms}</Link>
+            <Link href={nav.privacy}>{t.privacy}</Link>
           </nav>
         </div>
         <hr className="footer__divider" />

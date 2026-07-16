@@ -18,6 +18,7 @@ use App\Models\Page;
 use App\Models\Person;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\Localize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -86,7 +87,7 @@ class PageController extends Controller
             'excerpt' => $a->tr('excerpt'),
             'cover' => $this->img($a->cover_image),
             'date' => optional($a->published_at)->translatedFormat('j F Y'),
-            'url' => route('news.show', ['slug' => $a->slug]),
+            'url' => Localize::url('news.show', null, ['slug' => $a->slug]),
         ];
     }
 
@@ -225,7 +226,7 @@ class PageController extends Controller
                 'type' => 'product',
                 'title' => $p->tr('name'),
                 'image' => $this->img($p->image),
-                'url' => route('products', ['locale' => $locale]).'?product='.$p->slug,
+                'url' => Localize::url('products', $locale).'?product='.$p->slug,
             ]);
 
         $articles = Article::published()
@@ -239,7 +240,7 @@ class PageController extends Controller
                 'type' => 'article',
                 'title' => $a->tr('title'),
                 'image' => $this->img($a->cover_image),
-                'url' => route('news.show', ['locale' => $locale, 'slug' => $a->slug]),
+                'url' => Localize::url('news.show', $locale, ['slug' => $a->slug]),
             ]);
 
         return response()->json(['products' => $products, 'articles' => $articles]);
@@ -251,7 +252,7 @@ class PageController extends Controller
         $map = fn ($rows) => $rows->values()->map(fn ($p) => [
             'title' => $p->tr('title'), 'body' => $p->tr('body'), 'image' => $this->img($p->image),
             'link' => $p->link,
-            'url' => $p->slug ? route('csr.show', ['locale' => app()->getLocale(), 'slug' => $p->slug]) : null,
+            'url' => $p->slug ? Localize::url('csr.show', app()->getLocale(), ['slug' => $p->slug]) : null,
         ]);
 
         return Inertia::render('Csr', [
@@ -332,11 +333,11 @@ class PageController extends Controller
 
     private function legal(string $key)
     {
-        $lp = LegalPage::where('key', $key)->first();
+        $lp = LegalPage::where('key', $key)->firstOrFail();
 
         return Inertia::render('Legal', [
-            'title' => $lp?->tr('title'),
-            'body' => $lp?->tr('body'),
+            'title' => $lp->tr('title'),
+            'body' => $lp->tr('body'),
         ]);
     }
 

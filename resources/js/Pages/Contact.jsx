@@ -5,7 +5,7 @@ import Modal from "../components/Modal"
 
 export default function Contact({ page, vacancies, faqs }) {
   const {
-    props: { t, locale, homeUrl, flash },
+    props: { t, locale, nav, homeUrl, flash },
   } = usePage()
   const en = locale === "en"
   const [tab, setTab] = useState(flash.contact_success ? "kontak" : "karir")
@@ -652,8 +652,8 @@ export default function Contact({ page, vacancies, faqs }) {
                           {en
                             ? "I’ve read and agree with "
                             : "Saya telah membaca dan menyetujui "}
-                          <a href="/terms-of-use">Terms of Services</a> and{" "}
-                          <a href="/privacy-notice">Privacy Policy</a>
+                          <a href={nav.terms}>Terms of Services</a> and{" "}
+                          <a href={nav.privacy}>Privacy Policy</a>
                         </span>
                       </label>
                       <button

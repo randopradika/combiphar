@@ -37,11 +37,14 @@ class LegalPageResource extends Resource
                 Forms\Components\TextInput::make('title_en')
                     ->label('Title (EN)')
                     ->maxLength(255),
-                Forms\Components\RichEditor::make('body_id')
-                    ->label('Isi Halaman (ID)')
+                Forms\Components\Textarea::make('body_id')
+                    ->label('Isi Halaman — HTML (ID)')
+                    ->helperText('Konten HTML mentah (diimpor dari combiphar.com). Edit dengan hati-hati agar tag HTML tetap valid.')
+                    ->rows(20)
                     ->columnSpanFull(),
-                Forms\Components\RichEditor::make('body_en')
-                    ->label('Page Content (EN)')
+                Forms\Components\Textarea::make('body_en')
+                    ->label('Page Content — HTML (EN)')
+                    ->rows(20)
                     ->columnSpanFull(),
             ]);
     }
