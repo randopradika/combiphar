@@ -16,4 +16,4 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 EXPOSE 80 5173
 
-CMD ["sh", "-c", "php artisan storage:link --force && php artisan serve --host=0.0.0.0 --port=80"]
+CMD ["sh", "-c", "php artisan storage:link --force && (php artisan inertia:start-ssr > storage/logs/ssr.log 2>&1 &) ; php artisan serve --host=0.0.0.0 --port=80"]

@@ -63,5 +63,10 @@ log "Clearing caches + linking storage"
 $EXEC php artisan optimize:clear
 $EXEC php artisan storage:link --force || true
 
+# The SSR daemon (started by the image CMD) caches the bundle at boot; restart
+# so it picks up the ssr.js that npm run build just produced.
+log "Restarting app container (SSR daemon reloads the fresh bundle)"
+$DC restart app
+
 log "Deploy complete"
 $DC ps

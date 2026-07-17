@@ -179,7 +179,17 @@ function SearchOverlay({ locale, en, onClose }) {
 
 export default function SiteLayout({ children, navMode = "solid" }) {
   const { props, url } = usePage()
-  const { t, nav, homeUrl, altUrls, locale, routeName, footer } = props
+  // Defaults keep renderToString alive if a shared prop is ever absent during
+  // SSR — the client render then hydrates with the real values.
+  const {
+    t = {},
+    nav = {},
+    homeUrl = "/",
+    altUrls = {},
+    locale = "id",
+    routeName,
+    footer,
+  } = props
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -287,7 +297,7 @@ export default function SiteLayout({ children, navMode = "solid" }) {
                 href={nav[s]}
                 className={routeName === s ? "active" : ""}
               >
-                {t.nav[s]}
+                {t.nav?.[s]}
               </Link>
             ))}
           </nav>
@@ -385,7 +395,7 @@ export default function SiteLayout({ children, navMode = "solid" }) {
                 className={routeName === s ? "active" : ""}
                 onClick={() => setMenuOpen(false)}
               >
-                {t.nav[s]}
+                {t.nav?.[s]}
               </Link>
             ))}
           </nav>
@@ -459,7 +469,7 @@ export default function SiteLayout({ children, navMode = "solid" }) {
           <nav className="footer__links" aria-label="Footer">
             {menu.map((s) => (
               <Link key={s} href={nav[s]}>
-                {t.nav[s]}
+                {t.nav?.[s]}
               </Link>
             ))}
             <Link href={nav.terms}>{t.terms}</Link>
