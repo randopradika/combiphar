@@ -28,6 +28,11 @@ class ArticlesByCategoryChart extends ChartWidget
         return 'doughnut';
     }
 
+    public function getDescription(): ?string
+    {
+        return 'Total '.Article::count().' berita.';
+    }
+
     protected function getData(): array
     {
         $counts = Article::query()

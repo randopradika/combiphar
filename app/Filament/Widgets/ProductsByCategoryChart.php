@@ -22,6 +22,11 @@ class ProductsByCategoryChart extends ChartWidget
         return 'bar';
     }
 
+    public function getDescription(): ?string
+    {
+        return 'Total '.Product::count().' produk, dikelompokkan ke kategori utama.';
+    }
+
     protected function getData(): array
     {
         $counts = Product::query()
