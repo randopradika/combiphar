@@ -170,10 +170,12 @@ class PageController extends Controller
     {
         $shops = OnlineShop::orderBy('sort')->get();
         $shopArr = fn ($s) => ['name' => $s->name, 'url' => $s->url, 'logo' => $this->img($s->logo), 'color' => $this->shopColor($s->name)];
-        // Each product shows only its selected shops; null shop_ids = available at all shops.
-        $product = function ($p) use ($shops, $shopArr) {
+        // Each product shows only its selected shops; null shop_ids falls back
+        // to the default marketplaces (Tokopedia/Shopee/Blibli).
+        $defaultIds = OnlineShop::defaultIds();
+        $product = function ($p) use ($shops, $shopArr, $defaultIds) {
             $selected = $p->shop_ids;
-            $list = is_array($selected) ? $shops->whereIn('id', $selected) : $shops;
+            $list = $shops->whereIn('id', is_array($selected) ? $selected : $defaultIds);
 
             return [
                 'slug' => $p->slug,

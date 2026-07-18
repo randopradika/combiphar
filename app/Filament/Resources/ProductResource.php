@@ -77,9 +77,9 @@ class ProductResource extends Resource
                     ->image(),
                 Forms\Components\CheckboxList::make('shop_ids')
                     ->label('Toko Online')
-                    ->helperText('Pilih toko tempat produk ini tersedia. Semua toko dipilih secara default.')
+                    ->helperText('Pilih toko tempat produk ini tersedia. Default: Tokopedia, Shopee, Blibli.')
                     ->options(fn () => \App\Models\OnlineShop::orderBy('sort')->pluck('name', 'id'))
-                    ->formatStateUsing(fn ($state) => $state ?? \App\Models\OnlineShop::orderBy('sort')->pluck('id')->all())
+                    ->formatStateUsing(fn ($state) => $state ?? \App\Models\OnlineShop::defaultIds())
                     ->bulkToggleable()
                     ->columns(2)
                     ->columnSpanFull(),
