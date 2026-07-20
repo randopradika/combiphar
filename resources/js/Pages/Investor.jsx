@@ -208,12 +208,12 @@ function DocSection({ title, docs, en }) {
   )
 }
 
-function StockSection() {
+function StockSection({ title }) {
   return (
     <section className="section investor-panel">
       <div className="container">
         <div className="doc-head rv">
-          <h2>Stock Information</h2>
+          <h2>{title}</h2>
         </div>
         <article className="stock stock--flat rv">
           <p className="stock-note">Widget here.</p>
@@ -223,14 +223,14 @@ function StockSection() {
   )
 }
 
-function ShareholderSection({ en }) {
+function ShareholderSection({ en, title }) {
   const shareholders = []
 
   return (
     <section className="section investor-panel">
       <div className="container">
         <div className="doc-head rv">
-          <h2>Shareholder</h2>
+          <h2>{title}</h2>
         </div>
 
         <div className="doc-list rv">
@@ -261,12 +261,12 @@ function ShareholderSection({ en }) {
   )
 }
 
-function ContactSection({ en }) {
+function ContactSection({ en, title }) {
   return (
     <section className="section investor-panel">
       <div className="container">
         <div className="doc-head rv">
-          <h2>Investor Relations Contact</h2>
+          <h2>{title}</h2>
         </div>
 
         <div className="ir-contact-grid rv">
@@ -313,8 +313,21 @@ function ContactSection({ en }) {
   )
 }
 
+/** Used when the CMS has no cards yet (fresh DB before the migration seed). */
+const DEFAULT_HUB_CARDS = [
+  { key: "stock", label: "Stock Information" },
+  { key: "financial", label: "Financial Information" },
+  { key: "annual", label: "Annual Report" },
+  { key: "sustainability", label: "Sustainability Report" },
+  { key: "presentation", label: "Company Presentation" },
+  { key: "disclosures", label: "Information Disclosures" },
+  { key: "shareholder", label: "Shareholder" },
+  { key: "contact", label: "IR Contact" },
+]
+
 export default function Investor({
   page,
+  hubCards = [],
   annual = [],
   sustainability = [],
   financial = [],
@@ -328,28 +341,18 @@ export default function Investor({
 
   const en = locale === "en"
 
+  // One CMS-driven list feeds the hub cards, the sub-nav tabs and the section
+  // headings, so a renamed card can never drift out of sync with its tab.
+  const cards = hubCards.length ? hubCards : DEFAULT_HUB_CARDS
+
   const investorTabs = [
-    { key: "hub", label: "Investor Relations" },
-    { key: "stock", label: "Stock Information" },
-    { key: "financial", label: "Financial Information" },
-    { key: "annual", label: "Annual Report" },
-    { key: "sustainability", label: "Sustainability Report" },
-    { key: "presentation", label: "Company Presentation" },
-    { key: "disclosures", label: "Information Disclosures" },
-    { key: "shareholder", label: "Shareholder" },
-    { key: "contact", label: "IR Contact" },
+    { key: "hub", label: page?.bannerTitle || "Investor Relations" },
+    ...cards,
   ]
 
-  const hubCards = [
-    { key: "stock", label: "Stock Information" },
-    { key: "financial", label: "Financial Information" },
-    { key: "annual", label: "Annual Report" },
-    { key: "sustainability", label: "Sustainability Report" },
-    { key: "presentation", label: "Company Presentation" },
-    { key: "disclosures", label: "Information Disclosures" },
-    { key: "shareholder", label: "Shareholder" },
-    { key: "contact", label: "IR Contact" },
-  ]
+  const titleFor = (key) =>
+    cards.find((c) => c.key === key)?.label ||
+    DEFAULT_HUB_CARDS.find((c) => c.key === key)?.label
 
   const [activeTab, setActiveTab] = useState("hub")
 
@@ -432,11 +435,16 @@ export default function Investor({
         <section className="section investor-hub">
           <div className="container">
             <div className="investor-hub-grid rv">
-              {hubCards.map((item) => (
+              {cards.map((item) => (
                 <button
                   key={item.key}
                   type="button"
-                  className="hub-card"
+                  className={"hub-card" + (item.image ? " hub-card--img" : "")}
+                  style={
+                    item.image
+                      ? { backgroundImage: `url('${item.image}')` }
+                      : undefined
+                  }
                   onClick={() => setActiveTab(item.key)}
                 >
                   <div className="hub-card__bottom">
@@ -450,39 +458,47 @@ export default function Investor({
         </section>
       )}
 
-      {activeTab === "stock" && <StockSection />}
+      {activeTab === "stock" && <StockSection title={titleFor("stock")} />}
 
       {activeTab === "financial" && (
-        <DocSection title="Financial Information" docs={financial} en={en} />
+        <DocSection title={titleFor("financial")} docs={financial} en={en} />
       )}
 
       {activeTab === "annual" && (
-        <DocSection title="Annual Reports" docs={annual} en={en} />
+        <DocSection title={titleFor("annual")} docs={annual} en={en} />
       )}
 
       {activeTab === "sustainability" && (
         <DocSection
-          title="Sustainability Report"
+          title={titleFor("sustainability")}
           docs={sustainability}
           en={en}
         />
       )}
 
       {activeTab === "presentation" && (
-        <DocSection title="Company Presentation" docs={presentations} en={en} />
+        <DocSection
+          title={titleFor("presentation")}
+          docs={presentations}
+          en={en}
+        />
       )}
 
       {activeTab === "disclosures" && (
         <DocSection
-          title="Information Disclosures"
+          title={titleFor("disclosures")}
           docs={disclosures}
           en={en}
         />
       )}
 
-      {activeTab === "shareholder" && <ShareholderSection en={en} />}
+      {activeTab === "shareholder" && (
+        <ShareholderSection en={en} title={titleFor("shareholder")} />
+      )}
 
-      {activeTab === "contact" && <ContactSection en={en} />}
+      {activeTab === "contact" && (
+        <ContactSection en={en} title={titleFor("contact")} />
+      )}
     </>
   )
 }

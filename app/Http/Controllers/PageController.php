@@ -413,6 +413,14 @@ class PageController extends Controller
 
         return Inertia::render('Investor', [
             'page' => $this->page('investor'),
+            // Hub sub-menu cards; `key` selects the section the card opens.
+            'hubCards' => \App\Models\InvestorHubCard::where('is_visible', true)
+                ->orderBy('sort')->get()
+                ->map(fn ($c) => [
+                    'key' => $c->key,
+                    'label' => $c->tr('title'),
+                    'image' => $this->img($c->image),
+                ]),
             'annual' => $map($docs->where('category', 'annual_report')),
             'sustainability' => $map($docs->where('category', 'sustainability')),
             'financial' => $map($docs->where('category', 'financial')),
