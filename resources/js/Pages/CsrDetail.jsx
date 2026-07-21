@@ -44,7 +44,7 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
       <>
         <Head title={`${program.title} — Combiphar`} />
 
-        <section className="banner banner--about" style={bannerStyle}>
+        <section className="banner banner--about banner--detail" style={bannerStyle}>
           <div className="container">
             <div className="banner__row">
               <h1 className="display">{program.title}</h1>
@@ -77,7 +77,7 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
     <>
       <Head title={`${hasTopics ? content.title : program.title} — Combiphar`} />
 
-      <section className="banner banner--about" style={bannerStyle}>
+      <section className="banner banner--about banner--detail" style={bannerStyle}>
         <div className="container">
           {hasGallery ? (
             // Figma 646:1864 — title left + short description right, no breadcrumb.

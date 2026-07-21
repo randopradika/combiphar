@@ -2861,6 +2861,11 @@ html,body{overflow-x:hidden}
     .banner--about .banner__title-l1{font-size:clamp(26px,8vw,40px)}
     .banner--about .banner__title-l2{font-size:clamp(38px,11vw,56px)}
 }
+/* CSR / detail sub-page banner (Figma 646:1864 / 646:1929): shorter than the
+   About hero so the detail content (gallery / intro / article) sits at the fold
+   instead of below an ~810px hero. Overrides .banner--about's min-height above. */
+.banner--detail{min-height:min(54vh,500px)}
+@media (max-width:820px){.banner--detail{min-height:min(58vh,440px)}}
 /* About — intro paragraph below the banner (Figma 577:3158): 40px #3E1D81 centred */
 .about-intro{max-width:1200px;margin-inline:auto;text-align:center;font-family:var(--font-display);font-weight:400;font-size:clamp(24px,3vw,40px);line-height:1.5;color:#3E1D81}
 
