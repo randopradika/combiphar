@@ -291,6 +291,10 @@ class PageController extends Controller
                 'title' => $program->tr('title'),
                 'subtitle' => $program->tr('body'),
                 'body' => $program->tr('content') ?: $program->tr('body'),
+                // Raw "Isi Halaman Detail" (may be empty) — rendered above the
+                // photo grid in the gallery layout so the detail content shows
+                // there too, not only in the default/slider layouts.
+                'content' => $program->tr('content'),
                 'image' => $this->img($program->image),
                 'category' => $program->category,
                 'layout' => $program->layout,

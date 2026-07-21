@@ -111,6 +111,13 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
         // Photo gallery layout (Figma 646:1864): 3-col grid + "See All" link.
         <section className="section">
           <div className="container">
+            {program.content && (
+              // "Isi Halaman Detail" content sits above the photo grid.
+              <div
+                className="article-body csr-gallery-intro"
+                dangerouslySetInnerHTML={{ __html: program.content }}
+              />
+            )}
             <div className="csr-gallery rv">
               {gallery.map((g, i) => (
                 <figure className="csr-gallery__item" key={i}>
