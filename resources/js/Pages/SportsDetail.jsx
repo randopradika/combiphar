@@ -1,25 +1,23 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import SiteLayout from '../Layouts/SiteLayout';
 
 export default function SportsDetail({ program, teams = [] }) {
-    const { props: { t, nav } } = usePage();
-
     return (
         <>
             <Head title={`${program.title} — Combiphar`} />
 
             <section
-                className="banner banner--about"
+                className="banner banner--about banner--detail"
                 style={program.image ? { backgroundImage: `url('${program.image}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
             >
                 <div className="container">
-                    <h1 className="display">{program.title}</h1>
-                    {program.subtitle && (
-                        <p className="banner__row-sub" style={{ maxWidth: 560, marginTop: 16 }}>{program.subtitle}</p>
-                    )}
-                    <span className="banner__crumb" style={{ marginTop: 14, marginBottom: 0 }}>
-                        <Link href={nav.csr}>{t.nav.csr}</Link> &rsaquo; <strong>{program.title}</strong>
-                    </span>
+                    {/* Title left + description right, no breadcrumb (matches CsrDetail). */}
+                    <div className="banner__row">
+                        <h1 className="display">{program.title}</h1>
+                        {program.subtitle && (
+                            <p className="banner__row-sub">{program.subtitle}</p>
+                        )}
+                    </div>
                 </div>
             </section>
 

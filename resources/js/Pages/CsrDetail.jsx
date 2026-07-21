@@ -13,6 +13,11 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
   const hasTopics = topics.length > 0
   const gallery = program.gallery ?? []
   const hasGallery = gallery.length > 0
+  // Gallery layout comes from the CMS "Tata Letak Halaman Detail" = "Galeri Foto"
+  // (works with zero photos, e.g. a content-only page), or — for back-compat —
+  // whenever photos exist. It renders only the Isi Halaman Detail content + photo
+  // grid: no article title, no card excerpt, no contact form.
+  const useGallery = program.layout === "gallery" || hasGallery
   const content = hasTopics ? (topics[active] ?? topics[0]) : program
 
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -79,7 +84,7 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
 
       <section className="banner banner--about banner--detail" style={bannerStyle}>
         <div className="container">
-          {hasGallery ? (
+          {useGallery ? (
             // Figma 646:1864 — title left + short description right, no breadcrumb.
             <div className="banner__row">
               <h1 className="display">{program.title}</h1>
@@ -107,7 +112,7 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
         </div>
       </section>
 
-      {hasGallery ? (
+      {useGallery ? (
         // Photo gallery layout (Figma 646:1864): 3-col grid + "See All" link.
         <section className="section">
           <div className="container">

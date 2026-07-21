@@ -1485,8 +1485,8 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .csr-gallery__cap{color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.5}
 @media(max-width:860px){.csr-gallery{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.csr-gallery{grid-template-columns:1fr}}
-/* "Isi Halaman Detail" content shown above the gallery photo grid. */
-.csr-gallery-intro{margin-bottom:clamp(32px,4vw,56px)}
+/* "Isi Halaman Detail" content shown above the gallery photo grid — centered. */
+.csr-gallery-intro{max-width:1000px;margin:0 auto clamp(32px,4vw,56px);text-align:center}
 /* Legal pages (Terms of Use / Privacy Notice) — gradient banner + readable prose */
 .banner--legal{background:var(--grad-brand)}
 .legal-body{max-width:920px;margin:0 auto;color:var(--text)}
