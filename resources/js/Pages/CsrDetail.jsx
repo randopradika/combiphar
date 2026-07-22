@@ -1,15 +1,31 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import { useState } from "react"
 import SiteLayout from "../Layouts/SiteLayout"
+import Modal from "../components/Modal"
+import BoardGrid from "../components/BoardGrid"
 import { ImpactSlider } from "../components/Sliders"
 
-export default function CsrDetail({ program, topics = [], slides = [] }) {
+export default function CsrDetail({
+  program,
+  topics = [],
+  slides = [],
+  auditCommittee = [],
+  corporateSecretary = [],
+}) {
   const {
     props: { t, locale, nav, flash },
+    url,
   } = usePage()
   const en = locale === "en"
-  const [active, setActive] = useState(0)
+  // A ?topic=<slug> query (e.g. redirected from the old /csr/komite-audit URL)
+  // pre-selects that sub-menu tab.
+  const [active, setActive] = useState(() => {
+    const topic = new URLSearchParams(url.split("?")[1] || "").get("topic")
+    const i = topics.findIndex((tp) => tp.slug === topic)
+    return i >= 0 ? i : 0
+  })
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [board, setBoard] = useState(null)
   const hasTopics = topics.length > 0
   const gallery = program.gallery ?? []
   const hasGallery = gallery.length > 0
@@ -74,6 +90,104 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
             <ImpactSlider items={slides} />
           </section>
         )}
+      </>
+    )
+  }
+
+  // Board layout (Figma 967:78 — Komite Audit): intro content, then the Audit
+  // Committee + Corporate Secretary member grids (identical to the About page),
+  // then a second content block for the duties / charter text below the grids.
+  if (program.layout === "board") {
+    return (
+      <>
+        <Head title={`${program.title} — Combiphar`} />
+
+        <section
+          className="banner banner--about banner--detail"
+          style={bannerStyle}
+        >
+          <div className="container">
+            <div className="banner__row">
+              <h1 className="display">{program.title}</h1>
+              {program.subtitle && (
+                <p className="banner__row-sub">{program.subtitle}</p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section className="section">
+          <div className="container">
+            {program.content && (
+              <div
+                className="article-body csr-gallery-intro rv"
+                dangerouslySetInnerHTML={{ __html: program.content }}
+              />
+            )}
+
+            {auditCommittee.length > 0 && (
+              <>
+                <div
+                  className="sec-head sec-head--center rv"
+                  style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                >
+                  <h2 className="display">
+                    {en ? "Audit Committee" : "Komite Audit"}
+                  </h2>
+                </div>
+                <BoardGrid people={auditCommittee} onOpen={setBoard} />
+              </>
+            )}
+
+            {corporateSecretary.length > 0 && (
+              <>
+                <div
+                  className="sec-head sec-head--center rv"
+                  style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                >
+                  <h2 className="display">Corporate Secretary</h2>
+                </div>
+                <BoardGrid people={corporateSecretary} onOpen={setBoard} />
+              </>
+            )}
+
+            {program.content2 && (
+              <div
+                className="article-body rv"
+                style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                dangerouslySetInnerHTML={{ __html: program.content2 }}
+              />
+            )}
+          </div>
+        </section>
+
+        <Modal
+          open={!!board}
+          onClose={() => setBoard(null)}
+          flush
+          closeLabel={t.close}
+        >
+          {board && (
+            <div className="bmodal">
+              <div
+                className="bmodal__img"
+                style={
+                  board.photo
+                    ? { backgroundImage: `url('${board.photo}')` }
+                    : {}
+                }
+              ></div>
+              <div className="bmodal__body">
+                <h3 className="bmodal__name">{board.name}</h3>
+                {board.role && <p className="bmodal__role">{board.role}</p>}
+                <div
+                  className="bmodal__bio"
+                  dangerouslySetInnerHTML={{ __html: board.bio || "" }}
+                />
+              </div>
+            </div>
+          )}
+        </Modal>
       </>
     )
   }
@@ -203,22 +317,80 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
             </nav>
           )}
 
-          <section className="section">
-            <div className="container">
-              <article className="article-body csr-detail rv">
-                <h2
-                  className="display"
-                  style={{ color: "var(--purple-700)", marginBottom: 28 }}
-                >
-                  {content.title}
-                </h2>
-                <div
-                  dangerouslySetInnerHTML={{ __html: content.body || "" }}
-                />
-              </article>
-            </div>
-          </section>
+          {content.layout === "board" ? (
+            // Board sub-topic (mis. Komite Audit): intro + Audit Committee +
+            // Corporate Secretary grids + below-grid duties text, inline in the tab.
+            <section className="section">
+              <div className="container">
+                {content.body && (
+                  <div
+                    className="article-body"
+                    dangerouslySetInnerHTML={{ __html: content.body }}
+                  />
+                )}
 
+                {auditCommittee.length > 0 && (
+                  <>
+                    <div
+                      className="sec-head sec-head--center"
+                      style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                    >
+                      <h2 className="display">
+                        {en ? "Audit Committee" : "Komite Audit"}
+                      </h2>
+                    </div>
+                    <BoardGrid
+                      people={auditCommittee}
+                      onOpen={setBoard}
+                      reveal={false}
+                    />
+                  </>
+                )}
+
+                {corporateSecretary.length > 0 && (
+                  <>
+                    <div
+                      className="sec-head sec-head--center"
+                      style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                    >
+                      <h2 className="display">Corporate Secretary</h2>
+                    </div>
+                    <BoardGrid
+                      people={corporateSecretary}
+                      onOpen={setBoard}
+                      reveal={false}
+                    />
+                  </>
+                )}
+
+                {content.content2 && (
+                  <div
+                    className="article-body"
+                    style={{ marginTop: "clamp(48px,5vw,80px)" }}
+                    dangerouslySetInnerHTML={{ __html: content.content2 }}
+                  />
+                )}
+              </div>
+            </section>
+          ) : (
+            <section className="section">
+              <div className="container">
+                <article className="article-body csr-detail">
+                  <h2
+                    className="display"
+                    style={{ color: "var(--purple-700)", marginBottom: 28 }}
+                  >
+                    {content.title}
+                  </h2>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: content.body || "" }}
+                  />
+                </article>
+              </div>
+            </section>
+          )}
+
+          {content.layout !== "board" && (
           <section className="section contact-hero-section">
             <div className="container">
               <div className="contact-intro-grid">
@@ -328,6 +500,35 @@ export default function CsrDetail({ program, topics = [], slides = [] }) {
               </div>
             </div>
           </section>
+          )}
+
+          <Modal
+            open={!!board}
+            onClose={() => setBoard(null)}
+            flush
+            closeLabel={t.close}
+          >
+            {board && (
+              <div className="bmodal">
+                <div
+                  className="bmodal__img"
+                  style={
+                    board.photo
+                      ? { backgroundImage: `url('${board.photo}')` }
+                      : {}
+                  }
+                ></div>
+                <div className="bmodal__body">
+                  <h3 className="bmodal__name">{board.name}</h3>
+                  {board.role && <p className="bmodal__role">{board.role}</p>}
+                  <div
+                    className="bmodal__bio"
+                    dangerouslySetInnerHTML={{ __html: board.bio || "" }}
+                  />
+                </div>
+              </div>
+            )}
+          </Modal>
         </>
       )}
     </>

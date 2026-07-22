@@ -2,6 +2,7 @@ import { Head, usePage } from "@inertiajs/react"
 import { useMemo, useState } from "react"
 import SiteLayout from "../Layouts/SiteLayout"
 import Modal from "../components/Modal"
+import BoardGrid from "../components/BoardGrid"
 import { MilestoneSlider } from "../components/Sliders"
 
 const Arrow = () => (
@@ -25,33 +26,6 @@ const shopColor = (name = "") => {
     name.toLowerCase().includes(k),
   )
   return key ? SHOP_COLORS[key] : "#5B2D8E"
-}
-
-function BoardGrid({ people, onOpen }) {
-  const {
-    props: { locale },
-  } = usePage()
-  return (
-    <div className="board-grid" style={{ marginTop: 44 }}>
-      {people.map((p, i) => (
-        <div className="board-card rv" key={i} onClick={() => onOpen(p)}>
-          <div
-            className="board-card__photo"
-            style={p.photo ? { backgroundImage: `url('${p.photo}')` } : {}}
-          ></div>
-          <div className="board-card__info">
-            <h4>{p.name}</h4>
-            <div className="board-card__swap">
-              <span className="board-card__role">{p.role}</span>
-              <span className="board-card__bio-btn">
-                {locale === "en" ? "Biography" : "Biografi"}
-              </span>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
 }
 
 export default function About({

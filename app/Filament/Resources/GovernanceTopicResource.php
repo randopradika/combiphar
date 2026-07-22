@@ -45,10 +45,29 @@ class GovernanceTopicResource extends Resource
             Forms\Components\TextInput::make('slug')
                 ->label('Slug')->required()->maxLength(255)
                 ->helperText('mis. whistleblowing-system (untuk URL /csr/{slug}).'),
+            Forms\Components\Select::make('layout')
+                ->label('Tata Letak Halaman Detail')
+                ->helperText('"Dewan / Komite" = intro + grid Komite Audit & Corporate Secretary + teks bawah grid (mis. Komite Audit). "Artikel" = konten biasa.')
+                ->options([
+                    'default' => 'Artikel (default)',
+                    'board' => 'Dewan / Komite (mis. Komite Audit)',
+                ])
+                ->default('default')
+                ->live()
+                ->native(false),
             Forms\Components\RichEditor::make('content_id')
                 ->label('Isi Konten (ID)')->columnSpanFull(),
             Forms\Components\RichEditor::make('content_en')
                 ->label('Content (EN)')->columnSpanFull(),
+            Forms\Components\RichEditor::make('content2_id')
+                ->label('Isi Bawah Grid — Tugas & Wewenang (ID)')
+                ->helperText('Tata letak "Dewan / Komite" saja: teks di bawah grid anggota (mis. Tugas, Tanggung Jawab, Piagam Komite Audit).')
+                ->visible(fn (Forms\Get $get) => $get('layout') === 'board')
+                ->columnSpanFull(),
+            Forms\Components\RichEditor::make('content2_en')
+                ->label('Below-Grid Content — Duties & Authority (EN)')
+                ->visible(fn (Forms\Get $get) => $get('layout') === 'board')
+                ->columnSpanFull(),
             Forms\Components\TextInput::make('sort')
                 ->numeric()->default(0),
         ]);

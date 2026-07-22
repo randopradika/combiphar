@@ -25,10 +25,16 @@ class CsrProgramResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /** ESG + Health Campaign only. Sports are managed in SportResource. */
+    /**
+     * ESG + Health Campaign only. Sports are managed in SportResource, and
+     * Governance sub-topics (mis. Komite Audit) in GovernanceTopicResource
+     * ("Sub-Menu Governance") — so they do not also appear here.
+     */
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('category', '!=', 'sports');
+        return parent::getEloquentQuery()
+            ->where('category', '!=', 'sports')
+            ->whereDoesntHave('parent', fn (Builder $q) => $q->where('slug', 'governance'));
     }
 
     public static function form(Form $form): Form
@@ -44,12 +50,14 @@ class CsrProgramResource extends Resource
                     ->default('esg'),
                 Forms\Components\Select::make('layout')
                     ->label('Tata Letak Halaman Detail')
-                    ->helperText('Pilih tampilan halaman detail /csr/{slug}. "Slider Program" memakai banner + intro + slider sub-program (mis. Social Care); "Galeri Foto" memakai grid foto (mis. Environmental); "Artikel" memakai konten + formulir kontak.')
+                    ->helperText('Pilih tampilan halaman detail /csr/{slug}. "Slider Program" memakai banner + intro + slider sub-program (mis. Social Care); "Galeri Foto" memakai grid foto (mis. Environmental); "Dewan / Komite" memakai intro + grid Komite Audit & Corporate Secretary (mis. Komite Audit); "Artikel" memakai konten + formulir kontak.')
                     ->options([
                         'default' => 'Artikel + Formulir Kontak (default)',
                         'gallery' => 'Galeri Foto (mis. Environmental)',
                         'slider' => 'Slider Program (mis. Social Care)',
+                        'board' => 'Dewan / Komite (mis. Komite Audit)',
                     ])
+                    ->live()
                     ->default('default')
                     ->native(false),
                 Forms\Components\TextInput::make('title_id')
@@ -83,6 +91,15 @@ class CsrProgramResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\RichEditor::make('content_en')
                     ->label('Detail Page Content (EN)')
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('content2_id')
+                    ->label('Isi Bawah Grid — Tugas & Wewenang (ID)')
+                    ->helperText('Tata letak "Dewan / Komite" saja: teks yang tampil di bawah grid anggota (mis. Tugas, Tanggung Jawab, dan Piagam Komite Audit).')
+                    ->visible(fn (Forms\Get $get) => $get('layout') === 'board')
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('content2_en')
+                    ->label('Below-Grid Content — Duties & Authority (EN)')
+                    ->visible(fn (Forms\Get $get) => $get('layout') === 'board')
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),

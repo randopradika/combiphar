@@ -300,6 +300,12 @@ class PageController extends Controller
     {
         $program = CsrProgram::where('slug', $slug)->firstOrFail();
 
+        // Komite Audit has no standalone page — it lives as a tab on the
+        // Governance sub-menu. Redirect the old detail URL to that tab.
+        if ($program->slug === 'komite-audit') {
+            return redirect()->route('csr.show.'.app()->getLocale(), ['slug' => 'governance', 'topic' => 'komite-audit']);
+        }
+
         if ($program->category === 'sports') {
             return Inertia::render('SportsDetail', [
                 'program' => [
@@ -315,6 +321,12 @@ class PageController extends Controller
                 ]),
             ]);
         }
+
+        $person = fn (Person $p) => [
+            'name' => $p->name, 'role' => $p->tr('role'), 'bio' => $p->tr('bio'), 'photo' => $this->img($p->photo),
+        ];
+        $isBoard = $program->layout === 'board'
+            || $program->children->contains(fn ($c) => $c->layout === 'board');
 
         return Inertia::render('CsrDetail', [
             'program' => [
@@ -343,11 +355,17 @@ class PageController extends Controller
                     return ['image' => $this->img($g), 'caption' => null];
                 })->values(),
                 'seeAll' => $program->link,
+                // Second rich block rendered below the member grids (board layout).
+                'content2' => $program->tr('content2'),
             ],
             'topics' => $program->children->map(fn ($c) => [
                 'title' => $c->tr('title'),
                 'body' => $c->tr('content') ?: $c->tr('body'),
                 'slug' => $c->slug,
+                // A "board" sub-topic (mis. Komite Audit) renders its member grids
+                // inline in this sub-menu tab instead of an article + contact form.
+                'layout' => $c->layout,
+                'content2' => $c->tr('content2'),
             ]),
             // Slider layout (mis. Social Care): each sub-program becomes a slide.
             'slides' => $program->children->map(fn ($c) => [
@@ -355,6 +373,10 @@ class PageController extends Controller
                 'title' => $c->tr('title'),
                 'body' => $c->tr('body') ?: trim(strip_tags((string) $c->tr('content'))),
             ])->values(),
+            // "Board" layout (Figma 967:78 — Komite Audit): reuse the About page
+            // Audit Committee + Corporate Secretary member grids.
+            'auditCommittee' => $isBoard ? Person::where('group', 'audit_committee')->orderBy('sort')->get()->map($person) : [],
+            'corporateSecretary' => $isBoard ? Person::where('group', 'corporate_secretary')->orderBy('sort')->get()->map($person) : [],
         ]);
     }
 
