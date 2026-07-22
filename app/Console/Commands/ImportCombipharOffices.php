@@ -38,7 +38,7 @@ class ImportCombipharOffices extends Command
                     if ($name === '') {
                         continue;
                     }
-                    $address = preg_replace('/\s+/', ' ', trim(strip_tags(str_replace('&nbsp;', ' ', $d['address'] ?? ''))));
+                    $address = preg_replace('/\s+/', ' ', trim(html_entity_decode(strip_tags(str_replace('&nbsp;', ' ', $d['address'] ?? '')), ENT_QUOTES)));
 
                     Office::updateOrCreate(
                         [
