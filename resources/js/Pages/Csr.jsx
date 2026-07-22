@@ -94,7 +94,7 @@ export default function Csr({ page, esg, health, sports }) {
             )}
             {page?.intro && (
               <p
-                className="cat-intro rv"
+                className="cat-intro-csr rv"
                 style={{ marginTop: 24, maxWidth: 1000 }}
               >
                 {page.intro}

@@ -103,6 +103,36 @@ function DocFileDownloadIcon() {
   )
 }
 
+function ComingSoonOverlay({ en }) {
+  return (
+    <div className="coming-soon-overlay">
+      <div className="coming-soon-modal">
+        <div className="coming-soon-icon">
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        </div>
+        <h2>{en ? "Coming Soon" : "Segera Hadir"}</h2>
+        <p>
+          {en
+            ? "We are currently updating our Investor Relations portal to serve you better. Please check back soon!"
+            : "Kami sedang melakukan pembaruan pada portal Hubungan Investor untuk memberikan informasi yang lebih baik."}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function DocSection({ title, docs, en }) {
   if (!docs?.length) {
     return (
@@ -385,6 +415,11 @@ export default function Investor({
         </div>
       </section>
 
+      {/* Main Relative Container to Anchor the Overlay */}
+      <div style={{ position: "relative", minHeight: "450px" }}>
+        {/* Blurred Content */}
+        <div className="content-blurred">
+
       <nav className="subnav" aria-label="Investor submenu">
         <div className="container subnav__inner">
           <div className="subnav__desktop">
@@ -431,10 +466,11 @@ export default function Investor({
         </div>
       </nav>
 
+      
       {activeTab === "hub" && (
         <section className="section investor-hub">
           <div className="container">
-            <div className="investor-hub-grid rv">
+            {/* <div className="investor-hub-grid rv">
               {cards.map((item) => (
                 <button
                   key={item.key}
@@ -453,7 +489,7 @@ export default function Investor({
                   </div>
                 </button>
               ))}
-            </div>
+            </div> */}
           </div>
         </section>
       )}
@@ -499,6 +535,10 @@ export default function Investor({
       {activeTab === "contact" && (
         <ContactSection en={en} title={titleFor("contact")} />
       )}
+      {/* Coming Soon Glassmorphism Overlay */}
+      </div>
+        <ComingSoonOverlay en={en} />
+      </div>
     </>
   )
 }
