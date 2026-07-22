@@ -183,11 +183,27 @@ class PageController extends Controller
                 'summary' => $p->tr('summary') ?: $p->tr('description'),
                 'description' => $p->tr('description'), 'image' => $this->img($p->image),
                 'shops' => $list->map($shopArr)->values(),
+                // Official website + social links (rendered only when non-empty).
+                'website' => $p->website_url,
+                'instagram' => $p->instagram_url,
+                'facebook' => $p->facebook_url,
             ];
         };
 
+        // Product popup social icons come from the matching SocialLink's
+        // product_icon (colored logo, distinct from the footer icon). Matched by
+        // platform name; null when no such link / no product icon is uploaded,
+        // in which case the popup falls back to a built-in glyph.
+        $socialIcon = fn ($keyword) => $this->img(
+            optional(\App\Models\SocialLink::where('name', 'like', '%'.$keyword.'%')->first())->product_icon
+        );
+
         return Inertia::render('Products', [
             'page' => $this->page('products'),
+            'socialIcons' => [
+                'instagram' => $socialIcon('instagram'),
+                'facebook' => $socialIcon('facebook'),
+            ],
             'categories' => ProductCategory::whereNull('parent_id')
                 ->with([
                     'products' => fn ($q) => $q->orderBy('sort'),

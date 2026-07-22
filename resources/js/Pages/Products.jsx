@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react"
 import SiteLayout from "../Layouts/SiteLayout"
 import Modal from "../components/Modal"
 
-export default function Products({ page, categories }) {
+export default function Products({ page, categories, socialIcons = {} }) {
   const {
     props: { t, locale, homeUrl },
     url,
@@ -333,6 +333,7 @@ export default function Products({ page, categories }) {
             <div className="pmodal__panel">
               <h3>{detail.name}</h3>
               {detail.description && <p>{detail.description}</p>}
+
               {detail.shops?.length > 0 && (
                 <div className="pmodal__shops">
                   <h4>{en ? "Available at" : "Tersedia di"}</h4>
@@ -350,6 +351,94 @@ export default function Products({ page, categories }) {
                       </a>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {(detail.website || detail.instagram || detail.facebook) && (
+                <div className="pmodal__more">
+                  <h4>
+                    {en ? "More Information" : "Informasi Lebih Lanjut"}
+                  </h4>
+
+                  {(detail.instagram || detail.facebook) && (
+                    <div className="pmodal__socials">
+                      {detail.instagram && (
+                        <a
+                          className="pmodal__social"
+                          href={detail.instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Instagram"
+                        >
+                          {socialIcons.instagram ? (
+                            <img src={socialIcons.instagram} alt="Instagram" />
+                          ) : (
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <rect x="2" y="2" width="20" height="20" rx="5" />
+                              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37Z" />
+                              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                            </svg>
+                          )}
+                        </a>
+                      )}
+                      {detail.facebook && (
+                        <a
+                          className="pmodal__social"
+                          href={detail.facebook}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Facebook"
+                        >
+                          {socialIcons.facebook ? (
+                            <img src={socialIcons.facebook} alt="Facebook" />
+                          ) : (
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                            </svg>
+                          )}
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {detail.website && (
+                    <a
+                      className="pmodal__web"
+                      href={detail.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {en ? "Visit Website" : "Kunjungi Website"}
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M7 17 17 7" />
+                        <path d="M8 7h9v9" />
+                      </svg>
+                    </a>
+                  )}
                 </div>
               )}
             </div>

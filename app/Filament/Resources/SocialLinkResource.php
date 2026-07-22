@@ -34,8 +34,13 @@ class SocialLinkResource extends Resource
                 ->url()
                 ->maxLength(255),
             Forms\Components\FileUpload::make('icon')
-                ->label('Ikon')
+                ->label('Ikon Footer')
                 ->helperText('Tampil di footer gelap — gunakan ikon putih / transparan (PNG/SVG).')
+                ->image()
+                ->imageEditor(),
+            Forms\Components\FileUpload::make('product_icon')
+                ->label('Ikon Produk (Informasi Lebih Lanjut)')
+                ->helperText('Tampil di popup produk (latar terang) — gunakan logo berwarna. Berbeda dari ikon footer. Kosongkan bila tidak dipakai.')
                 ->image()
                 ->imageEditor(),
             Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),

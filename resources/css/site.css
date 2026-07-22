@@ -1214,6 +1214,24 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 
 .pmodal__shops{margin-top:26px}
 .pmodal__shops h4{font-family:var(--font-display);font-weight:700;color:var(--purple-900);margin-bottom:12px;font-size:16px}
+/* Product popup — official website button + "Informasi Lebih Lanjut" socials */
+.pmodal__web{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;margin-top:22px;padding:11px 22px;border:1.5px solid var(--purple-600);border-radius:var(--radius-pill);color:var(--purple-600);font-family:var(--font-display);font-weight:600;font-size:15px;line-height:1;text-decoration:none;transition:background .2s,color .2s}
+.pmodal__web svg{width:16px;height:16px;flex:none}
+.pmodal__web:hover{background:var(--purple-600);color:#fff}
+.pmodal__more{margin-top:26px}
+.pmodal__more h4{font-family:var(--font-display);font-weight:700;color:var(--purple-900);margin-bottom:12px;font-size:16px}
+.pmodal__socials{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:6px}
+/* Light-bg logos here (colored CMS product_icon, or a purple fallback glyph) —
+   deliberately different from the footer's white monochrome icons. */
+.pmodal__social{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;overflow:hidden;transition:transform .2s}
+.pmodal__social img{width:100%;height:100%;object-fit:contain}
+.pmodal__social svg{width:30px;height:30px;color:var(--purple-600)}
+.pmodal__social:hover{transform:translateY(-2px)}
+@media (max-width:760px){
+    .pmodal__web{margin-top:18px;font-size:14px;padding:10px 18px}
+    .pmodal__more{margin-top:22px}
+    .pmodal__social{width:42px;height:42px}
+}
 .market--sm{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:0}
 .market--sm a{width:auto;aspect-ratio:1;min-width:0;padding:6px;border-radius:10px;font-size:9px;line-height:1.15;text-align:center;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
 .market--sm a img{max-width:80%;max-height:80%;object-fit:contain;display:block}

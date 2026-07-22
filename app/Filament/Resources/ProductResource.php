@@ -83,6 +83,22 @@ class ProductResource extends Resource
                     ->bulkToggleable()
                     ->columns(2)
                     ->columnSpanFull(),
+                Forms\Components\TextInput::make('website_url')
+                    ->label('Website Resmi (URL)')
+                    ->helperText('Tampil sebagai tombol "Kunjungi Website" di popup produk. Kosongkan bila tidak ada.')
+                    ->url()
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('instagram_url')
+                    ->label('Instagram (URL)')
+                    ->helperText('Ikon Instagram pada bagian "Informasi Lebih Lanjut". Kosongkan bila tidak ada.')
+                    ->url()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('facebook_url')
+                    ->label('Facebook (URL)')
+                    ->helperText('Ikon Facebook pada bagian "Informasi Lebih Lanjut". Kosongkan bila tidak ada.')
+                    ->url()
+                    ->maxLength(255),
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
