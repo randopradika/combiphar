@@ -47,19 +47,11 @@ export default function News({ page, investor, health, product, others }) {
     props: { t, locale, homeUrl },
   } = usePage()
   const en = locale === "en"
-  const [tab, setTab] = useState("investor")
+  const [tab, setTab] = useState("health")
   const [pageNum, setPageNum] = useState(1)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const tabs = [
-    {
-      key: "investor",
-      label: "Investor Update",
-      items: investor,
-      desc: en
-        ? "The latest corporate updates and investor information from Combiphar."
-        : "Pembaruan korporasi dan informasi investor terkini dari Combiphar.",
-    },
     {
       key: "health",
       label: en ? "Health Information" : "Informasi Kesehatan",
@@ -75,6 +67,16 @@ export default function News({ page, investor, health, product, others }) {
       desc: en
         ? "News and information about Combiphar products."
         : "Berita dan informasi seputar produk Combiphar.",
+    },
+    {
+      key: "investor",
+      label: en
+        ? "Investor Update (under development)"
+        : "Investor Update (dalam pengembangan)",
+      items: investor,
+      desc: en
+        ? "The latest corporate updates and investor information from Combiphar."
+        : "Pembaruan korporasi dan informasi investor terkini dari Combiphar.",
     },
     {
       key: "others",
