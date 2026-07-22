@@ -123,6 +123,14 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('international_body_id')->label('International body (ID)')->rows(4),
                         Forms\Components\Textarea::make('international_body_en')->label('International body (EN)')->rows(4),
                     ]),
+                Forms\Components\Section::make('Konten Halaman CSR (Tanggung Jawab Sosial)')
+                    ->description('Diisi hanya untuk halaman dengan slug "csr". Deskripsi tampil di bawah judul banner baris 2 ("Corporate Citizenship...").')
+                    ->collapsible()
+                    ->visible(fn (?Page $record) => $record?->slug === 'csr')
+                    ->schema([
+                        Forms\Components\Textarea::make('intro_id')->label('Deskripsi / Intro (ID)')->rows(3),
+                        Forms\Components\Textarea::make('intro_en')->label('Deskripsi / Intro (EN)')->rows(3),
+                    ]),
                 Forms\Components\Section::make('Footer — Copyright')
                     ->description('Teks copyright di footer. Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
                     ->collapsible()
