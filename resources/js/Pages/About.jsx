@@ -265,6 +265,10 @@ export default function About({
                 <BoardGrid people={directors} onOpen={setBoard} />
               </>
             )}
+            {/* Audit Committee + Corporate Secretary are hidden on the About page
+                by request. To show them again, remove the comment markers around
+                the block below. (They still appear on the CSR Komite Audit tab.) */}
+            {/*
             {auditCommittee.length > 0 && (
               <>
                 <div
@@ -289,6 +293,7 @@ export default function About({
                 <BoardGrid people={corporateSecretary} onOpen={setBoard} />
               </>
             )}
+            */}
           </div>
         </section>
       )}
