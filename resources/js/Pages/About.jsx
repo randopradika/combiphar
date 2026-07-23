@@ -68,12 +68,15 @@ export default function About({
     // Hero row shows at most 7 logos; falls back to all awards when none flagged.
     return (hero.length ? hero : awards).slice(0, 7)
   }, [awards])
-  // The "detail" popup always lists every award grouped by year (regardless of
-  // which are hero), so the "Click here for details" link is always available.
+  // The "Daftar Penghargaan" popup lists only the regular (non-hero) awards
+  // grouped by year — hero logos are a separate set (CMS "Penghargaan Hero").
+  const galleryAwards = useMemo(() => awards.filter((a) => !a.is_hero), [awards])
   const awardYears = useMemo(
     () =>
-      [...new Set(awards.map((a) => a.year).filter(Boolean))].sort((a, b) => b - a),
-    [awards],
+      [...new Set(galleryAwards.map((a) => a.year).filter(Boolean))].sort(
+        (a, b) => b - a,
+      ),
+    [galleryAwards],
   )
   const [awardYear, setAwardYear] = useState(() =>
     awardYears.length ? String(awardYears[0]) : "all",
@@ -81,9 +84,9 @@ export default function About({
   const shownAwards = useMemo(
     () =>
       awardYear === "all"
-        ? awards
-        : awards.filter((a) => String(a.year) === awardYear),
-    [awards, awardYear],
+        ? galleryAwards
+        : galleryAwards.filter((a) => String(a.year) === awardYear),
+    [galleryAwards, awardYear],
   )
   const visibleOffices = offices.filter(
     (o) => (!city || o.city === city) && (!cat || o.category === cat),
@@ -318,7 +321,7 @@ export default function About({
                 className="awards-detail-link"
                 onClick={() => setAwardsOpen(true)}
               >
-                {en ? "Click here for details" : "Klik di sini untuk detail"}
+                {en ? "List of Awards" : "Daftar Penghargaan"}
               </button>
             </div>
             <div className="awards rv" style={{ marginTop: 44 }}>

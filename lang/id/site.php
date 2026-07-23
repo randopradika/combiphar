@@ -4,7 +4,7 @@ return [
     'nav' => [
         'about' => 'Tentang Kami',
         'products' => 'Produk',
-        'csr' => 'Tanggung Jawab Sosial Perusahaan',
+        'csr' => 'Keberlanjutan',
         'investor' => 'Investor',
         'news' => 'Berita',
         'contact' => 'Karir & Kontak',

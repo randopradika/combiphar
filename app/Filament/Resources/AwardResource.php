@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AwardResource\Pages;
-use App\Filament\Resources\AwardResource\RelationManagers;
 use App\Models\Award;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,7 +10,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AwardResource extends Resource
 {
@@ -24,6 +22,12 @@ class AwardResource extends Resource
     protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    /** Daftar penghargaan (popup "Daftar Penghargaan") — logo hero dikelola di menu "Penghargaan Hero". */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('is_hero', false);
+    }
 
     public static function form(Form $form): Form
     {
@@ -38,10 +42,6 @@ class AwardResource extends Resource
                     ->label('Tahun')
                     ->helperText('Mengelompokkan penghargaan pada popup "Pencapaian & Penghargaan" (filter Tahun).')
                     ->numeric(),
-                Forms\Components\Toggle::make('is_hero')
-                    ->label('Tampilkan sebagai Hero (logo di halaman)')
-                    ->helperText('Aktif = tampil sebagai logo di halaman Tentang Kami. Nonaktif = hanya muncul di popup "detail" (dikelompokkan per tahun). Jika tidak ada yang diaktifkan, semua tampil sebagai logo.')
-                    ->default(false),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
