@@ -28,16 +28,24 @@ services:
     image: mysql:8.0
     container_name: combiphar-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: combiphar
-      MYSQL_USER: combiphar
-      MYSQL_PASSWORD: secret
+      # Values come from the repo .env (compose reads it for ${...} substitution)
+      # so real credentials never live in this tracked file. NOTE: the mysql
+      # image only applies these on FIRST init of an empty data volume — to
+      # rotate a password on an existing volume, ALTER USER inside mysql AND
+      # update .env to match.
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_DATABASE:-combiphar}
+      MYSQL_USER: ${DB_USERNAME:-combiphar}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
     ports:
-      - "3306:3306"
+      # Loopback-only: host-local tools (mysql CLI, dumps) keep working, but the
+      # port is never internet-reachable (published Docker ports bypass ufw-style
+      # host firewalls). The app connects over the compose network (DB_HOST=mysql).
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD:-root}"]
       interval: 5s
       timeout: 5s
       retries: 20

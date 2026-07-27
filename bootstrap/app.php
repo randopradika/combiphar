@@ -14,9 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Served behind a TLS-terminating proxy (dev/prod hosting): trust the
-        // X-Forwarded-* headers so route()/url() generate https:// URLs.
-        $middleware->trustProxies(at: '*');
+        // Trusted proxies (for X-Forwarded-* / https detection) are configured
+        // in AppServiceProvider::boot() from config('app.trusted_proxies') —
+        // config isn't loaded yet when this closure runs, and '*' here would
+        // let any client spoof its IP past the per-IP rate limiters.
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\NoIndexNonProduction::class,

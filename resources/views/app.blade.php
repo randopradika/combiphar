@@ -29,7 +29,7 @@
             'url' => url('/'),
             'logo' => url('/img/logo-header.svg'),
             'sameAs' => $__socials,
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        ], JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     @endphp
     <script type="application/ld+json">
     {!! $__ld !!}

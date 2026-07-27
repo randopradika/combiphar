@@ -75,13 +75,28 @@ APP_DEBUG=false             # true only while actively debugging
 APP_URL=https://<your-dev-host>
 APP_FORCE_HTTPS=true        # gluvia terminates TLS; forces https:// links (avoids mixed-content)
 
+SESSION_SECURE_COOKIE=true  # cookies only over https (there is a TLS proxy in front)
+# TRUSTED_PROXIES=<proxy-ip>  # optional: defaults to loopback + private ranges
+                              # (see config/app.php 'trusted_proxies'); set the
+                              # exact proxy IP/CIDR to tighten further
+
 DB_CONNECTION=mysql
 DB_HOST=mysql               # the docker-compose service name, NOT 127.0.0.1
 DB_PORT=3306
 DB_DATABASE=combiphar
 DB_USERNAME=combiphar       # or root
-DB_PASSWORD=secret          # match docker-compose.yml (root password is 'root')
+DB_PASSWORD=secret          # docker-compose.yml reads DB_DATABASE/DB_USERNAME/
+                            # DB_PASSWORD (+ optional DB_ROOT_PASSWORD) from this
+                            # same .env, so the two always match. NOTE: mysql only
+                            # applies them on FIRST init of an empty data volume —
+                            # rotating a password later needs ALTER USER in mysql
+                            # plus the matching .env edit.
 ```
+
+> **MySQL is published on loopback only** (`127.0.0.1:3306`) — host-local tools
+> (mysql CLI, dumps, phpMyAdmin on the server) still connect via `127.0.0.1`,
+> but the port is not internet-reachable. Don't widen this: published Docker
+> ports bypass ufw-style host firewalls.
 
 > `.env` is gitignored, so it is **never** overwritten by a deploy — configure
 > it once. `git reset --hard` in the deploy only touches tracked files.

@@ -19,6 +19,14 @@ return [
     // config (not env()) so it survives `php artisan config:cache`.
     'force_https' => env('APP_FORCE_HTTPS', false),
 
+    // Proxies allowed to set X-Forwarded-* ('*', or comma-separated IPs/CIDRs).
+    // Defaults to loopback + private ranges: the TLS proxy reaches the container
+    // via the docker bridge (private), while direct internet clients keep their
+    // public source IP and are NOT trusted — so they can't spoof X-Forwarded-For
+    // past the contact/search/login rate limiters. Applied at runtime in
+    // AppServiceProvider::boot() (bootstrap/app.php runs before config loads).
+    'trusted_proxies' => env('TRUSTED_PROXIES', '127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
