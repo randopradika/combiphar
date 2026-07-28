@@ -122,12 +122,9 @@ export default function About({
         }
       >
         <div className="container banner__row">
-          <p className="banner__intro">
-            {page?.bannerSubtitle ||
-              (en
-                ? "With over 53 years of professional experience in the pharmaceutical industry, marked by sustainable growth and the acquisition of major companies, Combiphar represents the purpose of:"
-                : "Dengan pengalaman lebih dari 53 tahun di industri farmasi, ditandai dengan pertumbuhan berkelanjutan dan akuisisi berbagai perusahaan besar, Combiphar mewakili tujuan:")}
-          </p>
+          {page?.bannerSubtitle && (
+            <p className="banner__intro">{page.bannerSubtitle}</p>
+          )}
           <h1 className="banner__title display">
             <span className="banner__title-l1">
               {page?.bannerTitle || "Championing a"}
