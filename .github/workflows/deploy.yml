@@ -31,6 +31,10 @@ jobs:
           script_stop: true
           # First deploy builds the image from scratch (apt, gd, node) — give it room.
           command_timeout: 30m
-          script: |
-            cd ${{ secrets.DEV_APP_PATH }}
-            DEPLOY_BRANCH=main bash deploy.sh
+          # One line on purpose. The server's deploy.sh is a stale copy that
+          # never rebuilds or restarts the app container, which left the SSR
+          # daemon dead for 10 days, and extra lines added to this script were
+          # silently not executed. Chaining the recreate here is the one channel
+          # that reliably runs: --build picks up the Dockerfile CMD (supervised
+          # SSR), --force-recreate guarantees the container actually restarts.
+          script: cd ${{ secrets.DEV_APP_PATH }} && DEPLOY_BRANCH=main bash deploy.sh && docker compose up -d --build --force-recreate app
