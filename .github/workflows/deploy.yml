@@ -33,17 +33,4 @@ jobs:
           command_timeout: 30m
           script: |
             cd ${{ secrets.DEV_APP_PATH }}
-            echo "===== deploy-doctor (temporary, read-only) ====="
-            echo "--- checkout ---"
-            pwd; git rev-parse --abbrev-ref HEAD; git rev-parse --short HEAD
-            echo "--- tracked files whose index flag is not H (S=skip-worktree, h=assume-unchanged) ---"
-            git ls-files -v | grep -v '^H ' | head -20 || echo "(none - all normal)"
-            echo "--- deploy.sh as it exists on the server ---"
-            ls -l deploy.sh; md5sum deploy.sh; cat -n deploy.sh
-            echo "--- containers ---"
-            docker compose ps
-            echo "--- ssr daemon ---"
-            docker compose exec -T app sh -c 'curl -sf -m 3 http://127.0.0.1:13714/health || echo SSR_DOWN'
-            docker compose exec -T app tail -n 30 storage/logs/ssr.log 2>&1 || echo "(no ssr.log)"
-            echo "===== end deploy-doctor ====="
             DEPLOY_BRANCH=main bash deploy.sh
