@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AboutHistory;
 use App\Models\Accreditation;
 use App\Models\Article;
 use App\Models\Award;
+use App\Models\ContactMessage;
 use App\Models\CsrProgram;
 use App\Models\Facility;
-use App\Models\GlobalSite;
+use App\Models\Faq;
 use App\Models\ImpactProgram;
+use App\Models\InvestorDocument;
+use App\Models\InvestorHubCard;
 use App\Models\JobVacancy;
 use App\Models\LegalPage;
 use App\Models\Milestone;
@@ -17,7 +21,9 @@ use App\Models\OnlineShop;
 use App\Models\Page;
 use App\Models\Person;
 use App\Models\Product;
+use App\Models\ProductBanner;
 use App\Models\ProductCategory;
+use App\Models\SocialLink;
 use App\Support\Localize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -42,7 +48,9 @@ class PageController extends Controller
     private function page(string $slug): ?array
     {
         $p = Page::where('slug', $slug)->first();
-        if (! $p) return null;
+        if (! $p) {
+            return null;
+        }
 
         return [
             'metaTitle' => $p->tr('meta_title'),
@@ -61,6 +69,8 @@ class PageController extends Controller
             'ctaTitle' => $p->tr('cta_title'),
             'underDevelopment' => (bool) $p->under_development,
             'intro' => $p->tr('intro'),
+            'healthTitle' => $p->tr('health_title'),
+            'healthDesc' => $p->tr('health_desc'),
             'vision' => $p->tr('vision'),
             'mission' => $p->tr('mission'),
             'values' => $p->tr('values'),
@@ -105,7 +115,7 @@ class PageController extends Controller
             'categories' => ProductCategory::orderBy('sort')->get()->map(fn ($c) => [
                 'name' => $c->tr('name'), 'image' => $this->img($c->image),
             ]),
-            'productBanners' => \App\Models\ProductBanner::orderBy('sort')->take(3)->get()->map(fn ($b) => [
+            'productBanners' => ProductBanner::orderBy('sort')->take(3)->get()->map(fn ($b) => [
                 'title' => $b->tr('title'), 'image' => $this->img($b->image), 'link' => $b->link,
             ]),
             'articles' => Article::published()->latest('published_at')->take(3)->get()->map(fn ($a) => $this->articleCard($a)),
@@ -120,7 +130,7 @@ class PageController extends Controller
 
         return Inertia::render('About', [
             'page' => $this->page('about'),
-            'milestones' => \App\Models\AboutHistory::orderBy('sort')->get()->map(fn ($m) => [
+            'milestones' => AboutHistory::orderBy('sort')->get()->map(fn ($m) => [
                 'year' => $m->year, 'caption' => $m->tr('caption'), 'photo' => $this->img($m->photo),
             ]),
             'commissioners' => Person::where('group', 'commissioners')->orderBy('sort')->get()->map($person),
@@ -197,7 +207,7 @@ class PageController extends Controller
         // platform name; null when no such link / no product icon is uploaded,
         // in which case the popup falls back to a built-in glyph.
         $socialIcon = fn ($keyword) => $this->img(
-            optional(\App\Models\SocialLink::where('name', 'like', '%'.$keyword.'%')->first())->product_icon
+            optional(SocialLink::where('name', 'like', '%'.$keyword.'%')->first())->product_icon
         );
 
         return Inertia::render('Products', [
@@ -463,7 +473,7 @@ class PageController extends Controller
 
     public function investor()
     {
-        $docs = \App\Models\InvestorDocument::orderByDesc('year')->orderBy('sort')->get();
+        $docs = InvestorDocument::orderByDesc('year')->orderBy('sort')->get();
         $map = fn ($rows) => $rows->values()->map(fn ($d) => [
             'title' => $d->tr('title'), 'year' => $d->year,
             'fileId' => $this->img($d->file_id), 'fileEn' => $this->img($d->file_en),
@@ -472,7 +482,7 @@ class PageController extends Controller
         return Inertia::render('Investor', [
             'page' => $this->page('investor'),
             // Hub sub-menu cards; `key` selects the section the card opens.
-            'hubCards' => \App\Models\InvestorHubCard::where('is_visible', true)
+            'hubCards' => InvestorHubCard::where('is_visible', true)
                 ->orderBy('sort')->get()
                 ->map(fn ($c) => [
                     'key' => $c->key,
@@ -497,13 +507,13 @@ class PageController extends Controller
                 'description' => $v->tr('description'),
                 'requirements' => $v->tr('requirements'), 'applyUrl' => $v->apply_url,
             ]),
-            'faqs' => \App\Models\Faq::orderBy('sort')->get()->map(fn ($f) => [
+            'faqs' => Faq::orderBy('sort')->get()->map(fn ($f) => [
                 'question' => $f->tr('question'), 'answer' => $f->tr('answer'),
             ]),
         ]);
     }
 
-    public function contactSubmit(\Illuminate\Http\Request $request)
+    public function contactSubmit(Request $request)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -513,11 +523,11 @@ class PageController extends Controller
             'message' => 'required|string|max:5000',
         ]);
 
-        \App\Models\ContactMessage::create([
+        ContactMessage::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'subject' => $data['subject'] ?? null,
-            'message' => (! empty($data['phone']) ? 'Phone: ' . $data['phone'] . "\n\n" : '') . $data['message'],
+            'message' => (! empty($data['phone']) ? 'Phone: '.$data['phone']."\n\n" : '').$data['message'],
         ]);
 
         return back()->with('contact_success', true);

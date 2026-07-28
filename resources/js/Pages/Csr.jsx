@@ -121,15 +121,27 @@ export default function Csr({ page, esg, health, sports }) {
               </>
             )}
 
-            {/* Health Campaign — heading + description removed by request. The
-                cards flow directly under the ESG cards inside the same section
-                and container (no separate section padding), so the first card
-                moves up and aligns with the previous section. Buttons are
+            {/* Health Campaign. Heading and description are CMS fields on the
+                csr Page record (health_title_* / health_desc_*), so an admin can
+                edit them or blank both to hide the heading entirely — there is
+                deliberately no hardcoded fallback. The cards stay inside the ESG
+                section's container (no separate section padding), so the first
+                card still aligns with the previous section. Buttons are
                 per-card: "Kampanye Hidup Sehat" has its detail url cleared in
                 PageController::csr() (no button), while "Education" keeps its
                 "Pelajari Lebih Lanjut" link. */}
             {health.length > 0 && (
-              <CsrList items={health} learnMore={learnMore} />
+              <>
+                {(page?.healthTitle || page?.healthDesc) && (
+                  <div className="sec-head sec-head--product rv">
+                    {page?.healthTitle && (
+                      <h2 className="display">{page.healthTitle}</h2>
+                    )}
+                    {page?.healthDesc && <p>{page.healthDesc}</p>}
+                  </div>
+                )}
+                <CsrList items={health} learnMore={learnMore} />
+              </>
             )}
           </div>
         </section>

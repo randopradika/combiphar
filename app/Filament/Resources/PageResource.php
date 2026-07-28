@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PageResource\Pages;
-use App\Filament\Resources\PageResource\RelationManagers;
 use App\Models\Page;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PageResource extends Resource
 {
@@ -135,6 +132,12 @@ class PageResource extends Resource
                     ->schema([
                         Forms\Components\Textarea::make('intro_id')->label('Deskripsi / Intro (ID)')->rows(3),
                         Forms\Components\Textarea::make('intro_en')->label('Deskripsi / Intro (EN)')->rows(3),
+                        Forms\Components\TextInput::make('health_title_id')
+                            ->label('Judul Health Campaign (ID)')
+                            ->helperText('Judul di atas kartu Health Campaign. Kosongkan judul dan deskripsi (ID dan EN) untuk menyembunyikannya.'),
+                        Forms\Components\TextInput::make('health_title_en')->label('Health Campaign heading (EN)'),
+                        Forms\Components\Textarea::make('health_desc_id')->label('Deskripsi Health Campaign (ID)')->rows(3),
+                        Forms\Components\Textarea::make('health_desc_en')->label('Health Campaign description (EN)')->rows(3),
                     ]),
                 Forms\Components\Section::make('Footer — Copyright')
                     ->description('Teks copyright di footer. Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
