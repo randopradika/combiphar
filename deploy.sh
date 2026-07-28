@@ -71,5 +71,29 @@ $EXEC php artisan storage:link --force || true
 log "Restarting app container (SSR daemon reloads the fresh bundle)"
 $DC restart app
 
+# Verify SSR actually came back. A dead daemon falls back to client-side
+# rendering, so the site looks fine while every page ships an empty shell —
+# this check is the only thing that makes that failure visible. Non-fatal: a
+# CSR-only site still works, and failing the deploy here would help nobody.
+log "Verifying SSR daemon"
+ssr_ok=0
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+    if $EXEC curl -sf -m 3 http://127.0.0.1:13714/health >/dev/null 2>&1; then
+        ssr_ok=1
+        break
+    fi
+    sleep 3
+done
+
+if [ "$ssr_ok" = 1 ] && $EXEC curl -sf -m 10 http://127.0.0.1:80/id 2>/dev/null | grep -q '<section'; then
+    log "SSR healthy (daemon up, server-rendered markup confirmed)"
+else
+    printf '\n\033[1;31mWARNING:\033[0m SSR is NOT serving rendered markup — the site is falling back to CSR.\n' >&2
+    printf 'Daemon health on 127.0.0.1:13714: %s\n' "$([ "$ssr_ok" = 1 ] && echo up || echo DOWN)" >&2
+    printf -- '--- last 40 lines of storage/logs/ssr.log ---\n' >&2
+    $EXEC tail -n 40 storage/logs/ssr.log 2>&1 || echo '(no ssr.log)'
+    printf -- '--- end ssr.log ---\n' >&2
+fi
+
 log "Deploy complete"
 $DC ps
