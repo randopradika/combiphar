@@ -302,7 +302,13 @@ class PageController extends Controller
             'page' => $this->page('csr'),
             'esg' => $map($all->where('category', 'esg')),
             'health' => $health,
-            'sports' => $map($all->where('category', 'sports')),
+            // Sports cards read as a plain alphabetical list (Basketball →
+            // Tennis). Sorted here rather than by renumbering `sort`, because
+            // that column is hidden from admins and auto-appends — so a sport
+            // added later slots in alphabetically on its own.
+            'sports' => $map($all->where('category', 'sports'))
+                ->sortBy('title', SORT_NATURAL | SORT_FLAG_CASE)
+                ->values(),
         ]);
     }
 
