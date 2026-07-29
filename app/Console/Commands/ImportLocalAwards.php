@@ -11,17 +11,105 @@ class ImportLocalAwards extends Command
 {
     protected $signature = 'awards:import-local
         {--path= : Folder holding the {year}-*.zip archives (default: base_path/award)}
+        {--from-dir= : Import from a plain folder of {year}/ subfolders instead of zips}
+        {--export= : Also write the imported rows to this JSON file (e.g. database/data/awards.json)}
         {--dry-run : List what would be imported without writing files or rows}';
 
-    protected $description = 'Import award images from per-year zip archives (award/{year}-*.zip) into the Award CMS records for the "Pencapaian & Penghargaan" popup.';
+    protected $description = 'Import award images — from per-year zip archives (award/{year}-*.zip) or a {year}/ folder tree (--from-dir) — into the Award CMS records for the "Pencapaian & Penghargaan" popup.';
 
     /** Image extensions we import (the popup renders <img>); everything else (PDF, …) is skipped. */
     private const IMAGE_EXT = ['jpg', 'jpeg', 'png', 'webp'];
 
+    private int $sort = 0;
+
+    private int $imported = 0;
+
+    private int $skipped = 0;
+
+    /** @var list<array{title_id:string,title_en:string,year:string,image:string}> */
+    private array $rows = [];
+
     public function handle(): int
     {
-        $dir = $this->option('path') ?: base_path('award');
+        $this->sort = (int) (Award::max('sort') ?? 0);
+        $dry = (bool) $this->option('dry-run');
 
+        $status = $this->option('from-dir')
+            ? $this->importFromDir((string) $this->option('from-dir'), $dry)
+            : $this->importFromZips($this->option('path') ?: base_path('award'), $dry);
+
+        if ($status !== self::SUCCESS) {
+            return $status;
+        }
+
+        $verb = $dry ? 'Would import' : 'Imported/updated';
+        $this->info("{$verb} {$this->imported} award images; skipped {$this->skipped} non-image files (PDFs, etc.).");
+
+        if ($export = $this->option('export')) {
+            $this->writeExport((string) $export, $dry);
+        }
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Import a plain folder tree: {dir}/{year}/{Descriptive-Name}.jpg — the shape
+     * of the hand-curated "Edited" award folder. Deterministic destinations, so a
+     * re-run updates the same rows instead of duplicating them.
+     */
+    private function importFromDir(string $dir, bool $dry): int
+    {
+        if (! is_dir($dir)) {
+            $this->error("Award folder not found: {$dir}");
+
+            return self::FAILURE;
+        }
+
+        $years = glob(rtrim($dir, '/\\').'/*', GLOB_ONLYDIR) ?: [];
+        sort($years);
+
+        if (! $years) {
+            $this->error("No {year}/ subfolders found in {$dir}");
+
+            return self::FAILURE;
+        }
+
+        foreach ($years as $yearDir) {
+            $year = basename($yearDir);
+            if (! preg_match('/^\d{4}$/', $year)) {
+                $this->warn("Skipping non-year folder: {$year}");
+
+                continue;
+            }
+
+            $files = glob($yearDir.'/*') ?: [];
+            sort($files);
+
+            foreach ($files as $file) {
+                if (! is_file($file)) {
+                    continue;
+                }
+
+                $base = basename($file);
+                if (str_starts_with($base, '.')) {
+                    continue;
+                }
+
+                $this->importOne(
+                    entryKey: "{$year}/{$base}",
+                    base: $base,
+                    year: $year,
+                    dry: $dry,
+                    read: fn () => file_get_contents($file),
+                );
+            }
+        }
+
+        return self::SUCCESS;
+    }
+
+    private function importFromZips(string $dir, bool $dry): int
+    {
         if (! is_dir($dir)) {
             $this->error("Award folder not found: {$dir}");
 
@@ -34,11 +122,6 @@ class ImportLocalAwards extends Command
 
             return self::FAILURE;
         }
-
-        $dry = (bool) $this->option('dry-run');
-        $sort = (int) (Award::max('sort') ?? 0);
-        $imported = 0;
-        $skipped = 0;
 
         foreach ($zips as $zipPath) {
             $year = $this->yearFromZipName(basename($zipPath));
@@ -64,62 +147,102 @@ class ImportLocalAwards extends Command
                     continue;
                 }
 
-                $ext = strtolower(pathinfo($base, PATHINFO_EXTENSION));
-                if (! in_array($ext, self::IMAGE_EXT, true)) {
-                    $skipped++;        // PDFs / certificates / other non-images
-                    continue;
-                }
-
                 // Prefer the year from the entry's top folder (e.g. "2013/IMG.jpg"); fall back to the zip name.
-                $entryYear = $this->yearFromEntry($name) ?? $year;
-
-                // Deterministic destination so re-runs update the same row instead of duplicating.
-                $slug = Str::slug(pathinfo($base, PATHINFO_FILENAME)) ?: 'award';
-                $dest = "awards/{$entryYear}/{$slug}-".substr(md5($name), 0, 6).'.'.$ext;
-
-                [$titleId, $titleEn] = $this->titlesFor($base, $entryYear);
-
-                if ($dry) {
-                    $this->line("[{$entryYear}] {$titleId}  ←  {$name}");
-                    $imported++;
-
-                    continue;
-                }
-
-                $bytes = $zip->getFromIndex($i);
-                if ($bytes === false) {
-                    $this->warn("Could not read {$name} — skipped.");
-                    $skipped++;
-
-                    continue;
-                }
-
-                Storage::disk('public')->put($dest, $bytes);
-
-                Award::updateOrCreate(
-                    ['image' => $dest],
-                    [
-                        'title_id' => $titleId,
-                        'title_en' => $titleEn,
-                        'year' => $entryYear,
-                        'is_hero' => false,
-                        'sort' => ++$sort,
-                    ]
+                $this->importOne(
+                    entryKey: $name,
+                    base: $base,
+                    year: $this->yearFromEntry($name) ?? $year,
+                    dry: $dry,
+                    read: fn () => $zip->getFromName($name),
                 );
-                $imported++;
             }
 
             $zip->close();
         }
 
-        $verb = $dry ? 'Would import' : 'Imported/updated';
-        $this->info("{$verb} {$imported} award images; skipped {$skipped} non-image files (PDFs, etc.).");
+        return self::SUCCESS;
+    }
 
-        if (! $dry) {
-            $this->line('Next: run `php artisan images:optimize` to shrink the large photos, then check the About page popup.');
+    /**
+     * Store one image and upsert its Award row. $entryKey is the stable source
+     * path — it seeds the filename hash, so the destination (and therefore the
+     * row this updates) is the same on every run.
+     */
+    private function importOne(string $entryKey, string $base, string $year, bool $dry, callable $read): void
+    {
+        $ext = strtolower(pathinfo($base, PATHINFO_EXTENSION));
+        if (! in_array($ext, self::IMAGE_EXT, true)) {
+            $this->skipped++;        // PDFs / certificates / other non-images
+
+            return;
         }
 
-        return self::SUCCESS;
+        $slug = Str::slug(pathinfo($base, PATHINFO_FILENAME)) ?: 'award';
+        $dest = "awards/{$year}/{$slug}-".substr(md5($entryKey), 0, 6).'.'.$ext;
+
+        [$titleId, $titleEn] = $this->titlesFor($base, $year);
+
+        $this->rows[] = [
+            'title_id' => $titleId,
+            'title_en' => $titleEn,
+            'year' => $year,
+            'image' => $dest,
+        ];
+
+        if ($dry) {
+            $this->line("[{$year}] {$titleId}  ←  {$entryKey}");
+            $this->imported++;
+
+            return;
+        }
+
+        $bytes = $read();
+        if ($bytes === false) {
+            $this->warn("Could not read {$entryKey} — skipped.");
+            $this->skipped++;
+            array_pop($this->rows);
+
+            return;
+        }
+
+        Storage::disk('public')->put($dest, $bytes);
+
+        Award::updateOrCreate(
+            ['image' => $dest],
+            [
+                'title_id' => $titleId,
+                'title_en' => $titleEn,
+                'year' => $year,
+                'is_hero' => false,
+                'sort' => ++$this->sort,
+            ]
+        );
+        $this->imported++;
+    }
+
+    /**
+     * Write the imported rows as JSON. This is the file the deploy-time
+     * migration reads to recreate the same rows on every environment, so it must
+     * be regenerated (and committed) whenever the image set changes.
+     */
+    private function writeExport(string $path, bool $dry): void
+    {
+        if (! str_starts_with($path, '/') && ! preg_match('/^[A-Za-z]:/', $path)) {
+            $path = base_path($path);
+        }
+
+        if ($dry) {
+            $this->line('Would write '.count($this->rows)." rows to {$path}");
+
+            return;
+        }
+
+        file_put_contents(
+            $path,
+            json_encode($this->rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n"
+        );
+
+        $this->info('Wrote '.count($this->rows)." rows to {$path}");
     }
 
     /** "2013-20260722T....zip" → "2013". */
@@ -154,8 +277,11 @@ class ImportLocalAwards extends Command
             return ["Penghargaan {$year}", "Award {$year}"];
         }
 
-        // Clean a descriptive filename into a readable caption.
+        // Clean a descriptive filename into a readable caption. Hyphens are word
+        // separators ("Top-Brand-Award" → "Top Brand Award") except between
+        // digits, so a year range like "2010-2011" survives intact.
         $t = str_replace('_', ' ', $name);
+        $t = preg_replace('/(?<!\d)-|-(?!\d)/', ' ', $t);
         $t = preg_replace('/^[^\p{L}\p{N}]+/u', '', $t);   // drop leading "· ", bullets, stray punctuation
         $t = preg_replace('/\s*\(\d+\)\s*$/', '', $t);     // drop trailing " (1)" duplicate markers
         $t = trim(preg_replace('/\s+/', ' ', $t));
