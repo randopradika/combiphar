@@ -149,6 +149,33 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('wellness_desc_id')->label('Deskripsi (ID)')->rows(3),
                         Forms\Components\Textarea::make('wellness_desc_en')->label('Description (EN)')->rows(3),
                     ]),
+                Forms\Components\Section::make('Peringatan Penipuan Lowongan (tab Karir & Kontak)')
+                    ->description('Pita ungu-magenta di bagian bawah halaman. Judul tampil dalam huruf besar; tekan Enter untuk mengatur pergantian baris. Catatan diberi nomor 1, 2, 3 … secara otomatis.')
+                    ->collapsible()
+                    ->visible(fn (?Page $record) => $record?->slug === 'contact')
+                    ->schema([
+                        Forms\Components\Textarea::make('fraud_title_id')
+                            ->label('Judul (ID)')
+                            ->rows(2)
+                            ->helperText('Contoh: "HATI-HATI PENIPUAN" lalu Enter lalu "LOWONGAN KERJA".'),
+                        Forms\Components\Textarea::make('fraud_title_en')->label('Title (EN)')->rows(2),
+                        Forms\Components\Repeater::make('fraud_items')
+                            ->label('Catatan Bernomor')
+                            ->helperText('Kosongkan seluruh daftar untuk menyembunyikan catatan. Gunakan tebal untuk menyorot nomor telepon atau akun.')
+                            ->addActionLabel('Tambah Catatan')
+                            ->reorderable()
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->columnSpanFull()
+                            ->schema([
+                                Forms\Components\RichEditor::make('text_id')
+                                    ->label('Teks (ID)')
+                                    ->toolbarButtons(['bold', 'italic', 'link', 'undo', 'redo']),
+                                Forms\Components\RichEditor::make('text_en')
+                                    ->label('Text (EN)')
+                                    ->toolbarButtons(['bold', 'italic', 'link', 'undo', 'redo']),
+                            ]),
+                    ]),
                 Forms\Components\Section::make('Footer — Copyright')
                     ->description('Teks copyright di footer. Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
                     ->collapsible()

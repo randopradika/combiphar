@@ -594,6 +594,37 @@ export default function Contact({ page, vacancies, faqs, wellness = [] }) {
               </div>
             </div>
           </section>
+
+          {/* Recruitment-fraud warning (Figma 987:51) — Karir only, per the
+              design. Headline and notes are CMS fields on the contact Page
+              record; the notes carry admin-authored bold, so they render as
+              HTML like the other rich-text fields on the site. */}
+          {(page?.fraudTitle || page?.fraudItems?.length > 0) && (
+            <section className="warning">
+              <div className="container warning__inner">
+                {page?.fraudTitle && (
+                  <div className="warning__lead">
+                    <span className="warning__badge warning__badge--alert">!</span>
+                    <h2 className="warning__title">{page.fraudTitle}</h2>
+                  </div>
+                )}
+
+                {page?.fraudItems?.length > 0 && (
+                  <ol className="warning__notes">
+                    {page.fraudItems.map((html, i) => (
+                      <li className="warning__note" key={i}>
+                        <span className="warning__badge">{i + 1}</span>
+                        <div
+                          className="warning__note-text"
+                          dangerouslySetInnerHTML={{ __html: html }}
+                        />
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </div>
+            </section>
+          )}
         </>
       )}
 
@@ -803,33 +834,6 @@ export default function Contact({ page, vacancies, faqs, wellness = [] }) {
           </section>
         </>
       )}
-
-      <section className="warning">
-        <div className="container warning__inner">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
-          </svg>
-          <div>
-            <h3>
-              {en
-                ? "Official Combiphar recruitment information is only available here. Don't fall for scams impersonating us."
-                : "Informasi rekrutmen resmi Combiphar hanya tersedia di sini. Jangan tertipu penipuan yang mengatasnamakan kami."}
-            </h3>
-            {/* <p>
-              {en
-                ? "Combiphar never charges any fees during recruitment. All official recruitment is conducted only through Combiphar official channels."
-                : "Combiphar tidak pernah memungut biaya apa pun selama proses rekrutmen. Seluruh proses rekrutmen resmi hanya dilakukan melalui kanal resmi Combiphar."}
-            </p> */}
-          </div>
-        </div>
-      </section>
 
       <Modal
         open={!!vac}

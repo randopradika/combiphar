@@ -80,6 +80,14 @@ class PageController extends Controller
             'healthDesc' => $p->tr('health_desc'),
             'wellnessTitle' => $p->tr('wellness_title'),
             'wellnessDesc' => $p->tr('wellness_desc'),
+            'fraudTitle' => $p->tr('fraud_title'),
+            // Each note is a bilingual pair; hand the page the active locale
+            // (falling back to ID) and drop notes an admin left empty.
+            'fraudItems' => collect($p->fraud_items ?? [])
+                ->map(fn ($i) => trim($i['text_'.app()->getLocale()] ?? '') ?: trim($i['text_id'] ?? ''))
+                ->filter()
+                ->values()
+                ->all(),
             'vision' => $p->tr('vision'),
             'mission' => $p->tr('mission'),
             'values' => $p->tr('values'),

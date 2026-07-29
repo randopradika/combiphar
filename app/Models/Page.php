@@ -13,5 +13,7 @@ class Page extends Model
 
     protected $casts = [
         'under_development' => 'boolean',
+        // Bilingual rich-text notes in the recruitment-fraud band (Figma 987:51).
+        'fraud_items' => 'array',
     ];
 }

@@ -6,7 +6,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {{-- Barlow Condensed is used only by the recruitment-fraud headline (Figma 987:51); it rides on the existing request rather than opening a new one. --}}
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
     @if (app()->environment('production'))
         {{-- Same GA4 property the old combiphar.com build reports to --}}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2PSJXT6M6"></script>

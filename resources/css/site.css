@@ -2059,11 +2059,107 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .field textarea{min-height:130px;resize:vertical}
 .field small{color:#C62547;font-size:13px}
 .form-success{background:#E7F6EC;color:#1E8E5A;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-weight:600}
-.warning{background:#FBECEF;padding:clamp(30px,4vw,54px) 0}
-.warning__inner{display:flex;gap:18px;align-items:flex-start}
-.warning>.warning__inner>svg,.warning svg{width:40px;height:40px;color:#C62547;flex:none}
-.warning h3{font-family:var(--font-display);font-weight:700;color:#C62547;margin-bottom:8px}
-.warning p{color:var(--text-muted);line-height:1.6}
+/* ---------- Recruitment-fraud warning band (Karir, Figma 987:51) ---------- */
+/* Full-bleed magenta→purple band: headline left, numbered notes beside it.
+   Three columns on desktop, stacking to one on narrow screens. */
+.warning {
+  background: linear-gradient(142deg, #c92b82 10%, #3e1f65 104%);
+  padding: clamp(48px, 5.5vw, 92px) 0;
+}
+
+.warning__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 545fr) minmax(0, 1005fr);
+  gap: clamp(32px, 4vw, 72px);
+  align-items: start;
+}
+
+.warning__lead {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.warning__title {
+  font-family: 'Barlow Condensed', var(--font-body), sans-serif;
+  font-weight: 700;
+  font-size: clamp(38px, 3.9vw, 72px);
+  line-height: 1;
+  color: #fff;
+  text-transform: uppercase;
+  /* The CMS title carries its own line break, so the admin controls the wrap. */
+  white-space: pre-line;
+}
+
+.warning__notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(28px, 3vw, 56px);
+}
+
+.warning__note {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.warning__badge {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #9e2779;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.warning__badge--alert {
+  background: var(--magenta);
+  color: #fff;
+  font-size: 34px;
+}
+
+.warning__note-text,
+.warning__note-text p {
+  color: #fff;
+  font-size: clamp(17px, 1.15vw, 20px);
+  line-height: 1.6;
+}
+
+.warning__note-text strong {
+  font-weight: 700;
+}
+
+.warning__note-text a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+  .warning__inner {
+    grid-template-columns: 1fr;
+    gap: clamp(32px, 5vw, 48px);
+  }
+}
+
+@media (max-width: 720px) {
+  .warning__notes {
+    grid-template-columns: 1fr;
+  }
+
+  .warning__lead,
+  .warning__note {
+    gap: 18px;
+  }
+}
 .vac-modal__head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:22px}
 .vac-modal h3{font-family:var(--font-display);font-weight:700;font-size:clamp(24px,2.4vw,40px);line-height:1.1;color:#7a2e92}
 .vac-modal__loc{margin-top:12px;color:var(--text);font-size:16px}
@@ -2470,37 +2566,6 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
   color: #555;
   font-size: 16px;
   line-height: 1.85;
-}
-
-.warning {
-  background: linear-gradient(90deg, #cf167d 0%, #4f1d82 100%);
-  padding: clamp(48px, 6vw, 84px) 0;
-}
-
-.warning__inner {
-  justify-content: center;
-  text-align: center;
-}
-
-.warning__inner svg {
-  display: none;
-}
-
-.warning h3,
-.warning p {
-  color: #fff;
-}
-
-.warning h3 {
-  margin-bottom: 8px;
-  font-size: clamp(28px, 2.3vw, 44px);
-}
-
-.warning p {
-  max-width: 40ch;
-  margin-inline: auto;
-  font-size: clamp(18px, 1.35vw, 22px);
-  line-height: 1.6;
 }
 
 @media (max-width: 1100px) {
