@@ -133,7 +133,7 @@ export default function Csr({ page, esg, health, sports }) {
             {health.length > 0 && (
               <>
                 {(page?.healthTitle || page?.healthDesc) && (
-                  <div className="sec-head sec-head--product rv">
+                  <div className="sec-head sec-head--product csr-health-head rv">
                     {page?.healthTitle && (
                       <h2 className="display">{page.healthTitle}</h2>
                     )}
