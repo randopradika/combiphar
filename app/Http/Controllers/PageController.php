@@ -24,6 +24,7 @@ use App\Models\Product;
 use App\Models\ProductBanner;
 use App\Models\ProductCategory;
 use App\Models\SocialLink;
+use App\Models\WellnessProgram;
 use App\Support\Localize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +40,12 @@ class PageController extends Controller
 
         // Imported products may store an absolute image URL (e.g. combiphar.com) — use as-is.
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        // Seeded defaults that ship in public/ (e.g. "/img/wellness/football.png")
+        // are already web paths; only storage-disk paths need Storage::url().
+        if (str_starts_with($path, '/')) {
             return $path;
         }
 
@@ -71,6 +78,8 @@ class PageController extends Controller
             'intro' => $p->tr('intro'),
             'healthTitle' => $p->tr('health_title'),
             'healthDesc' => $p->tr('health_desc'),
+            'wellnessTitle' => $p->tr('wellness_title'),
+            'wellnessDesc' => $p->tr('wellness_desc'),
             'vision' => $p->tr('vision'),
             'mission' => $p->tr('mission'),
             'values' => $p->tr('values'),
@@ -515,6 +524,9 @@ class PageController extends Controller
             ]),
             'faqs' => Faq::orderBy('sort')->get()->map(fn ($f) => [
                 'question' => $f->tr('question'), 'answer' => $f->tr('answer'),
+            ]),
+            'wellness' => WellnessProgram::orderBy('sort')->get()->map(fn ($w) => [
+                'icon' => $this->img($w->icon), 'title' => $w->tr('title'), 'body' => $w->tr('body'),
             ]),
         ]);
     }

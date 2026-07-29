@@ -139,6 +139,16 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('health_desc_id')->label('Deskripsi Health Campaign (ID)')->rows(3),
                         Forms\Components\Textarea::make('health_desc_en')->label('Health Campaign description (EN)')->rows(3),
                     ]),
+                Forms\Components\Section::make('Employee Wellness Program (tab Karir)')
+                    ->description('Judul dan deskripsi di atas lingkaran program. Programnya sendiri dikelola di menu "Employee Wellness Program". Kosongkan judul dan deskripsi untuk menyembunyikan teks pengantarnya.')
+                    ->collapsible()
+                    ->visible(fn (?Page $record) => $record?->slug === 'contact')
+                    ->schema([
+                        Forms\Components\TextInput::make('wellness_title_id')->label('Judul (ID)'),
+                        Forms\Components\TextInput::make('wellness_title_en')->label('Title (EN)'),
+                        Forms\Components\Textarea::make('wellness_desc_id')->label('Deskripsi (ID)')->rows(3),
+                        Forms\Components\Textarea::make('wellness_desc_en')->label('Description (EN)')->rows(3),
+                    ]),
                 Forms\Components\Section::make('Footer — Copyright')
                     ->description('Teks copyright di footer. Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
                     ->collapsible()

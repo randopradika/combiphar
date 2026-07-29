@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react"
 import SiteLayout from "../Layouts/SiteLayout"
 import Modal from "../components/Modal"
 
-export default function Contact({ page, vacancies, faqs }) {
+export default function Contact({ page, vacancies, faqs, wellness = [] }) {
   const {
     props: { t, locale, nav, homeUrl, flash },
   } = usePage()
@@ -510,6 +510,48 @@ export default function Contact({ page, vacancies, faqs }) {
               )}
             </div>
           </section>
+
+          {/* Employee Wellness Program (Figma 987:51). Heading and lead live on
+              the contact Page record; the circles come from the Employee
+              Wellness Program CMS menu. Both are optional — an empty list hides
+              the whole section, and blank heading fields hide just the text. */}
+          {wellness.length > 0 && (
+            <section className="section wellness">
+              <div className="container">
+                {(page?.wellnessTitle || page?.wellnessDesc) && (
+                  <div className="sec-head sec-head--product rv">
+                    {page?.wellnessTitle && (
+                      <h2 className="display">{page.wellnessTitle}</h2>
+                    )}
+                    {page?.wellnessDesc && <p>{page.wellnessDesc}</p>}
+                  </div>
+                )}
+
+                <ul className="wellness__grid rv">
+                  {wellness.map((w, i) => (
+                    <li className="wellness__item" key={i}>
+                      <div
+                        className={`wellness__circle wellness__circle--${(i % 4) + 1}`}
+                      >
+                        {w.icon && (
+                          <img
+                            src={w.icon}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        )}
+                      </div>
+
+                      {w.title && <h3 className="wellness__title">{w.title}</h3>}
+                      {w.body && <p className="wellness__body">{w.body}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
+
           <section className="section recruitment-process-section">
             <div className="container">
               <div className="sec-head rv">
