@@ -31,10 +31,18 @@ jobs:
           script_stop: true
           # First deploy builds the image from scratch (apt, gd, node) — give it room.
           command_timeout: 30m
-          # One line on purpose. The server's deploy.sh is a stale copy that
-          # never rebuilds or restarts the app container, which left the SSR
-          # daemon dead for 10 days, and extra lines added to this script were
-          # silently not executed. Chaining the recreate here is the one channel
-          # that reliably runs: --build picks up the Dockerfile CMD (supervised
-          # SSR), --force-recreate guarantees the container actually restarts.
-          script: cd ${{ secrets.DEV_APP_PATH }} && DEPLOY_BRANCH=main bash deploy.sh && docker compose up -d --build --force-recreate app
+          # ⚠️ The dev server IGNORES this script. Three different scripts sent
+          # from here (multi-line diagnostics, and a single line chaining
+          # `&& docker compose up -d --build --force-recreate app` after a
+          # deploy.sh that exited 0) all produced byte-identical output: only a
+          # fixed deploy runs, whose log wording ("==> Starting app container")
+          # appears in no commit of deploy.sh. That points at a forced command
+          # on the deploy key (`command="..."` in the server's
+          # ~/.ssh/authorized_keys) invoking a copy of deploy.sh kept outside
+          # the repo. Consequence: that copy never rebuilds or restarts the app
+          # container, so the SSR daemon stayed dead for 10 days and no change
+          # made here can revive it. Fixing it needs shell access — see
+          # docs/DEPLOY.md, "Dev server runs its own deploy script".
+          script: |
+            cd ${{ secrets.DEV_APP_PATH }}
+            DEPLOY_BRANCH=main bash deploy.sh

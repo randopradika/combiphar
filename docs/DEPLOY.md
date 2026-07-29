@@ -142,3 +142,51 @@ DEPLOY_BRANCH=my-branch bash deploy.sh   # deploy a different branch
   server `.env`, and that the `mysql` container is healthy (`docker compose ps`).
 - **Watch the run** — Actions tab → the run → the “Deploy over SSH” step streams
   the full `deploy.sh` output.
+
+---
+
+## 6. ⚠️ The dev server runs its own deploy script (open issue)
+
+**Observed 2026-07-29.** The dev server does not run the `script:` block from
+`.github/workflows/deploy.yml`. Three different scripts were sent — multi-line
+diagnostics, and a single line chaining
+`&& docker compose up -d --build --force-recreate app` after a `deploy.sh` that
+exited 0 — and every run produced byte-identical output. None of the added
+commands executed.
+
+What does run logs `==> Starting app container`, a string that appears in **no
+commit** of `deploy.sh` (every committed version says
+`Starting / rebuilding containers`). That script has no `up -d --build` and no
+container restart, which is why `docker compose ps` reported the app container
+`Up 10 days` across several deploys.
+
+The signature fits a **forced command on the deploy key** — a `command="..."`
+prefix on the key's line in the server's `~/.ssh/authorized_keys` — invoking a
+copy of `deploy.sh` kept outside the repo. SSH ignores the client's command when
+that is set.
+
+**Consequences:** the app container is never rebuilt or restarted, so the
+Inertia SSR daemon never comes back once it dies (every page then silently
+serves the client-rendered shell), and `config:cache` plus the SSR health check
+in the tracked `deploy.sh` never run. App code, assets and migrations *do*
+deploy, because the script still does `git reset --hard` + `npm run build` +
+`migrate`.
+
+**To fix, on the server (needs shell access):**
+
+```bash
+# 1) Bring SSR back right now — the rebuild picks up the supervised CMD.
+cd /var/www/combiphar-web        # the dir holding docker-compose.yml
+docker compose up -d --build --force-recreate app
+docker compose exec -T app curl -sf http://127.0.0.1:13714/health   # expect {"status":"OK",...}
+
+# 2) Find what the deploy key actually runs, and point it at the repo's script.
+grep -n 'command=' ~/.ssh/authorized_keys
+```
+
+Remove the `command="..."` prefix (or repoint it at
+`cd <repo> && bash deploy.sh`) so the tracked `deploy.sh` — which rebuilds,
+restarts, and verifies SSR — is the script that runs.
+
+**Verify from anywhere:** `curl -s https://<dev-host>/id | grep -c '<section'`
+returns 0 when SSR is dead and a non-zero count when it is healthy.
