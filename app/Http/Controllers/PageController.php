@@ -80,6 +80,21 @@ class PageController extends Controller
             'healthDesc' => $p->tr('health_desc'),
             'wellnessTitle' => $p->tr('wellness_title'),
             'wellnessDesc' => $p->tr('wellness_desc'),
+            // Recruitment-scam pop-up (Karir tab). `enabled` is an admin toggle,
+            // so the warning can be retired without a deploy.
+            'scamPopup' => [
+                'enabled' => (bool) $p->scam_popup_enabled,
+                'title' => $p->tr('scam_title'),
+                'note' => $p->tr('scam_note'),
+                'items' => collect($p->scam_items ?? [])
+                    ->map(fn ($i) => [
+                        'icon' => $this->img($i['icon'] ?? null),
+                        'text' => trim($i['text_'.app()->getLocale()] ?? '') ?: trim($i['text_id'] ?? ''),
+                    ])
+                    ->filter(fn ($i) => $i['text'] !== '' || $i['icon'])
+                    ->values()
+                    ->all(),
+            ],
             'fraudTitle' => $p->tr('fraud_title'),
             // Each note is a bilingual pair; hand the page the active locale
             // (falling back to ID) and drop notes an admin left empty.

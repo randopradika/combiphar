@@ -9,6 +9,19 @@ export default function Contact({ page, vacancies, faqs, wellness = [] }) {
   } = usePage()
   const en = locale === "en"
   const [tab, setTab] = useState(flash.contact_success ? "kontak" : "karir")
+
+  // Recruitment-scam pop-up (Figma 987:258): opens every time the Karir tab is
+  // opened, including on a return visit — it is a fraud warning, so it is not
+  // dismissed for good. Opened from an effect rather than initial state so the
+  // server-rendered HTML never contains it (no hydration mismatch).
+  const scam = page?.scamPopup
+  const scamReady =
+    !!scam?.enabled && (!!scam?.title || scam?.items?.length > 0 || !!scam?.note)
+  const [scamOpen, setScamOpen] = useState(false)
+
+  useEffect(() => {
+    if (tab === "karir" && scamReady) setScamOpen(true)
+  }, [tab, scamReady])
   const [vac, setVac] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -834,6 +847,35 @@ export default function Contact({ page, vacancies, faqs, wellness = [] }) {
           </section>
         </>
       )}
+
+      <Modal
+        open={scamOpen}
+        onClose={() => setScamOpen(false)}
+        closeLabel={t.close}
+        className="modal__box--scam"
+      >
+        <div className="scam-modal">
+          {scam?.title && <h2 className="scam-modal__title">{scam.title}</h2>}
+
+          {scam?.items?.map((item, i) => (
+            <div className="scam-modal__item" key={i}>
+              {item.icon && (
+                <span className="scam-modal__icon">
+                  <img src={item.icon} alt="" />
+                </span>
+              )}
+              {item.text && (
+                <div
+                  className="scam-modal__text"
+                  dangerouslySetInnerHTML={{ __html: item.text }}
+                />
+              )}
+            </div>
+          ))}
+
+          {scam?.note && <p className="scam-modal__note">{scam.note}</p>}
+        </div>
+      </Modal>
 
       <Modal
         open={!!vac}

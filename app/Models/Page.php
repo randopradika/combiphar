@@ -15,5 +15,8 @@ class Page extends Model
         'under_development' => 'boolean',
         // Bilingual rich-text notes in the recruitment-fraud band (Figma 987:51).
         'fraud_items' => 'array',
+        // Recruitment-scam pop-up on the Karir tab (Figma 987:258).
+        'scam_popup_enabled' => 'boolean',
+        'scam_items' => 'array',
     ];
 }

@@ -149,6 +149,44 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('wellness_desc_id')->label('Deskripsi (ID)')->rows(3),
                         Forms\Components\Textarea::make('wellness_desc_en')->label('Description (EN)')->rows(3),
                     ]),
+                Forms\Components\Section::make('Pop-up "Recruitment Scam" (tab Karir)')
+                    ->description('Muncul setiap kali tab Karir dibuka. Matikan tombol di bawah untuk menghentikannya tanpa perlu deploy.')
+                    ->collapsible()
+                    ->visible(fn (?Page $record) => $record?->slug === 'contact')
+                    ->schema([
+                        Forms\Components\Toggle::make('scam_popup_enabled')
+                            ->label('Tampilkan pop-up')
+                            ->default(false),
+                        Forms\Components\TextInput::make('scam_title_id')->label('Judul (ID)'),
+                        Forms\Components\TextInput::make('scam_title_en')->label('Title (EN)'),
+                        Forms\Components\Repeater::make('scam_items')
+                            ->label('Poin Peringatan')
+                            ->helperText('Setiap poin tampil sebagai ikon dalam lingkaran dengan teks di bawahnya. Teks TEBAL tampil putih; teks MIRING tampil magenta (dipakai untuk nama domain, sesuai desain).')
+                            ->addActionLabel('Tambah Poin')
+                            ->reorderable()
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->columnSpanFull()
+                            ->schema([
+                                Forms\Components\FileUpload::make('icon')
+                                    ->label('Ikon')
+                                    ->helperText('PNG persegi berlatar transparan. Ikon tampil gelap di atas lingkaran lavender.')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->directory('scam'),
+                                Forms\Components\RichEditor::make('text_id')
+                                    ->label('Teks (ID)')
+                                    ->toolbarButtons(['bold', 'italic', 'undo', 'redo']),
+                                Forms\Components\RichEditor::make('text_en')
+                                    ->label('Text (EN)')
+                                    ->toolbarButtons(['bold', 'italic', 'undo', 'redo']),
+                            ]),
+                        Forms\Components\Textarea::make('scam_note_id')
+                            ->label('Catatan kecil (ID)')
+                            ->rows(3)
+                            ->helperText('Teks kecil di bagian bawah pop-up, mis. nomor Call Center dan jam layanan.'),
+                        Forms\Components\Textarea::make('scam_note_en')->label('Small print (EN)')->rows(3),
+                    ]),
                 Forms\Components\Section::make('Peringatan Penipuan Lowongan (tab Karir & Kontak)')
                     ->description('Pita ungu-magenta di bagian bawah halaman. Judul tampil dalam huruf besar; tekan Enter untuk mengatur pergantian baris. Catatan diberi nomor 1, 2, 3 … secara otomatis.')
                     ->collapsible()
