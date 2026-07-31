@@ -30,6 +30,15 @@ class HandleInertiaRequests extends Middleware
             },
             'nav' => fn () => collect(['about', 'products', 'csr', 'investor', 'news', 'contact', 'terms', 'privacy'])
                 ->mapWithKeys(fn ($s) => [$s => \App\Support\Localize::url($s)])->all(),
+            // Menu items in site order, minus any page switched off in the CMS.
+            // Only this list is filtered — hiding an item never takes its route
+            // away, so direct links and the sitemap keep working.
+            'menuSections' => function () {
+                $sections = ['about', 'products', 'csr', 'investor', 'news', 'contact'];
+                $hidden = \App\Models\Page::where('show_in_menu', false)->pluck('slug')->all();
+
+                return array_values(array_diff($sections, $hidden));
+            },
             'homeUrl' => fn () => \App\Support\Localize::url('home'),
             'flash' => fn () => ['contact_success' => (bool) session('contact_success')],
             'footer' => function () {

@@ -13,6 +13,8 @@ class Page extends Model
 
     protected $casts = [
         'under_development' => 'boolean',
+        // Shows/hides this page's item in the nav, mobile menu and footer.
+        'show_in_menu' => 'boolean',
         // Bilingual rich-text notes in the recruitment-fraud band (Figma 987:51).
         'fraud_items' => 'array',
         // Recruitment-scam pop-up on the Karir tab (Figma 987:258).

@@ -62,6 +62,11 @@ class PageResource extends Resource
                     ->helperText('Aktif: halaman Investor + tab "Investor Update" di Berita menampilkan konten "Segera Hadir". Nonaktif: menampilkan konten sebenarnya.')
                     ->visible(fn (?Page $record) => $record?->slug === 'investor')
                     ->default(false),
+                Forms\Components\Toggle::make('show_in_menu')
+                    ->label('Tampilkan menu "Investor" di navigasi')
+                    ->helperText('Nonaktif: menu Investor disembunyikan dari navigasi atas, menu mobile, dan footer. Halamannya tetap bisa dibuka lewat URL.')
+                    ->visible(fn (?Page $record) => $record?->slug === 'investor')
+                    ->default(true),
                 Forms\Components\Section::make('Media Halaman Beranda (Home)')
                     ->description('Diisi hanya untuk halaman dengan slug "home".')
                     ->collapsible()

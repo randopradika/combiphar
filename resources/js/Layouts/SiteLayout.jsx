@@ -189,6 +189,7 @@ export default function SiteLayout({ children, navMode = "solid" }) {
     locale = "id",
     routeName,
     footer,
+    menuSections = null,
   } = props
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -213,7 +214,12 @@ export default function SiteLayout({ children, navMode = "solid" }) {
     setSearchOpen(false)
   }, [url])
 
-  const menu = ["about", "products", "csr", "investor", "news", "contact"]
+  // Menu items come from the CMS (a page can be switched off). Falls back to
+  // the full list when the shared prop is absent, e.g. a page rendered outside
+  // the locale group, where HandleInertiaRequests never runs.
+  const menu = menuSections?.length
+    ? menuSections
+    : ["about", "products", "csr", "investor", "news", "contact"]
   const navClass =
     "nav" +
     (navMode === "overlay" ? " nav--overlay" : "") +
