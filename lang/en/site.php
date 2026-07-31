@@ -4,7 +4,7 @@ return [
     'nav' => [
         'about' => 'About Us',
         'products' => 'Products',
-        'csr' => 'Corporate Social Responsibility',
+        'csr' => 'Sustainability',
         'investor' => 'Investor',
         'news' => 'News',
         'contact' => 'Careers & Contact',

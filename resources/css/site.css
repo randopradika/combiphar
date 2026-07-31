@@ -2903,8 +2903,9 @@ h3.display,.h3{font-size:clamp(22px,2.2vw,34px)}
     color:#3E1D81;
 }
 
+/* Hover shows the same indicator bar as the active page. */
 .nav__menu a:hover::after{
-    opacity: 0; /* optional */
+    opacity:1;
     transform:translateX(-50%) scaleX(1);
 }
 
@@ -2944,6 +2945,8 @@ h3.display,.h3{font-size:clamp(22px,2.2vw,34px)}
 .nav--overlay:not(.nav--scrolled) .nav__search{color:#fff}
 .nav--overlay:not(.nav--scrolled) .nav__menu a.active{color:#fff}
 .nav--overlay:not(.nav--scrolled) .nav__lang a.active{color:#fff}
+/* ...so the hover/active indicator is white too, not dark purple on the hero */
+.nav--overlay:not(.nav--scrolled) .nav__menu a::after{background:#fff}
 
 /* Sub-page banner: ~600px tall, FS Albert 96px white title, dark-purple foot gradient */
 .banner{min-height:600px;display:flex;align-items:flex-end;padding:0 0 clamp(44px,5vw,72px)}
