@@ -5,10 +5,18 @@ import Modal from "../components/Modal"
 
 export default function Contact({ page, vacancies, faqs, wellness = [] }) {
   const {
+    url,
     props: { t, locale, nav, homeUrl, flash },
   } = usePage()
   const en = locale === "en"
-  const [tab, setTab] = useState(flash.contact_success ? "kontak" : "karir")
+  // A nav link may open a tab: /contact?tab=kontak. A successful submit still
+  // wins, so the thank-you message is never hidden behind the wrong tab.
+  const [tab, setTab] = useState(() => {
+    if (flash.contact_success) return "kontak"
+    const asked = new URLSearchParams(url.split("?")[1] || "").get("tab")
+
+    return asked === "kontak" ? "kontak" : "karir"
+  })
 
   // Recruitment-scam pop-up (Figma 987:258): opens every time the Karir tab is
   // opened, including on a return visit — it is a fraud warning, so it is not

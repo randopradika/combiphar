@@ -220,6 +220,8 @@ export default function SiteLayout({ children, navMode = "solid" }) {
   const menu = menuSections?.length
     ? menuSections
     : ["about", "products", "csr", "investor", "news", "contact"]
+  // Hover menus keyed by nav section; see lang/*/site.php `nav.menus`.
+  const navMenus = t.nav?.menus || {}
   const navClass =
     "nav" +
     (navMode === "overlay" ? " nav--overlay" : "") +
@@ -297,15 +299,56 @@ export default function SiteLayout({ children, navMode = "solid" }) {
             />
           </Link>
           <nav className="nav__menu" aria-label="Main menu">
-            {menu.map((s) => (
-              <Link
-                key={s}
-                href={nav[s]}
-                className={routeName === s ? "active" : ""}
-              >
-                {t.nav?.[s]}
-              </Link>
-            ))}
+            {menu.map((s) => {
+              const link = (
+                <Link
+                  key={s}
+                  href={nav[s]}
+                  className={routeName === s ? "active" : ""}
+                >
+                  {t.nav?.[s]}
+                </Link>
+              )
+              // Hover menus are desktop only — .nav__menu is hidden below 961px,
+              // where the burger takes over.
+              const items = navMenus[s]
+              if (!items?.length) return link
+
+              // An item hangs off its own section unless it names another one.
+              const href = (it) => `${nav[it.base || s] || ""}${it.suffix || ""}`
+
+              return (
+                <div className="nav__item" key={s}>
+                  {link}
+                  <div className="nav__dropdown">
+                    {items.map((it) =>
+                      // Plain <a> throughout: the browser handles the in-page
+                      // jump. An Inertia <Link> re-renders and loses the hash.
+                      it.head || it.children?.length ? (
+                        <div className="nav__dropgroup" key={it.suffix}>
+                          <a className="nav__dropgroup-head" href={href(it)}>
+                            {it.label}
+                          </a>
+                          {(it.children || []).map((c) => (
+                            <a
+                              className="nav__dropsub"
+                              key={c.suffix}
+                              href={href(c)}
+                            >
+                              {c.label}
+                            </a>
+                          ))}
+                        </div>
+                      ) : (
+                        <a key={it.suffix} href={href(it)}>
+                          {it.label}
+                        </a>
+                      ),
+                    )}
+                  </div>
+                </div>
+              )
+            })}
           </nav>
           <div className="nav__tools">
             <span className="nav__lang" aria-label="Language">

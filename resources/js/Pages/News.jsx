@@ -51,10 +51,19 @@ export default function News({
   investorUnderDevelopment = false,
 }) {
   const {
+    url,
     props: { t, locale, homeUrl },
   } = usePage()
   const en = locale === "en"
-  const [tab, setTab] = useState("health")
+  // A nav link may open a specific tab: /news?tab=product. Read from the
+  // Inertia url (not window) so the server render picks the same tab.
+  const [tab, setTab] = useState(() => {
+    const asked = new URLSearchParams(url.split("?")[1] || "").get("tab")
+
+    return ["health", "product", "investor", "others"].includes(asked)
+      ? asked
+      : "health"
+  })
   const [pageNum, setPageNum] = useState(1)
   const [mobileOpen, setMobileOpen] = useState(false)
 

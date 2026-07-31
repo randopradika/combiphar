@@ -109,7 +109,7 @@ export default function Csr({ page, esg, health, sports }) {
           <div className="container">
             {esg.length > 0 && (
               <>
-                <div className="sec-head sec-head--product rv">
+                <div className="sec-head sec-head--product rv" id="esg">
                   <h2 className="display">Environmental, Social, and Governance</h2>
                   <p>
                     {en
@@ -133,7 +133,10 @@ export default function Csr({ page, esg, health, sports }) {
             {health.length > 0 && (
               <>
                 {(page?.healthTitle || page?.healthDesc) && (
-                  <div className="sec-head sec-head--product csr-health-head rv">
+                  <div
+                    className="sec-head sec-head--product csr-health-head rv"
+                    id="health"
+                  >
                     {page?.healthTitle && (
                       <h2 className="display">{page.healthTitle}</h2>
                     )}
@@ -148,7 +151,7 @@ export default function Csr({ page, esg, health, sports }) {
       )}
 
       {sports.length > 0 && (
-        <section className="section">
+        <section className="section" id="sport">
           <div className="container">
             <div className="sec-head sec-head--product rv">
               <h2 className="display">Sports</h2>

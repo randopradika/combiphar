@@ -136,7 +136,7 @@ export default function About({
         </div>
       </section>
 
-      <section className="section">
+      <section className="section" id="sekilas">
         <div className="container">
           <p className="about-intro rv">
             {page?.intro ||
@@ -148,7 +148,7 @@ export default function About({
       </section>
 
       {milestones.length > 0 && (
-        <section className="section section--history">
+        <section className="section section--history" id="sejarah">
           <div className="container journey-head rv">
             <span className="eyebrow eyebrow--magenta">{t.nav.about}</span>
             <h2 className="display">
@@ -160,7 +160,7 @@ export default function About({
       )}
 
       {(page?.vision || page?.mission || page?.values) && (
-        <section className="section">
+        <section className="section" id="visi-misi">
           <div className="container">
             <div className="vmv-list">
               {page?.vision && (
@@ -241,7 +241,7 @@ export default function About({
         directors.length > 0 ||
         auditCommittee.length > 0 ||
         corporateSecretary.length > 0) && (
-        <section className="section">
+        <section className="section" id="kepemimpinan">
           <div className="container">
             {commissioners.length > 0 && (
               <>
@@ -299,7 +299,7 @@ export default function About({
       )}
 
       {awards.length > 0 && (
-        <section className="section">
+        <section className="section" id="penghargaan">
           <div className="container">
             <div className="sec-head sec-head--center rv">
               <span className="eyebrow eyebrow--magenta">
@@ -426,7 +426,11 @@ export default function About({
         </div>
       </Modal>
 
-      <section className="section" style={{ background: "var(--surface)" }}>
+      <section
+        className="section"
+        id="kehadiran"
+        style={{ background: "var(--surface)" }}
+      >
         <div className="container">
           <div className="sec-head sec-head--center rv">
             <span className="eyebrow eyebrow--magenta">
@@ -579,7 +583,7 @@ export default function About({
 
       <section className="section">
         <div className="container">
-          <div className="about-feature rv">
+          <div className="about-feature rv" id="manufacturing">
             <div className="about-feature__body">
               <span className="eyebrow">ABOUT US</span>
               <h2 className="display">
@@ -603,7 +607,7 @@ export default function About({
               />
             </div>
           </div>
-          <div className="about-feature about-feature--flip rv">
+          <div className="about-feature about-feature--flip rv" id="international">
             <div className="about-feature__body">
               <span className="eyebrow">ABOUT US</span>
               <h2 className="display">

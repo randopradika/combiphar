@@ -916,23 +916,39 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
   font-weight: 700;
 }
 
+/* Reads as a control: the bar is #BD106F, so the trigger takes the darker
+   fill the active desktop tab uses instead of disappearing into it. */
 .subnav__trigger{
   width: 100%;
-  min-height: 44px;
-  padding: 14px 18px;
+  min-height: 46px;
+  padding: 12px 18px;
   border: 0;
-  border-radius: 16px;
-  background: #BD106F;
+  border-radius: 999px;
+  background: #75005C;
   color: #fff;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+}
+
+.subnav__label{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .subnav__caret{
-  margin-left: 12px;
+  flex: 0 0 auto;
   font-size: 12px;
+  line-height: 1;
+  transition: transform .2s ease;
+}
+
+.subnav__mobile.is-open .subnav__caret{
+  transform: rotate(180deg);
 }
 
 .subnav__menu{
@@ -969,9 +985,10 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
   border-bottom: 0;
 }
 
+/* The current category has to be findable once the menu is open. */
 .subnav__menu button.on{
-  background: #fff;
-  color: #4F2579;
+  background: #F7ECF4;
+  color: #75005C;
   font-weight: 700;
 }
 
@@ -1015,12 +1032,13 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
     display: none;
   }
 
+  /* 220px clipped the longest category ("Nutritions and Herbal Care"). */
   .subnav__mobile{
     display: inline-block;
     position: relative;
-    min-width: 160px;
-    max-width: 220px;
-    flex: 0 0 auto;
+    width: 100%;
+    max-width: min(100%, 320px);
+    flex: 0 1 auto;
   }
 }
 
@@ -2947,6 +2965,70 @@ h3.display,.h3{font-size:clamp(22px,2.2vw,34px)}
 .nav--overlay:not(.nav--scrolled) .nav__lang a.active{color:#fff}
 /* ...so the hover/active indicator is white too, not dark purple on the hero */
 .nav--overlay:not(.nav--scrolled) .nav__menu a::after{background:#fff}
+
+/* Tentang Kami hover menu. Desktop only — .nav__menu is hidden at <=960px. */
+.nav__item{position:relative;display:inline-flex;align-items:stretch}
+.nav__dropdown{
+    position:absolute;
+    top:100%;
+    left:50%;
+    min-width:272px;
+    padding:10px 0;
+    background:#fff;
+    border-radius:18px;
+    box-shadow:0 18px 40px rgba(38,0,67,.18);
+    display:flex;
+    flex-direction:column;
+    opacity:0;
+    visibility:hidden;
+    transform:translateX(-50%) translateY(8px);
+    transition:opacity .2s ease,transform .2s ease,visibility .2s;
+    z-index:60;
+}
+/* Ends flush against the bar: a gap would drop :hover on the way down. */
+.nav__item:hover .nav__dropdown,
+.nav__item:focus-within .nav__dropdown{
+    opacity:1;
+    visibility:visible;
+    transform:translateX(-50%) translateY(0);
+}
+/* Two classes, so these win over .nav__menu a regardless of order. */
+.nav__menu .nav__dropdown a{
+    display:block;
+    padding:11px 24px;
+    font-family:var(--font-body);
+    font-weight:400;
+    font-size:15px;
+    color:#444;
+    white-space:nowrap;
+    transition:background .2s ease,color .2s ease;
+}
+.nav__menu .nav__dropdown a::after{content:none}
+.nav__menu .nav__dropdown a:hover{background:#F6F0FB;color:#3E1D81;font-weight:600}
+/* The panel is white on every nav state, including the transparent home hero. */
+.nav--overlay:not(.nav--scrolled) .nav__menu .nav__dropdown a{color:#444}
+.nav--overlay:not(.nav--scrolled) .nav__menu .nav__dropdown a:hover{color:#3E1D81}
+
+/* Two-level menus (Produk, Keberlanjutan): a head with its pages beneath.
+   Children carry a rail rather than the groups carrying dividers — with most
+   groups childless, a divider per group read as a list of separators. */
+.nav__dropgroup + .nav__dropgroup{margin-top:2px}
+.nav__menu .nav__dropdown a.nav__dropgroup-head{font-weight:700;color:#3E1D81}
+.nav__menu .nav__dropdown a.nav__dropsub{
+    margin-left:24px;
+    padding-left:16px;
+    border-left:2px solid rgba(91,45,142,.18);
+    font-size:14px;
+    color:#5A5A5A;
+}
+.nav__menu .nav__dropdown a.nav__dropsub:hover{border-left-color:var(--purple-600)}
+
+/* Anchor targets clear the sticky header. */
+#sekilas,#sejarah,#visi-misi,#kepemimpinan,#penghargaan,
+#kehadiran,#manufacturing,#international,
+#esg,#health,#sport{
+    scroll-margin-top:calc(var(--nav-h) + 24px);
+}
 
 /* Sub-page banner: ~600px tall, FS Albert 96px white title, dark-purple foot gradient */
 .banner{min-height:600px;display:flex;align-items:flex-end;padding:0 0 clamp(44px,5vw,72px)}

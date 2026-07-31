@@ -10,8 +10,21 @@ export default function Products({ page, categories, socialIcons = {} }) {
   } = usePage()
 
   const en = locale === "en"
-  const [active, setActive] = useState(0)
-  const [subFilter, setSubFilter] = useState("all")
+  // A nav link may open a category and one of its sub-categories:
+  // /products?cat=nutrition-herbal&sub=nutrition-herbal-honey. Read from the
+  // Inertia url (not window) so the server render opens the same tab.
+  const asked = new URLSearchParams(url.split("?")[1] || "")
+  const askedCat = categories.findIndex((c) => c.slug === asked.get("cat"))
+  const initialCat = askedCat >= 0 ? askedCat : 0
+  const [active, setActive] = useState(initialCat)
+  const [subFilter, setSubFilter] = useState(() => {
+    // subFilter is an index into the category's children, as a string.
+    const i = (categories[initialCat]?.children ?? []).findIndex(
+      (s) => s.slug === asked.get("sub"),
+    )
+
+    return i >= 0 ? String(i) : "all"
+  })
   const [query, setQuery] = useState("")
   const [sort, setSort] = useState("az")
   const [detail, setDetail] = useState(null)
@@ -136,7 +149,9 @@ export default function Products({ page, categories, socialIcons = {} }) {
                 aria-haspopup="menu"
                 onClick={() => setMobileOpen((v) => !v)}
               >
-                {categories[active]?.name ?? "Categories"}
+                <span className="subnav__label">
+                  {categories[active]?.name ?? "Categories"}
+                </span>
                 <span className="subnav__caret">▾</span>
               </button>
 
