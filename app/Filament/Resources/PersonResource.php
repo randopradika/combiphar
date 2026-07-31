@@ -19,7 +19,7 @@ class PersonResource extends Resource
 
     protected static ?string $navigationGroup = 'Tentang Kami';
 
-    protected static ?string $navigationLabel = 'Dewan (BOC & BOD)';
+    protected static ?string $navigationLabel = 'Dewan';
 
     protected static ?int $navigationSort = 2;
 
@@ -64,6 +64,10 @@ class PersonResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('group')
                     ->searchable(),
+                // Editable straight from the list — flipping it off takes the
+                // member off the page without deleting the record.
+                Tables\Columns\ToggleColumn::make('show_on_page')
+                    ->label('Tampil di halaman'),
                 Tables\Columns\ImageColumn::make('photo'),
                 Tables\Columns\TextColumn::make('sort')
                     ->numeric()
