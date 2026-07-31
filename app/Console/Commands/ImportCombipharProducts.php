@@ -17,7 +17,7 @@ class ImportCombipharProducts extends Command
 
     /** Remote category id (combiphar.com) => [our slug, display name, parent slug|null]. */
     private const MAP = [
-        2 => ['speciality-care', 'Speciality Care', null],                            // Pharma
+        2 => ['pharmaceutical', 'Pharmaceutical', null],                              // Pharma
         3 => ['consumer-health', 'Consumer Health', null],                            // Consumer Healthcare
         5 => ['nutrition-herbal-serealsnack', 'Sereal & Snack', 'nutrition-herbal'],  // Cereal
         6 => ['nutrition-herbal-honey', 'Honey', 'nutrition-herbal'],                 // Honey

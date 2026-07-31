@@ -117,7 +117,7 @@ class CmsSeeder extends Seeder
         // ---- Product categories + products ----
         $cats = [
             ['consumer-health', 'Consumer Health', 'Consumer Health', 'Produk kesehatan sehari-hari yang terpercaya untuk seluruh keluarga Indonesia.', 'Everyday trusted health products for every Indonesian family.'],
-            ['speciality-care', 'Speciality Care', 'Speciality Care', 'Solusi terapi khusus dengan standar mutu farmasi tertinggi.', 'Specialised therapeutic solutions with the highest pharmaceutical standards.'],
+            ['pharmaceutical', 'Pharmaceutical', 'Pharmaceutical', 'Solusi terapi khusus dengan standar mutu farmasi tertinggi.', 'Specialised therapeutic solutions with the highest pharmaceutical standards.'],
             ['nutrition-herbal', 'Nutritions and Herbal Care', 'Nutritions and Herbal Care', 'Nutrisi dan perawatan herbal alami untuk hidup lebih sehat.', 'Natural nutrition and herbal care for a healthier life.'],
         ];
 
