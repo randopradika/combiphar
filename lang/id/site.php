@@ -70,6 +70,7 @@ return [
     'search' => 'Cari',
     'menu' => 'Menu',
     'close' => 'Tutup',
+    'back' => 'Kembali',
     'read_more' => 'Selengkapnya',
     'learn_more' => 'Pelajari Lebih Lanjut',
     'follow_us' => 'Ikuti kami di media sosial:',

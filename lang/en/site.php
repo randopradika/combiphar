@@ -70,6 +70,7 @@ return [
     'search' => 'Search',
     'menu' => 'Menu',
     'close' => 'Close',
+    'back' => 'Back',
     'read_more' => 'Read More',
     'learn_more' => 'Learn More',
     'follow_us' => 'Follow us on social media:',

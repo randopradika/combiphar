@@ -177,6 +177,43 @@ function SearchOverlay({ locale, en, onClose }) {
   )
 }
 
+const CHEV_RIGHT = "M9 5l7 7-7 7"
+const CHEV_LEFT = "M15 5l-7 7 7 7"
+
+// Hand-built rather than exported from Figma — single-node icon exports from
+// that file drop the outer shape (see CLAUDE.md §5).
+function Chevron({ d }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={d} />
+    </svg>
+  )
+}
+
+// Back arrow + the current level's title, shared by both drill-down levels.
+function MenuHead({ backLabel, onBack, children }) {
+  return (
+    <div className="mobilemenu__row">
+      <button
+        type="button"
+        className="mobilemenu__back"
+        aria-label={backLabel}
+        onClick={onBack}
+      >
+        <Chevron d={CHEV_LEFT} />
+      </button>
+      {children}
+    </div>
+  )
+}
+
 export default function SiteLayout({ children, navMode = "solid" }) {
   const { props, url } = usePage()
   // Defaults keep renderToString alive if a shared prop is ever absent during
@@ -193,6 +230,12 @@ export default function SiteLayout({ children, navMode = "solid" }) {
   } = props
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  // Mobile menu drill-down (Figma 835:34): null = the root section list,
+  // otherwise the section whose sub-menu is showing. `openGroup` goes one level
+  // deeper — a sub-menu item that has children of its own.
+  const [openSection, setOpenSection] = useState(null)
+  const [openGroup, setOpenGroup] = useState(null)
+  const [dir, setDir] = useState(1)
   const [searchOpen, setSearchOpen] = useState(false)
   const isHome = url === "/" + locale
 
@@ -220,8 +263,32 @@ export default function SiteLayout({ children, navMode = "solid" }) {
   const menu = menuSections?.length
     ? menuSections
     : ["about", "products", "csr", "investor", "news", "contact"]
-  // Hover menus keyed by nav section; see lang/*/site.php `nav.menus`.
+  // Hover menus keyed by nav section; see lang/*/site.php `nav.menus`. The
+  // mobile drill-down renders the same data.
   const navMenus = t.nav?.menus || {}
+  const closeMenu = () => setMenuOpen(false)
+  // Opening always starts at the root list; the reset waits for the next open
+  // so the panel doesn't visibly snap back while it slides away.
+  const toggleMenu = () => {
+    if (!menuOpen) {
+      setOpenSection(null)
+      setOpenGroup(null)
+    }
+    setMenuOpen((v) => !v)
+  }
+  // One step in (d=1) or out (d=-1) of the drill-down; `d` only picks the
+  // direction the incoming view slides from.
+  const drill = (d, next) => {
+    setDir(d)
+    if ("section" in next) {
+      setOpenSection(next.section)
+      setOpenGroup(null)
+    }
+    if ("group" in next) setOpenGroup(next.group)
+  }
+  // An item hangs off its own section unless it names another one.
+  const subHref = (it) =>
+    `${nav[it.base || openSection] || ""}${it.suffix || ""}`
   const navClass =
     "nav" +
     (navMode === "overlay" ? " nav--overlay" : "") +
@@ -398,7 +465,7 @@ export default function SiteLayout({ children, navMode = "solid" }) {
               className="nav__burger"
               aria-label={t.menu}
               aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((v) => !v)}
+              onClick={toggleMenu}
             >
               {menuOpen ? (
                 <svg
@@ -437,16 +504,116 @@ export default function SiteLayout({ children, navMode = "solid" }) {
       <div className={"mobilemenu" + (menuOpen ? " open" : "")}>
         <div className="mobilemenu__panel">
           <nav aria-label="Mobile menu">
-            {menu.map((s) => (
-              <Link
-                key={s}
-                href={nav[s]}
-                className={routeName === s ? "active" : ""}
-                onClick={() => setMenuOpen(false)}
-              >
-                {t.nav?.[s]}
-              </Link>
-            ))}
+            {/* Root list, a section's sub-menu, or a nested group. Keyed so
+                the slide-in replays on every step; --mm-from flips it. */}
+            <div
+              className="mobilemenu__view"
+              key={
+                openGroup
+                  ? openSection + openGroup.suffix
+                  : openSection || "root"
+              }
+              style={{ "--mm-from": dir > 0 ? "18px" : "-18px" }}
+            >
+              {openGroup ? (
+                // Level 2 — a sub-menu item that itself has children.
+                <>
+                  <MenuHead
+                    backLabel={t.back || "Back"}
+                    onBack={() => drill(-1, { group: null })}
+                  >
+                    <a
+                      className="mobilemenu__label mobilemenu__label--current"
+                      href={subHref(openGroup)}
+                      onClick={closeMenu}
+                    >
+                      {openGroup.label}
+                    </a>
+                  </MenuHead>
+                  {openGroup.children.map((c) => (
+                    <div className="mobilemenu__row--sub" key={c.suffix}>
+                      <a
+                        className="mobilemenu__label"
+                        href={subHref(c)}
+                        onClick={closeMenu}
+                      >
+                        {c.label}
+                      </a>
+                    </div>
+                  ))}
+                </>
+              ) : openSection ? (
+                // Level 1 — one section's sub-menu.
+                <>
+                  <MenuHead
+                    backLabel={t.back || "Back"}
+                    onBack={() => drill(-1, { section: null })}
+                  >
+                    <Link
+                      className="mobilemenu__label mobilemenu__label--current"
+                      href={nav[openSection]}
+                      onClick={closeMenu}
+                    >
+                      {t.nav?.[openSection]}
+                    </Link>
+                  </MenuHead>
+                  {(navMenus[openSection] || []).map((it) => (
+                    <div className="mobilemenu__row--sub" key={it.suffix}>
+                      {/* Plain <a> like the desktop dropdown — an Inertia
+                          <Link> re-renders the page and drops the #hash. */}
+                      <a
+                        className="mobilemenu__label"
+                        href={subHref(it)}
+                        onClick={closeMenu}
+                      >
+                        {it.label}
+                      </a>
+                      {it.children?.length ? (
+                        <button
+                          type="button"
+                          className="mobilemenu__chev"
+                          aria-label={it.label}
+                          aria-haspopup="true"
+                          aria-expanded={false}
+                          onClick={() => drill(1, { group: it })}
+                        >
+                          <Chevron d={CHEV_RIGHT} />
+                        </button>
+                      ) : null}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                menu.map((s) => (
+                  // The label navigates to the section page; only the chevron
+                  // opens the sub-menu.
+                  <div className="mobilemenu__row" key={s}>
+                    <Link
+                      className={
+                        "mobilemenu__label" +
+                        (routeName === s ? " active" : "")
+                      }
+                      href={nav[s]}
+                      onClick={closeMenu}
+                    >
+                      {t.nav?.[s]}
+                    </Link>
+                    {navMenus[s]?.length ? (
+                      <button
+                        type="button"
+                        className="mobilemenu__chev"
+                        aria-label={t.nav?.[s]}
+                        aria-haspopup="true"
+                        aria-expanded={false}
+                        onClick={() => drill(1, { section: s })}
+                      >
+                        <Chevron d={CHEV_RIGHT} />
+                      </button>
+                    ) : null}
+                  </div>
+                ))
+              )}
+            </div>
           </nav>
 
           <div className="mobilemenu__lang" aria-label="Language switcher">
