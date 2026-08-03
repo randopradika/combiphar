@@ -165,10 +165,10 @@ class PageController extends Controller
             'milestones' => AboutHistory::orderBy('sort')->get()->map(fn ($m) => [
                 'year' => $m->year, 'caption' => $m->tr('caption'), 'photo' => $this->img($m->photo),
             ]),
-            'commissioners' => Person::visible()->where('group','commissioners')->orderBy('sort')->get()->map($person),
-            'directors' => Person::visible()->where('group','directors')->orderBy('sort')->get()->map($person),
-            'auditCommittee' => Person::visible()->where('group','audit_committee')->orderBy('sort')->get()->map($person),
-            'corporateSecretary' => Person::visible()->where('group','corporate_secretary')->orderBy('sort')->get()->map($person),
+            'commissioners' => Person::visible()->where('group','commissioners')->ordered()->get()->map($person),
+            'directors' => Person::visible()->where('group','directors')->ordered()->get()->map($person),
+            'auditCommittee' => Person::visible()->where('group','audit_committee')->ordered()->get()->map($person),
+            'corporateSecretary' => Person::visible()->where('group','corporate_secretary')->ordered()->get()->map($person),
             'awards' => Award::orderBy('sort')->get()->map(fn ($a) => [
                 'title' => $a->tr('title'), 'year' => $a->year, 'image' => $this->img($a->image),
                 'is_hero' => (bool) $a->is_hero,
@@ -423,8 +423,8 @@ class PageController extends Controller
             ])->values(),
             // "Board" layout (Figma 967:78 — Komite Audit): reuse the About page
             // Audit Committee + Corporate Secretary member grids.
-            'auditCommittee' => $isBoard ? Person::visible()->where('group','audit_committee')->orderBy('sort')->get()->map($person) : [],
-            'corporateSecretary' => $isBoard ? Person::visible()->where('group','corporate_secretary')->orderBy('sort')->get()->map($person) : [],
+            'auditCommittee' => $isBoard ? Person::visible()->where('group','audit_committee')->ordered()->get()->map($person) : [],
+            'corporateSecretary' => $isBoard ? Person::visible()->where('group','corporate_secretary')->ordered()->get()->map($person) : [],
         ]);
     }
 
