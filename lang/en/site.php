@@ -40,8 +40,9 @@ return [
                 ['label' => 'Championing a Healthy Tomorrow', 'suffix' => '#health', 'head' => true, 'children' => [
                     ['label' => 'Empowerment', 'suffix' => '/combi-hope-youth-empowerment'],
                     ['label' => 'Education', 'suffix' => '/education'],
+                    // Jumps to the Sports section, not a detail page.
+                    ['label' => 'Sport', 'suffix' => '#sport'],
                 ]],
-                ['label' => 'Sport', 'suffix' => '#sport', 'head' => true],
             ],
             'investor' => [
                 ['label' => 'Whistleblowing System', 'base' => 'csr', 'suffix' => '/whistleblowing-system'],
