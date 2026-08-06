@@ -50,10 +50,11 @@ class CsrProgramResource extends Resource
                     ->default('esg'),
                 Forms\Components\Select::make('layout')
                     ->label('Tata Letak Halaman Detail')
-                    ->helperText('Pilih tampilan halaman detail /csr/{slug}. "Slider Program" memakai banner + intro + slider sub-program (mis. Social Care); "Galeri Foto" memakai grid foto (mis. Environmental); "Dewan / Komite" memakai intro + grid Komite Audit & Corporate Secretary (mis. Komite Audit); "Artikel" memakai konten + formulir kontak.')
+                    ->helperText('Pilih tampilan halaman detail /csr/{slug}. "Slider Program" memakai banner + intro + slider sub-program (mis. Social Care); "Galeri Foto" memakai grid foto lengkap dengan keterangan tiap foto; "Galeri Tim" memakai tata letak halaman Basketball — banner + deskripsi + galeri 6 foto per halaman, tanpa keterangan foto (mis. Environmental, Education); "Dewan / Komite" memakai intro + grid Komite Audit & Corporate Secretary (mis. Komite Audit); "Artikel" memakai konten + formulir kontak.')
                     ->options([
                         'default' => 'Artikel + Formulir Kontak (default)',
-                        'gallery' => 'Galeri Foto (mis. Environmental)',
+                        'gallery' => 'Galeri Foto (grid + keterangan)',
+                        'sports' => 'Galeri Tim (seperti Basketball, 6 foto/halaman)',
                         'slider' => 'Slider Program (mis. Social Care)',
                         'board' => 'Dewan / Komite (mis. Komite Audit)',
                     ])

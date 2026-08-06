@@ -354,18 +354,35 @@ class PageController extends Controller
             return redirect()->route('csr.show.'.app()->getLocale(), ['slug' => 'governance', 'topic' => 'komite-audit']);
         }
 
-        if ($program->category === 'sports') {
+        // Every sports programme uses this layout, and any other programme can
+        // opt into it from the CMS ("Galeri Tim") — that is how Environmental
+        // and Education get Basketball's banner + paginated 6-per-page grid.
+        if ($program->category === 'sports' || $program->layout === 'sports') {
+            // Sports pages carry team rows as children. A programme that opted
+            // in from the CMS has none, so it becomes its own single block —
+            // with no title or logo, which would only repeat the banner above.
+            // Gated on the opt-in: a sport with no team rows kept rendering as
+            // banner-only before this, and must keep doing so.
+            $isSelfBlock = $program->children->isEmpty() && $program->layout === 'sports';
+            $blocks = $isSelfBlock ? collect([$program]) : $program->children;
+
             return Inertia::render('SportsDetail', [
                 'program' => [
                     'title' => $program->tr('title'),
                     'subtitle' => $program->tr('body'),
                     'image' => $this->img($program->image),
                 ],
-                'teams' => $program->children->map(fn ($c) => [
-                    'title' => $c->tr('title'),
+                'teams' => $blocks->map(fn ($c) => [
+                    'title' => $isSelfBlock ? null : $c->tr('title'),
                     'body' => $c->tr('content') ?: $c->tr('body'),
-                    'logo' => $this->img($c->image),
-                    'gallery' => collect($c->gallery ?? [])->map(fn ($g) => $this->img($g))->values(),
+                    'logo' => $isSelfBlock ? null : $this->img($c->image),
+                    // Sports galleries are plain path strings; CSR galleries are
+                    // {image, caption_*} objects. This layout shows no captions,
+                    // so reduce both to a list of URLs.
+                    'gallery' => collect($c->gallery ?? [])
+                        ->map(fn ($g) => $this->img(is_array($g) ? ($g['image'] ?? null) : $g))
+                        ->filter()
+                        ->values(),
                 ]),
             ]);
         }

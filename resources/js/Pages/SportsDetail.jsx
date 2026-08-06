@@ -19,10 +19,14 @@ function SportTeam({ team }) {
         <section className="section sport-detail">
             <div className="container">
                 <div className="sport-detail__head rv">
-                    <div className="sport-detail__title">
-                        {team.logo && <img className="sport-detail__logo" src={team.logo} alt="" />}
-                        <h2 className="display">{team.title}</h2>
-                    </div>
+                    {/* A programme rendering itself as its only block sends no
+                        title or logo — they would just repeat the banner. */}
+                    {(team.title || team.logo) && (
+                        <div className="sport-detail__title">
+                            {team.logo && <img className="sport-detail__logo" src={team.logo} alt="" />}
+                            {team.title && <h2 className="display">{team.title}</h2>}
+                        </div>
+                    )}
                     {team.body && (
                         <div className="sport-detail__desc" dangerouslySetInnerHTML={{ __html: team.body }} />
                     )}
