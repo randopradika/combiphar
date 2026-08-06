@@ -26,6 +26,15 @@ if ($uri !== '/' && strpos($uri, '..') === false && is_file($file)) {
     ];
     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 
+    // The PHP built-in server EXECUTES any .php handed to it, and public/storage
+    // symlinks to the CMS upload tree — so one writable script under there would
+    // be remote code execution. Nothing below public/ may execute except the
+    // front controller required at the bottom of this file.
+    if (preg_match('/^(php[0-9]?|phtml|phps|phar|pht|inc|hh)$/', $ext)) {
+        http_response_code(404);
+        exit;
+    }
+
     if (isset($types[$ext])) {
         $mtime = filemtime($file);
         $size = filesize($file);

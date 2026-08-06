@@ -10,8 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
     @if (app()->environment('production'))
         {{-- Same GA4 property the old combiphar.com build reports to --}}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2PSJXT6M6"></script>
-        <script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2PSJXT6M6" nonce="{{ $cspNonce ?? '' }}"></script>
+        {{-- nonce comes from SecurityHeaders; without it the CSP blocks this. --}}
+        <script nonce="{{ $cspNonce ?? '' }}">
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
@@ -32,7 +33,7 @@
             'sameAs' => $__socials,
         ], JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     @endphp
-    <script type="application/ld+json">
+    <script type="application/ld+json" nonce="{{ $cspNonce ?? '' }}">
     {!! $__ld !!}
     </script>
 </head>

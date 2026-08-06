@@ -65,7 +65,20 @@ return [
 
     'temporary_file_upload' => [
         'disk' => null,        // Example: 'local', 's3'              | Default: 'default'
-        'rules' => ['required', 'file', 'max:51200'],   // 50MB — allows CMS manifesto MP4 uploads (was default 12MB)
+        // 50MB — allows CMS manifesto MP4 uploads (was default 12MB).
+        // The `extensions` whitelist is the single global gate on WHAT may be
+        // uploaded: it runs on every temporary upload before any Filament field
+        // validation, so a field that forgets `acceptedFileTypes()` still cannot
+        // take a .php/.phtml. That matters because uploads land in
+        // storage/app/public, which is web-served through the public/storage
+        // symlink — an executable file there would be RCE. Narrow per field with
+        // `acceptedFileTypes()`; never widen this list to add an executable type.
+        'rules' => [
+            'required',
+            'file',
+            'max:51200',
+            'extensions:jpg,jpeg,png,webp,gif,avif,ico,svg,pdf,mp4,webm',
+        ],
         'directory' => null,   // Example: 'tmp'                      | Default: 'livewire-tmp'
         'middleware' => null,  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
         'preview_mimes' => [   // Supported file types for temporary pre-signed file URLs...

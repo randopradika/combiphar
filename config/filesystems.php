@@ -56,7 +56,10 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
+            // Throw on S3 failures rather than returning false. A silent failure
+            // here means a CMS upload reports success while the object never
+            // reaches the bucket, and the saved row points at a 404 forever.
+            'throw' => true,
             'report' => false,
         ],
 

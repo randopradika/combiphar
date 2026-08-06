@@ -5,24 +5,12 @@ services:
       dockerfile: Dockerfile
     image: combiphar-app:latest
     container_name: combiphar-app
-    # Mirrors the image CMD, declared here as well on purpose: a change to this
-    # file makes `docker compose up -d` recreate the container even when the
-    # image is not rebuilt, so the SSR daemon is guaranteed to come back. The
-    # daemon runs in a supervision loop and is decoupled from storage:link with
-    # `;` — a storage:link failure must not stop SSR from starting, and a
-    # crashed daemon must restart itself, or the site silently serves the
-    # client-rendered shell until someone notices.
-    command: >
-      sh -c "php artisan storage:link --force || true;
-      : > storage/logs/ssr.log;
-      (while true; do php artisan inertia:start-ssr >> storage/logs/ssr.log 2>&1;
-      echo '[ssr] daemon exited, restarting in 5s' >> storage/logs/ssr.log;
-      sleep 5; done &) ;
-      php artisan serve --host=0.0.0.0 --port=80"
-    environment:
-      # Multi-worker built-in server so Livewire/Filament file uploads
-      # don't deadlock (single-threaded `artisan serve` hangs uploads).
-      PHP_CLI_SERVER_WORKERS: "10"
+    # No `command:` override on purpose. The image entrypoint starts supervisord,
+    # which owns nginx, PHP-FPM and the Inertia SSR daemon; supervisor restarts a
+    # crashed SSR daemon the way the old inline shell loop did, but its state is
+    # visible to `supervisorctl status` instead of silently degrading every page
+    # to client-render. Concurrency is now PHP-FPM's pool, not the 10-worker cap
+    # of the built-in server.
     ports:
       - "80:80"
       - "5173:5173"

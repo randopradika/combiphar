@@ -19,14 +19,39 @@ class User extends Authenticatable implements FilamentUser
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_EDITOR = 'editor';
+
+    public const ROLE_DISABLED = 'disabled';
+
+    /** Role => label for the CMS. Keep stored values in step with these keys. */
+    public const ROLES = [
+        self::ROLE_ADMIN => 'Administrator',
+        self::ROLE_EDITOR => 'Editor',
+        self::ROLE_DISABLED => 'Nonaktif',
+    ];
+
+    /** Roles that may open the CMS at all. */
+    private const PANEL_ROLES = [self::ROLE_ADMIN, self::ROLE_EDITOR];
+
     /**
-     * Required once APP_ENV=production — Filament denies every login without
-     * it. Accounts are admin-provisioned only (no public registration), so any
-     * user row may access the panel; tighten if self-registration is added.
+     * Required once APP_ENV=production — Filament denies every login without it.
+     *
+     * This used to `return true`, which meant every row in `users` was a full
+     * CMS administrator and the only way to revoke access was to delete the
+     * account. It is now an explicit ALLOW-LIST: an unknown or 'disabled' role
+     * gets nothing, so access can be revoked (and restored) without destroying
+     * the record. `role` is not mass-assignable — set it deliberately.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return in_array($this->role, self::PANEL_ROLES, true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
     }
 
     /**
