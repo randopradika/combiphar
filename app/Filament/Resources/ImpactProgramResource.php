@@ -19,11 +19,22 @@ class ImpactProgramResource extends Resource
 
     protected static ?string $navigationGroup = 'Beranda';
 
-    protected static ?string $navigationLabel = 'Program Dampak (Slider)';
+    protected static ?string $navigationLabel = 'Program Dampak';
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+
+    protected static ?string $recordTitleAttribute = 'title_id';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title_id', 'title_en'];
+    }
 
     public static function form(Form $form): Form
     {

@@ -144,8 +144,8 @@ class PageResource extends Resource
                         Forms\Components\Textarea::make('health_desc_id')->label('Deskripsi Health Campaign (ID)')->rows(3),
                         Forms\Components\Textarea::make('health_desc_en')->label('Health Campaign description (EN)')->rows(3),
                     ]),
-                Forms\Components\Section::make('Employee Wellness Program (tab Karir)')
-                    ->description('Judul dan deskripsi di atas lingkaran program. Programnya sendiri dikelola di menu "Employee Wellness Program". Kosongkan judul dan deskripsi untuk menyembunyikan teks pengantarnya.')
+                Forms\Components\Section::make('Program Kesejahteraan Karyawan (tab Karir)')
+                    ->description('Judul dan deskripsi di atas lingkaran program. Programnya sendiri dikelola di menu "Program Kesejahteraan Karyawan". Kosongkan judul dan deskripsi untuk menyembunyikan teks pengantarnya.')
                     ->collapsible()
                     ->visible(fn (?Page $record) => $record?->slug === 'contact')
                     ->schema([

@@ -21,9 +21,20 @@ class OnlineShopResource extends Resource
 
     protected static ?string $navigationLabel = 'Toko Online Resmi';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 9;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
+    }
 
     public static function form(Form $form): Form
     {

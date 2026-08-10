@@ -26,11 +26,22 @@ class WellnessProgramResource extends Resource
 
     protected static ?string $navigationGroup = 'Karir & Kontak';
 
-    protected static ?string $navigationLabel = 'Employee Wellness Program';
+    protected static ?string $navigationLabel = 'Program Kesejahteraan Karyawan';
 
     protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
+
+    protected static ?string $recordTitleAttribute = 'title_id';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title_id', 'title_en'];
+    }
 
     public static function form(Form $form): Form
     {

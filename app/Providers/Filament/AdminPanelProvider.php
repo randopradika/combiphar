@@ -104,13 +104,13 @@ class AdminPanelProvider extends PanelProvider
     private function pageBannerItems(): array
     {
         $pages = [
-            ['home', 'Beranda', 'Hero, Manifesto & CTA'],
+            ['home', 'Beranda', 'Banner & Teks Halaman'],
             ['about', 'Tentang Kami', 'Banner & Teks Halaman'],
-            ['products', 'Produk', 'Banner Halaman'],
-            ['csr', 'Tanggung Jawab Sosial', 'Banner & Intro'],
-            ['news', 'Berita', 'Banner Halaman'],
-            ['investor', 'Investor', 'Banner Halaman'],
-            ['contact', 'Karir & Kontak', 'Banner Halaman'],
+            ['products', 'Produk', 'Banner & Teks Halaman'],
+            ['csr', 'Tanggung Jawab Sosial', 'Banner & Teks Halaman'],
+            ['news', 'Berita', 'Banner & Teks Halaman'],
+            ['investor', 'Investor', 'Banner & Teks Halaman'],
+            ['contact', 'Karir & Kontak', 'Banner & Teks Halaman'],
         ];
 
         return array_map(fn (array $p) => NavigationItem::make($p[0] . '-banner')

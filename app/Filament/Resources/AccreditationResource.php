@@ -21,9 +21,20 @@ class AccreditationResource extends Resource
 
     protected static ?string $navigationLabel = 'Akreditasi';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-check-badge';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'issuer'];
+    }
 
     public static function form(Form $form): Form
     {

@@ -21,9 +21,20 @@ class GlobalSiteResource extends Resource
 
     protected static ?string $navigationLabel = 'Jangkauan Bisnis';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 8;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
+    }
 
     public static function form(Form $form): Form
     {

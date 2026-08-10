@@ -21,9 +21,20 @@ class ContactMessageResource extends Resource
 
     protected static ?string $navigationLabel = 'Pesan Masuk';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-inbox';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email', 'subject'];
+    }
 
     public static function form(Form $form): Form
     {

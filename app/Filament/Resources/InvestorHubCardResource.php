@@ -23,11 +23,22 @@ class InvestorHubCardResource extends Resource
 
     protected static ?string $navigationGroup = 'Investor';
 
-    protected static ?string $navigationLabel = 'Kartu Sub-Menu';
+    protected static ?string $navigationLabel = 'Kartu Halaman Investor';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+
+    protected static ?string $recordTitleAttribute = 'title_id';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title_id', 'title_en'];
+    }
 
     public static function form(Form $form): Form
     {

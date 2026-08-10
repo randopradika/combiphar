@@ -22,6 +22,17 @@ class AboutHistoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clock';
 
+    protected static ?string $recordTitleAttribute = 'caption_id';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['caption_id', 'caption_en'];
+    }
+
     public static function form(Form $form): Form
     {
         return $form

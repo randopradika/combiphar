@@ -16,11 +16,22 @@ class LegalPageResource extends Resource
 
     protected static ?string $navigationGroup = 'Karir & Kontak';
 
-    protected static ?string $navigationLabel = 'Halaman Legal (Footer)';
+    protected static ?string $navigationLabel = 'Halaman Legal';
 
-    protected static ?int $navigationSort = 90;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
+    protected static ?string $recordTitleAttribute = 'title_id';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title_id', 'title_en'];
+    }
 
     /** Toolbar for the legal bodies — headings included; `.legal-body` styles h2/h3. */
     private const TOOLBAR = [
