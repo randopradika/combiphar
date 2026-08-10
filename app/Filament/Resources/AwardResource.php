@@ -9,7 +9,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class AwardResource extends Resource
 {
@@ -19,16 +18,27 @@ class AwardResource extends Resource
 
     protected static ?string $navigationLabel = 'Penghargaan';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-trophy';
 
-    /** Daftar penghargaan (popup "Daftar Penghargaan") — logo hero dikelola di menu "Penghargaan Hero". */
-    public static function getEloquentQuery(): Builder
+    protected static ?string $recordTitleAttribute = 'title_id';
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
     {
-        return parent::getEloquentQuery()->where('is_hero', false);
+        return ['title_id', 'title_en'];
     }
 
+    /**
+     * Semua penghargaan dalam satu daftar. Sebelumnya terpisah menjadi dua menu
+     * ("Penghargaan" dan "Penghargaan Unggulan") yang hanya dibedakan oleh satu
+     * kolom boolean, sehingga mengunggulkan sebuah penghargaan berarti
+     * memindahkannya antar menu. Sekarang cukup satu klik di kolom "Unggulan".
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -44,6 +54,10 @@ class AwardResource extends Resource
                     ->numeric(),
                 Forms\Components\FileUpload::make('image')
                     ->image(),
+                Forms\Components\Toggle::make('is_hero')
+                    ->label('Tampilkan sebagai logo unggulan')
+                    ->helperText('Logo tampil di bawah deskripsi "Pencapaian & Penghargaan" di halaman Tentang Kami (maksimal 7 pertama). Penghargaan lain tetap tampil di popup "Daftar Penghargaan".')
+                    ->default(false),
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
@@ -59,6 +73,10 @@ class AwardResource extends Resource
                 Tables\Columns\TextColumn::make('year')
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('image'),
+                // Sama seperti "Tampil di halaman" pada Dewan: diubah langsung
+                // dari daftar, tanpa membuka recordnya.
+                Tables\Columns\ToggleColumn::make('is_hero')
+                    ->label('Unggulan'),
                 Tables\Columns\TextColumn::make('sort')
                     ->numeric()
                     ->sortable(),
@@ -72,10 +90,12 @@ class AwardResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('is_hero')
+                    ->label('Unggulan'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

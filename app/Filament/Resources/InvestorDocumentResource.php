@@ -3,16 +3,24 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\InvestorDocumentResource\Pages;
-use App\Filament\Resources\InvestorDocumentResource\RelationManagers;
 use App\Models\InvestorDocument;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+/**
+ * Semua dokumen investor dalam satu daftar, dipisahkan oleh tab kategori.
+ *
+ * Sebelumnya kategori dipecah menjadi lima menu terpisah (Informasi Keuangan,
+ * Laporan Tahunan, Keberlanjutan, Presentasi Perusahaan, Keterbukaan Informasi)
+ * yang isinya identik kecuali satu kolom, sementara resource gabungan ini
+ * justru disembunyikan dari navigasi. Akibatnya kategori "Informasi Saham"
+ * tidak punya menu sama sekali sehingga tidak dapat dikelola dari panel.
+ *
+ * Menambah kategori baru sekarang cukup satu baris pada CATEGORIES.
+ */
 class InvestorDocumentResource extends Resource
 {
     protected static ?string $model = InvestorDocument::class;
@@ -21,13 +29,29 @@ class InvestorDocumentResource extends Resource
 
     protected static ?string $navigationLabel = 'Dokumen Investor';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    public static function shouldRegisterNavigation(): bool
+    protected static ?string $recordTitleAttribute = 'title_id';
+
+    /** Satu-satunya sumber kebenaran untuk pilihan kategori, kolom, tab dan filter. */
+    public const CATEGORIES = [
+        'financial' => 'Informasi Keuangan',
+        'annual_report' => 'Laporan Tahunan',
+        'sustainability' => 'Laporan Keberlanjutan',
+        'presentation' => 'Presentasi Perusahaan',
+        'disclosure' => 'Keterbukaan Informasi',
+        'stock' => 'Informasi Saham',
+    ];
+
+    /**
+     * Fields the panel-wide search box looks at. Both language columns are
+     * listed so a search works whichever language the editor thinks in.
+     */
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['title_id', 'title_en'];
     }
 
     public static function form(Form $form): Form
@@ -35,25 +59,29 @@ class InvestorDocumentResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('category')
-                    ->options([
-                        'annual_report' => 'Annual Report',
-                        'sustainability' => 'Sustainability Report',
-                        'financial' => 'Financial Information',
-                        'disclosure' => 'Information Disclosure',
-                        'stock' => 'Stock Information',
-                        'presentation' => 'Company Presentation',
-                    ])
+                    ->label('Kategori')
+                    ->options(static::CATEGORIES)
+                    ->helperText('Menentukan di bagian mana dokumen ini tampil pada halaman Investor.')
                     ->required()
                     ->default('annual_report'),
                 Forms\Components\TextInput::make('title_id')
+                    ->label('Judul (ID)')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('title_en')
+                    ->label('Title (EN)')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('year')
+                    ->label('Tahun')
                     ->numeric(),
-                Forms\Components\FileUpload::make('file_id')->label('File (ID)')->acceptedFileTypes(['application/pdf'])->downloadable(),
-                Forms\Components\FileUpload::make('file_en')->label('File (EN)')->acceptedFileTypes(['application/pdf'])->downloadable(),
+                Forms\Components\FileUpload::make('file_id')
+                    ->label('File (ID)')
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->downloadable(),
+                Forms\Components\FileUpload::make('file_en')
+                    ->label('File (EN)')
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->downloadable(),
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
@@ -61,37 +89,45 @@ class InvestorDocumentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('sort')
             ->columns([
                 Tables\Columns\TextColumn::make('category')
-                    ->searchable(),
+                    ->label('Kategori')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state) => static::CATEGORIES[$state] ?? $state),
                 Tables\Columns\TextColumn::make('title_id')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('title_en')
-                    ->searchable(),
+                    ->label('Judul')
+                    ->searchable()
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('year')
+                    ->label('Tahun')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('file_id')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('file_en')
-                    ->searchable(),
+                Tables\Columns\IconColumn::make('file_id')
+                    ->label('File ID')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('file_en')
+                    ->label('File EN')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('sort')
+                    ->label('Urutan')
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Diperbarui')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category')
+                    ->label('Kategori')
+                    ->options(static::CATEGORIES),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
