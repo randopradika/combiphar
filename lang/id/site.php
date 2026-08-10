@@ -74,7 +74,6 @@ return [
     'read_more' => 'Selengkapnya',
     'learn_more' => 'Pelajari Lebih Lanjut',
     'follow_us' => 'Ikuti kami di media sosial:',
-    'rights' => 'Hak Cipta Dilindungi Combiphar',
     'terms' => 'Ketentuan Penggunaan',
     'privacy' => 'Kebijakan Privasi',
     'quick_links' => 'Tautan Cepat',

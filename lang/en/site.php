@@ -74,7 +74,6 @@ return [
     'read_more' => 'Read More',
     'learn_more' => 'Learn More',
     'follow_us' => 'Follow us on social media:',
-    'rights' => 'All Rights Reserved to Combiphar',
     'terms' => 'Terms of Use',
     'privacy' => 'Privacy Notice',
     'quick_links' => 'Quick Links',

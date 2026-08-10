@@ -195,6 +195,9 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .footer__social .ic:hover{background:#fff;color:var(--magenta);transform:translateY(-2px)}
 .footer__rights{font-size:16px;color:#fff;text-align:center;justify-self:center}
 .footer__rights strong{font-weight:700}
+/* Copyright is CMS rich text, so it arrives wrapped in <p> — drop the default
+   margins so the footer row keeps its original height. */
+.footer__rights p{margin:0}
 .footer__brand{display:flex;align-items:center;gap:20px;justify-self:end}
 .footer__brand img{height:clamp(38px,3vw,46px)}
 @media (max-width:820px){.footer__bottom{grid-template-columns:1fr;justify-items:center;text-align:center;gap:28px;padding:clamp(56px,10vw,90px) 0 40px}.footer__social,.footer__brand{justify-self:center}}
@@ -3090,6 +3093,7 @@ html,body{overflow-x:hidden}
 .mobilemenu__social .ic{width:40px;height:40px;border-radius:50%;background:#D9D9D9;display:block}
 .mobilemenu__copy{font-size:16px;color:#fff}
 .mobilemenu__copy strong{font-weight:700}
+.mobilemenu__copy p{margin:0}
 .mobilemenu__lang{display:flex;align-items:center;justify-content:center;gap:12px;font-family:var(--font-body);font-weight:700;color:#fff;margin-top:4px}
 .mobilemenu__lang .sep{width:1px;height:14px;background:rgba(255,255,255,.4)}
 .mobilemenu__lang a{opacity:.55}

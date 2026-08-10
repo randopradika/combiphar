@@ -667,13 +667,14 @@ export default function SiteLayout({ children, navMode = "solid" }) {
               </div>
             </div>
             <hr className="mobilemenu__divider" />
-            <p className="mobilemenu__copy">
-              {footer?.copyright || (
-                <>
-                  All Rights Reserved to <strong>Combiphar</strong>
-                </>
-              )}
-            </p>
+            {/* No hardcoded fallback: an emptied CMS field must really vanish
+                (CLAUDE.md §9). A div, not a p — the RichEditor emits <p>. */}
+            {footer?.copyright && (
+              <div
+                className="mobilemenu__copy"
+                dangerouslySetInnerHTML={{ __html: footer.copyright }}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -712,13 +713,12 @@ export default function SiteLayout({ children, navMode = "solid" }) {
                 ))}
               </div>
             </div>
-            <p className="footer__rights">
-              {footer?.copyright || (
-                <>
-                  All Rights Reserved to <strong>Combiphar</strong>
-                </>
-              )}
-            </p>
+            {footer?.copyright && (
+              <div
+                className="footer__rights"
+                dangerouslySetInnerHTML={{ __html: footer.copyright }}
+              />
+            )}
             <div className="footer__brand">
               <img src="/img/logo-combiphar-white.svg" alt="Combiphar" />
               <img

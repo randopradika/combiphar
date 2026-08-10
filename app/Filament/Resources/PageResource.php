@@ -220,12 +220,21 @@ class PageResource extends Resource
                             ]),
                     ]),
                 Forms\Components\Section::make('Footer — Copyright')
-                    ->description('Teks copyright di footer. Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
+                    ->description('Teks copyright di footer (tampil di footer desktop dan di menu mobile). Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
                     ->collapsible()
                     ->visible(fn (?Page $record) => $record?->slug === 'home')
                     ->schema([
-                        Forms\Components\TextInput::make('footer_copyright_id')->label('Teks Copyright (ID)'),
-                        Forms\Components\TextInput::make('footer_copyright_en')->label('Copyright text (EN)'),
+                        // RichEditor, not TextInput: "Combiphar" is bold in the
+                        // design (.footer__rights strong) and a plain string
+                        // field cannot express that.
+                        Forms\Components\RichEditor::make('footer_copyright_id')
+                            ->label('Teks Copyright (ID)')
+                            ->helperText('Gunakan tebal (bold) untuk menyorot nama Combiphar. Kosongkan untuk menyembunyikan baris ini.')
+                            ->toolbarButtons(['bold', 'italic', 'link', 'undo', 'redo']),
+                        Forms\Components\RichEditor::make('footer_copyright_en')
+                            ->label('Copyright text (EN)')
+                            ->helperText('Use bold to highlight the Combiphar name. Leave empty to hide this line.')
+                            ->toolbarButtons(['bold', 'italic', 'link', 'undo', 'redo']),
                     ]),
             ]);
     }
