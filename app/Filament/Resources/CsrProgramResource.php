@@ -28,11 +28,11 @@ class CsrProgramResource extends Resource
 {
     protected static ?string $model = CsrProgram::class;
 
-    protected static ?string $navigationGroup = 'Tanggung Jawab Sosial';
+    protected static ?string $navigationGroup = 'Konten';
 
     protected static ?string $navigationLabel = 'Program & Halaman CSR';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationIcon = 'heroicon-o-sparkles';
 

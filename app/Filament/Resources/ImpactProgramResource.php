@@ -17,9 +17,9 @@ class ImpactProgramResource extends Resource
 {
     protected static ?string $model = ImpactProgram::class;
 
-    protected static ?string $navigationGroup = 'Beranda';
+    protected static ?string $navigationGroup = 'Halaman';
 
-    protected static ?string $navigationLabel = 'Program Dampak';
+    protected static ?string $navigationLabel = 'Beranda: Program Dampak';
 
     protected static ?int $navigationSort = 2;
 

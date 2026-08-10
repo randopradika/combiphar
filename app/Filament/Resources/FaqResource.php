@@ -14,11 +14,11 @@ class FaqResource extends Resource
 {
     protected static ?string $model = Faq::class;
 
-    protected static ?string $navigationGroup = 'Karir & Kontak';
+    protected static ?string $navigationGroup = 'Formulir & Pesan';
 
     protected static ?string $navigationLabel = 'Pertanyaan Umum';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 

@@ -17,11 +17,11 @@ class ProductCategoryResource extends Resource
 {
     protected static ?string $model = ProductCategory::class;
 
-    protected static ?string $navigationGroup = 'Produk';
+    protected static ?string $navigationGroup = 'Konten';
 
     protected static ?string $navigationLabel = 'Kategori Produk';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 

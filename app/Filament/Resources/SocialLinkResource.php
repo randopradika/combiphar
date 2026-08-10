@@ -14,11 +14,11 @@ class SocialLinkResource extends Resource
 {
     protected static ?string $model = SocialLink::class;
 
-    protected static ?string $navigationGroup = 'Beranda';
+    protected static ?string $navigationGroup = 'Pengaturan';
 
-    protected static ?string $navigationLabel = 'Media Sosial (Footer)';
+    protected static ?string $navigationLabel = 'Media Sosial';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationIcon = 'heroicon-o-share';
 

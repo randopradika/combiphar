@@ -14,11 +14,11 @@ class AboutHistoryResource extends Resource
 {
     protected static ?string $model = AboutHistory::class;
 
-    protected static ?string $navigationGroup = 'Tentang Kami';
+    protected static ?string $navigationGroup = 'Profil Perusahaan';
 
     protected static ?string $navigationLabel = 'Sejarah';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $navigationIcon = 'heroicon-o-clock';
 

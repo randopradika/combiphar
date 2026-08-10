@@ -24,11 +24,11 @@ class WellnessProgramResource extends Resource
 
     protected static ?string $slug = 'wellness-programs';
 
-    protected static ?string $navigationGroup = 'Karir & Kontak';
+    protected static ?string $navigationGroup = 'Halaman';
 
-    protected static ?string $navigationLabel = 'Program Kesejahteraan Karyawan';
+    protected static ?string $navigationLabel = 'Karir: Program Kesejahteraan';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
 

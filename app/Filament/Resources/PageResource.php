@@ -14,16 +14,28 @@ class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
-
+    // Dulu resource ini disembunyikan dari navigasi dan hanya dapat dicapai
+    // lewat tujuh pintasan "banner" yang masing-masing menunjuk satu record.
+    // Akibatnya tidak ada daftar halaman di mana pun — dan tanpa daftar, tidak
+    // ada pula tombol untuk membuat halaman baru.
     protected static ?string $navigationGroup = 'Halaman';
+
+    protected static ?string $navigationLabel = 'Semua Halaman';
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
+
+    protected static ?string $modelLabel = 'Halaman';
+
+    protected static ?string $pluralModelLabel = 'Halaman';
+
+    protected static ?string $recordTitleAttribute = 'slug';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['slug', 'meta_title_id', 'meta_title_en'];
+    }
 
     public static function form(Form $form): Form
     {

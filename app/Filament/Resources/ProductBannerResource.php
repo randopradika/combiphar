@@ -14,9 +14,9 @@ class ProductBannerResource extends Resource
 {
     protected static ?string $model = ProductBanner::class;
 
-    protected static ?string $navigationGroup = 'Beranda';
+    protected static ?string $navigationGroup = 'Halaman';
 
-    protected static ?string $navigationLabel = 'Sorotan Produk Beranda';
+    protected static ?string $navigationLabel = 'Beranda: Sorotan Produk';
 
     protected static ?int $navigationSort = 3;
 

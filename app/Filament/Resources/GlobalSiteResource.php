@@ -17,11 +17,11 @@ class GlobalSiteResource extends Resource
 {
     protected static ?string $model = GlobalSite::class;
 
-    protected static ?string $navigationGroup = 'Tentang Kami';
+    protected static ?string $navigationGroup = 'Halaman';
 
-    protected static ?string $navigationLabel = 'Jangkauan Bisnis';
+    protected static ?string $navigationLabel = 'Tentang Kami: Jangkauan Bisnis';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 

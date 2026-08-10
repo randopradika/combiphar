@@ -14,11 +14,11 @@ class AwardResource extends Resource
 {
     protected static ?string $model = Award::class;
 
-    protected static ?string $navigationGroup = 'Tentang Kami';
+    protected static ?string $navigationGroup = 'Profil Perusahaan';
 
     protected static ?string $navigationLabel = 'Penghargaan';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
 

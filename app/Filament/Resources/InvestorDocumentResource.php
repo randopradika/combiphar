@@ -25,11 +25,11 @@ class InvestorDocumentResource extends Resource
 {
     protected static ?string $model = InvestorDocument::class;
 
-    protected static ?string $navigationGroup = 'Investor';
+    protected static ?string $navigationGroup = 'Konten';
 
     protected static ?string $navigationLabel = 'Dokumen Investor';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 

@@ -17,11 +17,11 @@ class OnlineShopResource extends Resource
 {
     protected static ?string $model = OnlineShop::class;
 
-    protected static ?string $navigationGroup = 'Tentang Kami';
+    protected static ?string $navigationGroup = 'Profil Perusahaan';
 
     protected static ?string $navigationLabel = 'Toko Online Resmi';
 
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 

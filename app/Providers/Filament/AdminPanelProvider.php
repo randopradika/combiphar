@@ -2,15 +2,12 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\PageResource;
-use App\Models\Page;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -24,15 +21,24 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
-    /** Sidebar groups, one per frontend page (in site order). */
+    /**
+     * Sidebar groups, in the order an editor works rather than the order the
+     * site is laid out.
+     *
+     * These used to be one group per frontend page, which meant the sidebar
+     * grew a section for every new page, content shown on two pages had no
+     * correct home, and anything belonging to no page (footer, social links,
+     * legal text) was filed under whichever page was least wrong. Grouping by
+     * the KIND OF WORK keeps the list stable as the site grows: a new page adds
+     * a row to "Halaman", not a section to this list.
+     */
     public const GROUPS = [
-        'Beranda',
-        'Tentang Kami',
-        'Produk',
-        'Tanggung Jawab Sosial',
-        'Berita',
-        'Investor',
-        'Karir & Kontak',
+        'Halaman',
+        'Konten',
+        'Profil Perusahaan',
+        'Formulir & Pesan',
+        'Pengaturan',
+        'Pengguna & Akses',
     ];
 
     public function panel(Panel $panel): Panel
@@ -74,7 +80,6 @@ class AdminPanelProvider extends PanelProvider
                 fn (string $g) => NavigationGroup::make($g)->collapsible(),
                 self::GROUPS,
             ))
-            ->navigationItems($this->pageBannerItems())
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -97,38 +102,4 @@ class AdminPanelProvider extends PanelProvider
             ]);
     }
 
-    /**
-     * One "banner / page text" link per page group, pointing straight at
-     * that page's record in the Pages resource.
-     */
-    private function pageBannerItems(): array
-    {
-        $pages = [
-            ['home', 'Beranda', 'Banner & Teks Halaman'],
-            ['about', 'Tentang Kami', 'Banner & Teks Halaman'],
-            ['products', 'Produk', 'Banner & Teks Halaman'],
-            ['csr', 'Tanggung Jawab Sosial', 'Banner & Teks Halaman'],
-            ['news', 'Berita', 'Banner & Teks Halaman'],
-            ['investor', 'Investor', 'Banner & Teks Halaman'],
-            ['contact', 'Karir & Kontak', 'Banner & Teks Halaman'],
-        ];
-
-        return array_map(fn (array $p) => NavigationItem::make($p[0] . '-banner')
-            ->label($p[2])
-            ->group($p[1])
-            ->sort(1)
-            ->icon('heroicon-o-photo')
-            ->url(function () use ($p) {
-                $id = Page::where('slug', $p[0])->value('id');
-
-                return $id
-                    ? PageResource::getUrl('edit', ['record' => $id])
-                    : PageResource::getUrl('index');
-            })
-            ->isActiveWhen(function () use ($p) {
-                $id = Page::where('slug', $p[0])->value('id');
-
-                return $id && request()->fullUrlIs(PageResource::getUrl('edit', ['record' => $id]) . '*');
-            }), $pages);
-    }
 }

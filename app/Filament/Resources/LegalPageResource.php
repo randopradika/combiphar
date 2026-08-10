@@ -14,11 +14,11 @@ class LegalPageResource extends Resource
 {
     protected static ?string $model = LegalPage::class;
 
-    protected static ?string $navigationGroup = 'Karir & Kontak';
+    protected static ?string $navigationGroup = 'Pengaturan';
 
     protected static ?string $navigationLabel = 'Halaman Legal';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 

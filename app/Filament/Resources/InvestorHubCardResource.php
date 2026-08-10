@@ -21,11 +21,11 @@ class InvestorHubCardResource extends Resource
 
     protected static ?string $slug = 'investor-hub-cards';
 
-    protected static ?string $navigationGroup = 'Investor';
+    protected static ?string $navigationGroup = 'Halaman';
 
-    protected static ?string $navigationLabel = 'Kartu Halaman Investor';
+    protected static ?string $navigationLabel = 'Investor: Kartu Halaman';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 

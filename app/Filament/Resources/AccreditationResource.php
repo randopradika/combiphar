@@ -17,11 +17,11 @@ class AccreditationResource extends Resource
 {
     protected static ?string $model = Accreditation::class;
 
-    protected static ?string $navigationGroup = 'Tentang Kami';
+    protected static ?string $navigationGroup = 'Profil Perusahaan';
 
     protected static ?string $navigationLabel = 'Akreditasi';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationIcon = 'heroicon-o-check-badge';
 
