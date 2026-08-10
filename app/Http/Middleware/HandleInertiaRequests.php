@@ -18,7 +18,19 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'locale' => fn () => app()->getLocale(),
             'routeName' => fn () => \App\Support\Localize::base(Route::currentRouteName()),
-            't' => fn () => Lang::get('site'),
+            // Menu navigasi kini berasal dari CMS. Bentuk `nav.menus` sengaja
+            // dibuat identik dengan yang dulu ditulis tangan di berkas bahasa,
+            // jadi tidak ada komponen React yang perlu berubah.
+            't' => function () {
+                $t = Lang::get('site');
+                $menus = $this->navMenus();
+
+                if ($menus) {
+                    $t['nav']['menus'] = $menus;
+                }
+
+                return $t;
+            },
             'altUrls' => function () use ($request) {
                 $base = \App\Support\Localize::base(Route::currentRouteName());
                 $params = $request->route() ? $request->route()->parameters() : [];
@@ -54,5 +66,67 @@ class HandleInertiaRequests extends Middleware
                 ];
             },
         ]);
+    }
+
+    /**
+     * Menu navigasi dari CMS, dalam bentuk yang sama persis dengan berkas
+     * bahasa: bagian => daftar item {label, suffix, base?, head?, children?}.
+     *
+     * Mengembalikan array kosong bila tabelnya belum ada atau masih kosong,
+     * sehingga berkas bahasa tetap menjadi cadangan — penting untuk lingkungan
+     * yang belum menjalankan migrasinya, dan agar menu tidak pernah hilang
+     * hanya karena tabelnya kosong.
+     */
+    private function navMenus(): array
+    {
+        try {
+            $items = \App\Models\NavItem::orderBy('sort')->get();
+        } catch (\Throwable) {
+            return [];
+        }
+
+        if ($items->isEmpty()) {
+            return [];
+        }
+
+        return $items
+            ->whereNull('parent_id')
+            ->groupBy('section')
+            ->map(fn ($sectionItems) => $this->navItemsTree($sectionItems, $items))
+            ->all();
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, \App\Models\NavItem>  $items
+     * @param  \Illuminate\Support\Collection<int, \App\Models\NavItem>  $all
+     * @return array<int, array<string, mixed>>
+     */
+    private function navItemsTree($items, $all): array
+    {
+        return $items->values()->map(function ($item) use ($all) {
+            $entry = [
+                'label' => $item->tr('label'),
+                'suffix' => $item->suffix ?? '',
+            ];
+
+            // Kunci opsional hanya ditulis bila terpakai, supaya payload-nya
+            // sama dengan berkas bahasa dan React tidak melihat 'head' => false
+            // di tempat yang dulu tidak punya kunci itu sama sekali.
+            if (filled($item->base)) {
+                $entry['base'] = $item->base;
+            }
+
+            if ($item->is_head) {
+                $entry['head'] = true;
+            }
+
+            $children = $all->where('parent_id', $item->id);
+
+            if ($children->isNotEmpty()) {
+                $entry['children'] = $this->navItemsTree($children, $all);
+            }
+
+            return $entry;
+        })->all();
     }
 }
