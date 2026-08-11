@@ -83,7 +83,7 @@ class ActivityLog extends BasePage implements HasTable
                         // sudah cukup untuk mengenali perubahannya, selebihnya
                         // ada di tooltip.
                         return count($fields) > 3
-                            ? implode(', ', array_slice($fields, 0, 3)) . ' +' . (count($fields) - 3)
+                            ? implode(', ', array_slice($fields, 0, 3)).' +'.(count($fields) - 3)
                             : implode(', ', $fields);
                     })
                     ->tooltip(fn (Activity $record) => $record->changeSummary())

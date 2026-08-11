@@ -88,11 +88,11 @@ class SeoOverview extends BasePage implements HasTable
                 }
 
                 if ($len > $max) {
-                    return $len . ' — terlalu panjang';
+                    return $len.' — terlalu panjang';
                 }
 
                 if ($min !== null && $len < $min) {
-                    return $len . ' — agak pendek';
+                    return $len.' — agak pendek';
                 }
 
                 return (string) $len;
