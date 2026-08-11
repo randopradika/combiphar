@@ -188,7 +188,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 .footer__links a:hover{opacity:1;color:var(--pink-300)}
 .footer__divider{border:0;border-top:1px solid rgba(255,255,255,.35);margin:0;width:100%}
 .footer__bottom{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;padding:clamp(120px,20vw,250px) 0 clamp(40px,4vw,54px)}
-.footer__social{display:flex;align-items:center;gap:16px;font-size:16px;color:#fff;justify-self:start}
+.footer__social{display:flex;align-items:end;gap:16px;font-size:16px;color:#fff;justify-self:start}
 .footer__icons{display:flex;align-items:center;gap:14px}
 .footer__social .ic{width:40px;height:40px;border-radius:50%;background:#D9D9D9;color:var(--purple-700);display:grid;place-items:center;transition:background .2s,color .2s,transform .2s}
 .footer__social .ic svg{width:20px;height:20px}
@@ -646,7 +646,7 @@ h3.display,.h3{font-size:clamp(22px,2vw,32px)}
 @media (max-width:640px){
     .footer__links{flex-direction:column;align-items:center;text-align:center;gap:16px}
     .footer__bottom{flex-direction:column;text-align:center;gap:24px}
-    .footer__social{flex-direction:column;gap:14px}
+    .footer__social{flex-direction:column;align-items:center;gap:14px}
     .footer__brand{justify-content:center}
     .footer__copy{text-align:center}
     .milestone__nav{justify-content:center}
@@ -3134,7 +3134,7 @@ html,body{overflow-x:hidden}
 .mobilemenu{inset:var(--nav-h) 0 0 0;z-index:90;background:transparent;padding:0;visibility:visible;pointer-events:none;transform:translateY(100%);transition:transform .35s ease}
 .mobilemenu.open{transform:translateY(0);pointer-events:auto}
 .mobilemenu__panel{flex:1;min-height:0;background:#592B8E;border-radius:32px 32px 0 0;overflow-y:auto;display:flex;flex-direction:column;padding:clamp(28px,7vw,48px) 24px 40px;text-align:center;box-shadow:0 -14px 40px rgba(0,0,0,.22)}
-.mobilemenu .footer__social{flex-direction:column;gap:14px;color:#fff}
+.mobilemenu .footer__social{flex-direction:column;align-items:center;gap:14px;color:#fff}
 .mobilemenu .footer__social>span{font-size:16px}
 /* Mobile menu drill-down (Figma 834:23 root list · 835:34 sub-menu).
    Row width 309px + the 44px arrow insets come straight from the 402px frame. */
