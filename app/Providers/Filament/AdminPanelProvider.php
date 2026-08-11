@@ -12,6 +12,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -76,6 +77,10 @@ class AdminPanelProvider extends PanelProvider
                 ],
             ])
             ->defaultThemeMode(ThemeMode::Light)
+            // Tombol Simpan yang menempel di bawah layar + peringatan saat
+            // meninggalkan formulir yang belum disimpan. Keduanya berlaku untuk
+            // seluruh formulir, jadi dipasang sekali di sini.
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => view('filament.cms-ux'))
             ->navigationGroups(array_map(
                 fn (string $g) => NavigationGroup::make($g)->collapsible(),
                 self::GROUPS,
@@ -101,5 +106,4 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
-
 }

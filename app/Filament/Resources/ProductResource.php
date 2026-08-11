@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class ProductResource extends Resource
 {
@@ -61,57 +62,103 @@ class ProductResource extends Resource
                     ->visible(fn (Forms\Get $get) => $get('top_category_id') && ProductCategory::where('parent_id', $get('top_category_id'))->exists())
                     ->required(fn (Forms\Get $get) => $get('top_category_id') && ProductCategory::where('parent_id', $get('top_category_id'))->exists())
                     ->dehydrated(true),
-                Forms\Components\TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('name_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('name_en')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('summary_id')
-                    ->label('Deskripsi Singkat (Kartu) — ID')
-                    ->helperText('Teks pendek yang tampil di kartu produk (desktop).')
-                    ->rows(2)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('summary_en')
-                    ->label('Deskripsi Singkat (Kartu) — EN')
-                    ->rows(2)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('description_id')
-                    ->label('Deskripsi (Popup Detail) — ID')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('description_en')
-                    ->label('Deskripsi (Popup Detail) — EN')
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
-                Forms\Components\CheckboxList::make('shop_ids')
-                    ->label('Toko Online')
-                    ->helperText('Pilih toko tempat produk ini tersedia. Default: Tokopedia, Shopee, Blibli.')
-                    ->options(fn () => OnlineShop::orderBy('sort')->pluck('name', 'id'))
-                    ->formatStateUsing(fn ($state) => $state ?? OnlineShop::defaultIds())
-                    ->bulkToggleable()
-                    ->columns(2)
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('website_url')
-                    ->label('Website Resmi (URL)')
-                    ->helperText('Tampil sebagai tombol "Kunjungi Website" di popup produk. Kosongkan bila tidak ada.')
-                    ->url()
-                    ->maxLength(255)
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('instagram_url')
-                    ->label('Instagram (URL)')
-                    ->helperText('Ikon Instagram pada bagian "Informasi Lebih Lanjut". Kosongkan bila tidak ada.')
-                    ->url()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('facebook_url')
-                    ->label('Facebook (URL)')
-                    ->helperText('Ikon Facebook pada bagian "Informasi Lebih Lanjut". Kosongkan bila tidak ada.')
-                    ->url()
-                    ->maxLength(255),
+                Forms\Components\Section::make('Nama & deskripsi')
+                    ->schema([
+                        Forms\Components\Tabs::make('Bahasa')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                    ->schema(static::contentFields('id')),
+                                Forms\Components\Tabs\Tab::make('English')
+                                    ->schema(static::contentFields('en')),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+
+                Forms\Components\Section::make('Gambar produk')
+                    ->schema([
+                        Forms\Components\FileUpload::make('image')
+                            ->label('')
+                            ->image()
+                            ->imageEditor(),
+                    ]),
+
+                Forms\Components\Section::make('Tempat membeli')
+                    ->description('Tombol dan tautan pada popup detail produk.')
+                    ->schema([
+                        Forms\Components\CheckboxList::make('shop_ids')
+                            ->label('Toko Online')
+                            ->helperText('Pilih toko tempat produk ini tersedia. Default: Tokopedia, Shopee, Blibli.')
+                            ->options(fn () => OnlineShop::orderBy('sort')->pluck('name', 'id'))
+                            ->formatStateUsing(fn ($state) => $state ?? OnlineShop::defaultIds())
+                            ->bulkToggleable()
+                            ->columns(2)
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('website_url')
+                            ->label('Website Resmi (URL)')
+                            ->helperText('Tampil sebagai tombol "Kunjungi Website". Kosongkan bila tidak ada.')
+                            ->url()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('instagram_url')
+                                ->label('Instagram (URL)')
+                                ->helperText('Ikon pada bagian "Informasi Lebih Lanjut".')
+                                ->url()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('facebook_url')
+                                ->label('Facebook (URL)')
+                                ->helperText('Ikon pada bagian "Informasi Lebih Lanjut".')
+                                ->url()
+                                ->maxLength(255),
+                        ]),
+                    ]),
+
+                Forms\Components\Section::make('Alamat halaman')
+                    ->description('Bagian teknis. Biasanya tidak perlu disentuh.')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\TextInput::make('slug')
+                            ->label('Slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText('Dipakai tautan langsung ke produk (?product={slug}). Dibuat otomatis dari nama saat produk baru.'),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
+    }
+
+    /**
+     * Nama dan deskripsi untuk satu bahasa, dipanggil sekali per tab.
+     */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\TextInput::make("name_{$locale}")
+                ->label($isId ? 'Nama produk' : 'Product name')
+                ->required($isId)
+                ->maxLength(255)
+                ->live(onBlur: true)
+                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state, string $operation) use ($isId) {
+                    if (! $isId || $operation !== 'create' || blank($state) || filled($get('slug'))) {
+                        return;
+                    }
+
+                    $set('slug', Str::slug($state));
+                })
+                ->columnSpanFull(),
+            Forms\Components\Textarea::make("summary_{$locale}")
+                ->label($isId ? 'Deskripsi singkat (kartu)' : 'Short description (card)')
+                ->helperText($isId ? 'Teks pendek yang tampil di kartu produk.' : null)
+                ->rows(2)
+                ->columnSpanFull(),
+            Forms\Components\Textarea::make("description_{$locale}")
+                ->label($isId ? 'Deskripsi lengkap (popup detail)' : 'Full description (detail popup)')
+                ->rows(5)
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table
