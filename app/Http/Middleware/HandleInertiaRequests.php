@@ -2,9 +2,16 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\FooterSetting;
+use App\Models\NavItem;
+use App\Models\Page;
+use App\Models\SocialLink;
+use App\Support\Localize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -17,7 +24,7 @@ class HandleInertiaRequests extends Middleware
         // set the app locale and URL defaults for the {locale} prefix.
         return array_merge(parent::share($request), [
             'locale' => fn () => app()->getLocale(),
-            'routeName' => fn () => \App\Support\Localize::base(Route::currentRouteName()),
+            'routeName' => fn () => Localize::base(Route::currentRouteName()),
             // Menu navigasi kini berasal dari CMS. Bentuk `nav.menus` sengaja
             // dibuat identik dengan yang dulu ditulis tangan di berkas bahasa,
             // jadi tidak ada komponen React yang perlu berubah.
@@ -32,37 +39,55 @@ class HandleInertiaRequests extends Middleware
                 return $t;
             },
             'altUrls' => function () use ($request) {
-                $base = \App\Support\Localize::base(Route::currentRouteName());
+                $base = Localize::base(Route::currentRouteName());
                 $params = $request->route() ? $request->route()->parameters() : [];
                 $alt = fn (string $loc) => $base
-                    ? \App\Support\Localize::url($base, $loc, $params)
-                    : url('/' . $loc);
+                    ? Localize::url($base, $loc, $params)
+                    : url('/'.$loc);
 
                 return ['id' => $alt('id'), 'en' => $alt('en')];
             },
             'nav' => fn () => collect(['about', 'products', 'csr', 'investor', 'news', 'contact', 'terms', 'privacy'])
-                ->mapWithKeys(fn ($s) => [$s => \App\Support\Localize::url($s)])->all(),
+                ->mapWithKeys(fn ($s) => [$s => Localize::url($s)])->all(),
             // Menu items in site order, minus any page switched off in the CMS.
             // Only this list is filtered — hiding an item never takes its route
             // away, so direct links and the sitemap keep working.
             'menuSections' => function () {
                 $sections = ['about', 'products', 'csr', 'investor', 'news', 'contact'];
-                $hidden = \App\Models\Page::where('show_in_menu', false)->pluck('slug')->all();
+                $hidden = Page::where('show_in_menu', false)->pluck('slug')->all();
 
                 return array_values(array_diff($sections, $hidden));
             },
-            'homeUrl' => fn () => \App\Support\Localize::url('home'),
+            'homeUrl' => fn () => Localize::url('home'),
             'flash' => fn () => ['contact_success' => (bool) session('contact_success')],
+            // Seluruh isi footer berasal dari satu baris footer_settings, disunting
+            // di Halaman -> Footer. try/catch-nya sama alasannya dengan navMenus():
+            // lingkungan yang belum menjalankan migrasinya harus tetap merender
+            // situs, bukan 500 di setiap halaman.
             'footer' => function () {
-                $p = \App\Models\Page::where('slug', 'home')->first();
+                try {
+                    $f = FooterSetting::query()->orderBy('id')->first();
+                } catch (\Throwable) {
+                    $f = null;
+                }
 
                 return [
-                    'socials' => \App\Models\SocialLink::orderBy('sort')->get()->map(fn ($s) => [
+                    'socials' => SocialLink::orderBy('sort')->get()->map(fn ($s) => [
                         'name' => $s->name,
                         'url' => $s->url,
-                        'icon' => $s->icon ? \Illuminate\Support\Facades\Storage::url($s->icon) : null,
+                        'icon' => $s->icon ? Storage::url($s->icon) : null,
                     ]),
-                    'copyright' => $p?->tr('footer_copyright'),
+                    'followLabel' => $f?->tr('follow_label'),
+                    'copyright' => $f?->tr('copyright'),
+                    'logos' => collect($f?->logos ?? [])
+                        ->filter(fn ($l) => ! empty($l['image']))
+                        ->map(fn ($l) => [
+                            'src' => Storage::url($l['image']),
+                            'alt' => $l['alt'] ?? '',
+                            // Tinggi pada 1920px; site.css yang menyusutkannya.
+                            'height' => (int) ($l['height'] ?: 82),
+                        ])
+                        ->values(),
                 ];
             },
         ]);
@@ -80,7 +105,7 @@ class HandleInertiaRequests extends Middleware
     private function navMenus(): array
     {
         try {
-            $items = \App\Models\NavItem::orderBy('sort')->get();
+            $items = NavItem::orderBy('sort')->get();
         } catch (\Throwable) {
             return [];
         }
@@ -97,8 +122,8 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, \App\Models\NavItem>  $items
-     * @param  \Illuminate\Support\Collection<int, \App\Models\NavItem>  $all
+     * @param  Collection<int, NavItem>  $items
+     * @param  Collection<int, NavItem>  $all
      * @return array<int, array<string, mixed>>
      */
     private function navItemsTree($items, $all): array

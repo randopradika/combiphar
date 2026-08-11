@@ -642,15 +642,13 @@ export default function SiteLayout({ children, navMode = "solid" }) {
           </div>
           <div className="mobilemenu__foot">
             <div className="mobilemenu__brand">
-              <img src="/img/logo-combiphar-white.svg" alt="Combiphar" />
-              <img
-                src="/img/logo-combicare-white.svg"
-                alt="Combi Care Center"
-              />
+              {(footer?.logos ?? []).map((l, i) => (
+                <img key={i} src={l.src} alt={l.alt || ""} />
+              ))}
             </div>
             <hr className="mobilemenu__divider" />
             <div className="footer__social">
-              <span>{t.follow_us}</span>
+              {footer?.followLabel && <span>{footer.followLabel}</span>}
               <div className="footer__icons">
                 {(footer?.socials ?? []).map((s, i) => (
                   <a
@@ -697,7 +695,7 @@ export default function SiteLayout({ children, navMode = "solid" }) {
         <div className="container">
           <div className="footer__bottom">
             <div className="footer__social">
-              <span>{t.follow_us}</span>
+              {footer?.followLabel && <span>{footer.followLabel}</span>}
               <div className="footer__icons">
                 {(footer?.socials ?? []).map((s, i) => (
                   <a
@@ -719,12 +717,18 @@ export default function SiteLayout({ children, navMode = "solid" }) {
                 dangerouslySetInnerHTML={{ __html: footer.copyright }}
               />
             )}
+            {/* Logo, urutan dan tingginya berasal dari CMS (Halaman -> Footer).
+                --logo-h dibaca site.css: dua logo Figma tingginya berbeda
+                (82 dan 89), jadi satu tinggi seragam tidak bisa 1:1. */}
             <div className="footer__brand">
-              <img src="/img/logo-combiphar-white.svg" alt="Combiphar" />
-              <img
-                src="/img/logo-combicare-white.svg"
-                alt="Combi Care Center"
-              />
+              {(footer?.logos ?? []).map((l, i) => (
+                <img
+                  key={i}
+                  src={l.src}
+                  alt={l.alt || ""}
+                  style={{ "--logo-h": l.height }}
+                />
+              ))}
             </div>
           </div>
         </div>

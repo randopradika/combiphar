@@ -9,6 +9,7 @@ use App\Models\Award;
 use App\Models\CsrProgram;
 use App\Models\Facility;
 use App\Models\Faq;
+use App\Models\FooterSetting;
 use App\Models\GlobalSite;
 use App\Models\ImpactProgram;
 use App\Models\InvestorDocument;
@@ -123,6 +124,7 @@ class AppServiceProvider extends ServiceProvider
             AboutHistory::class,
             ImpactProgram::class,
             GlobalSite::class,
+            FooterSetting::class,
             // Perubahan peran justru yang paling perlu terlacak. Kata sandi
             // disamarkan di observer, jadi tidak ada hash yang masuk catatan.
             User::class,

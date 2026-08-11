@@ -236,23 +236,10 @@ class PageResource extends Resource
                                                     ->toolbarButtons(['bold', 'italic', 'link', 'undo', 'redo']),
                                             ]),
                                     ]),
-                                Forms\Components\Section::make('Footer — Copyright')
-                                    ->description('Teks copyright di footer (tampil di footer desktop dan di menu mobile). Ikon media sosial dikelola di menu "Media Sosial (Footer)".')
-                                    ->collapsible()
-                                    ->visible(fn (?Page $record) => $record?->slug === 'home')
-                                    ->schema([
-                                        // RichEditor, not TextInput: "Combiphar" is bold in the
-                                        // design (.footer__rights strong) and a plain string
-                                        // field cannot express that.
-                                        Forms\Components\RichEditor::make('footer_copyright_id')
-                                            ->label('Teks Copyright (ID)')
-                                            ->helperText('Gunakan tebal (bold) untuk menyorot nama Combiphar. Kosongkan untuk menyembunyikan baris ini.')
-                                            ->toolbarButtons(['bold', 'italic', 'link', 'undo', 'redo']),
-                                        Forms\Components\RichEditor::make('footer_copyright_en')
-                                            ->label('Copyright text (EN)')
-                                            ->helperText('Use bold to highlight the Combiphar name. Leave empty to hide this line.')
-                                            ->toolbarButtons(['bold', 'italic', 'link', 'undo', 'redo']),
-                                    ]),
+                                // Copyright footer dulu berada di sini, di dalam record
+                                // Beranda: satu-satunya isi di formulir ini yang tampil di
+                                // SETIAP halaman, bukan di halaman ini saja. Sekarang
+                                // seluruh isi footer ada di Halaman -> Footer.
                             ]),
 
                         // Meta dulunya bidang PERTAMA pada formulir 60 bidang ini,
