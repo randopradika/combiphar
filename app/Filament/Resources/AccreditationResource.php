@@ -33,15 +33,29 @@ class AccreditationResource extends Resource
         return ['name', 'issuer'];
     }
 
+    /**
+     * Tabel ini tidak punya pasangan kolom ID/EN maupun kolom gambar, jadi tidak
+     * ada tab bahasa dan tidak ada tampilan galeri di sini — hanya satu bagian
+     * yang menjelaskan ke mana isinya pergi.
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('issuer')
-                    ->maxLength(255),
+                Forms\Components\Section::make('Akreditasi')
+                    ->description('Tampil sebagai daftar pada halaman Tentang Kami.')
+                    ->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Nama akreditasi')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('issuer')
+                                ->label('Lembaga penerbit')
+                                ->maxLength(255),
+                        ]),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }

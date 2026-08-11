@@ -36,23 +36,68 @@ class OfficeResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('city')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('category')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description_id')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('description_en')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(255),
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Forms\Components\Section::make('Kantor')
+                            ->schema([
+                                Forms\Components\Grid::make(2)->schema([
+                                    Forms\Components\TextInput::make('name')
+                                        ->label('Nama')
+                                        ->required()
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('city')
+                                        ->label('Kota')
+                                        ->maxLength(255),
+                                ]),
+                            ]),
+
+                        Forms\Components\Section::make('Deskripsi')
+                            ->schema([
+                                Forms\Components\Tabs::make('Bahasa')
+                                    ->tabs([
+                                        Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                            ->schema(static::contentFields('id')),
+                                        Forms\Components\Tabs\Tab::make('English')
+                                            ->schema(static::contentFields('en')),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        Forms\Components\Section::make('Detail')
+                            ->schema([
+                                Forms\Components\TextInput::make('category')
+                                    ->label('Kategori')
+                                    ->helperText('Menjadi penyaring pada daftar Lokasi Kami, mis. "Kantor Pusat".')
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('phone')
+                                    ->label('Telepon')
+                                    ->tel()
+                                    ->maxLength(255),
+                            ]),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
+    }
+
+    /** Deskripsi kantor untuk satu bahasa. */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\Textarea::make("description_{$locale}")
+                ->label($isId ? 'Deskripsi' : 'Description')
+                ->rows(5)
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table

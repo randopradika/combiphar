@@ -41,31 +41,55 @@ class LegalPageResource extends Resource
         'link', 'undo', 'redo',
     ];
 
+    /**
+     * Formulir ini tampil di dalam modal (halaman ini memakai ManageRecords).
+     * Dua editor teks kaya yang berjajar menumpuk berarti versi Inggris berada
+     * beberapa layar di bawah versi Indonesianya; tab bahasa menghapus jarak itu.
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('key')
-                    ->label('Kunci')
-                    ->helperText('Identitas halaman (terms / privacy) — jangan diubah.')
-                    ->disabled()
-                    ->dehydrated(false),
-                Forms\Components\TextInput::make('title_id')
-                    ->label('Judul (ID)')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('title_en')
-                    ->label('Title (EN)')
-                    ->maxLength(255),
-                Forms\Components\RichEditor::make('body_id')
-                    ->label('Isi Halaman (ID)')
-                    ->helperText('Gunakan Judul 2 / Judul 3 untuk sub-bagian dan tebal untuk penekanan.')
-                    ->toolbarButtons(self::TOOLBAR)
-                    ->columnSpanFull(),
-                Forms\Components\RichEditor::make('body_en')
-                    ->label('Page Content (EN)')
-                    ->toolbarButtons(self::TOOLBAR)
-                    ->columnSpanFull(),
+                Forms\Components\Section::make('Isi halaman')
+                    ->schema([
+                        Forms\Components\Tabs::make('Bahasa')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                    ->schema(static::contentFields('id')),
+                                Forms\Components\Tabs\Tab::make('English')
+                                    ->schema(static::contentFields('en')),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+
+                Forms\Components\Section::make('Lanjutan')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\TextInput::make('key')
+                            ->label('Kunci')
+                            ->helperText('Identitas halaman (terms / privacy) — jangan diubah.')
+                            ->disabled()
+                            ->dehydrated(false),
+                    ]),
             ]);
+    }
+
+    /** Judul dan isi halaman legal untuk satu bahasa. */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\TextInput::make("title_{$locale}")
+                ->label($isId ? 'Judul' : 'Title')
+                ->maxLength(255)
+                ->columnSpanFull(),
+            Forms\Components\RichEditor::make("body_{$locale}")
+                ->label($isId ? 'Isi Halaman' : 'Page content')
+                ->helperText($isId ? 'Gunakan Judul 2 / Judul 3 untuk sub-bagian dan tebal untuk penekanan.' : null)
+                ->toolbarButtons(self::TOOLBAR)
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table

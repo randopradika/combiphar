@@ -45,54 +45,94 @@ class NavItemResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Forms\Components\Select::make('section')
-                    ->label('Menu induk')
-                    ->helperText('Menu di bar atas tempat item ini muncul.')
-                    ->options(NavItem::SECTIONS)
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(fn (Forms\Set $set) => $set('parent_id', null)),
-                Forms\Components\Select::make('parent_id')
-                    ->label('Berada di bawah')
-                    ->helperText('Kosongkan untuk item tingkat atas. Pilih item lain untuk menjorok ke dalam sebagai sub-item.')
-                    ->options(fn (Forms\Get $get, ?NavItem $record) => NavItem::query()
-                        ->where('section', $get('section'))
-                        ->whereNull('parent_id')
-                        ->when($record, fn (Builder $q) => $q->whereKeyNot($record->getKey()))
-                        ->orderBy('sort')
-                        ->pluck('label_id', 'id')
-                        ->all())
-                    ->placeholder('— Item tingkat atas —')
-                    ->searchable()
-                    ->preload()
-                    ->nullable(),
-                Forms\Components\TextInput::make('label_id')
-                    ->label('Teks (ID)')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('label_en')
-                    ->label('Text (EN)')
-                    ->helperText('Kosongkan untuk memakai teks Indonesia.')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('suffix')
-                    ->label('Tujuan')
-                    ->helperText('Ditambahkan ke alamat halaman menu induk. Contoh: "#sejarah" melompat ke bagian pada halaman itu, "?tab=karir" membuka tab tertentu, "/education" membuka halaman detail.')
-                    ->maxLength(255),
-                Forms\Components\Select::make('base')
-                    ->label('Ambil alamat dari menu lain (opsional)')
-                    ->helperText('Hampir selalu dibiarkan kosong. Dipakai bila tujuannya berada di halaman bagian lain — dokumen governance milik Investor sebenarnya ada di bawah halaman Keberlanjutan.')
-                    ->options(NavItem::SECTIONS)
-                    ->nullable(),
-                Forms\Components\Toggle::make('is_head')
-                    ->label('Tampilkan sebagai judul kelompok')
-                    ->helperText('Dicetak tebal, dengan sub-item menjorok di bawahnya.'),
-                Forms\Components\TextInput::make('sort')
-                    ->label('Urutan')
-                    ->helperText('Angka kecil tampil lebih dulu.')
-                    ->numeric()
-                    ->default(fn () => (NavItem::max('sort') ?? 0) + 1),
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Forms\Components\Section::make('Teks')
+                            ->schema([
+                                Forms\Components\Tabs::make('Bahasa')
+                                    ->tabs([
+                                        Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                            ->schema(static::contentFields('id')),
+                                        Forms\Components\Tabs\Tab::make('English')
+                                            ->schema(static::contentFields('en')),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+
+                        Forms\Components\Section::make('Tujuan')
+                            ->description('⚠️ Alamat tidak diperiksa: tautan yang salah ketik tetap tersimpan dan menghasilkan halaman 404.')
+                            ->schema([
+                                Forms\Components\TextInput::make('suffix')
+                                    ->label('Tujuan')
+                                    ->helperText('Ditambahkan ke alamat halaman menu induk. Contoh: "#sejarah" melompat ke bagian pada halaman itu, "?tab=karir" membuka tab tertentu, "/education" membuka halaman detail.')
+                                    ->maxLength(255),
+                                Forms\Components\Select::make('base')
+                                    ->label('Ambil alamat dari menu lain (opsional)')
+                                    ->helperText('Hampir selalu dibiarkan kosong. Dipakai bila tujuannya berada di halaman bagian lain — dokumen governance milik Investor sebenarnya ada di bawah halaman Keberlanjutan.')
+                                    ->options(NavItem::SECTIONS)
+                                    ->nullable(),
+                            ]),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        Forms\Components\Section::make('Penempatan')
+                            ->schema([
+                                // ⚠️ `section` tetap live dan tetap mengosongkan
+                                // parent_id: pilihan induk diambil dari section
+                                // yang sedang dipilih, jadi keduanya harus tetap
+                                // berada dalam satu formulir yang sama.
+                                Forms\Components\Select::make('section')
+                                    ->label('Menu induk')
+                                    ->helperText('Menu di bar atas tempat item ini muncul.')
+                                    ->options(NavItem::SECTIONS)
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (Forms\Set $set) => $set('parent_id', null)),
+                                Forms\Components\Select::make('parent_id')
+                                    ->label('Berada di bawah')
+                                    ->helperText('Kosongkan untuk item tingkat atas. Pilih item lain untuk menjorok ke dalam sebagai sub-item.')
+                                    ->options(fn (Forms\Get $get, ?NavItem $record) => NavItem::query()
+                                        ->where('section', $get('section'))
+                                        ->whereNull('parent_id')
+                                        ->when($record, fn (Builder $q) => $q->whereKeyNot($record->getKey()))
+                                        ->orderBy('sort')
+                                        ->pluck('label_id', 'id')
+                                        ->all())
+                                    ->placeholder('— Item tingkat atas —')
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable(),
+                                Forms\Components\Toggle::make('is_head')
+                                    ->label('Tampilkan sebagai judul kelompok')
+                                    ->helperText('Dicetak tebal, dengan sub-item menjorok di bawahnya.'),
+                                Forms\Components\TextInput::make('sort')
+                                    ->label('Urutan')
+                                    ->helperText('Angka kecil tampil lebih dulu.')
+                                    ->numeric()
+                                    ->default(fn () => (NavItem::max('sort') ?? 0) + 1),
+                            ]),
+                    ]),
             ]);
+    }
+
+    /** Teks tautan untuk satu bahasa. */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\TextInput::make("label_{$locale}")
+                ->label($isId ? 'Teks' : 'Text')
+                ->helperText($isId ? null : 'Kosongkan untuk memakai teks Indonesia.')
+                ->required($isId)
+                ->maxLength(255)
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table

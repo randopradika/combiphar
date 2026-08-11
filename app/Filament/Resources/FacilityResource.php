@@ -37,32 +37,78 @@ class FacilityResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('region')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('plants')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('area')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('category_id')
-                    ->label('Kategori Produk (ID)')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('category_en')
-                    ->label('Kategori Produk (EN)')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('detail_id')
-                    ->label('Bentuk Sediaan / Dosage (ID)')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('detail_en')
-                    ->label('Bentuk Sediaan / Dosage (EN)')
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Forms\Components\Section::make('Fasilitas')
+                            ->schema([
+                                Forms\Components\Grid::make(2)->schema([
+                                    Forms\Components\TextInput::make('name')
+                                        ->label('Nama')
+                                        ->required()
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('region')
+                                        ->label('Wilayah')
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('plants')
+                                        ->label('Pabrik')
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('area')
+                                        ->label('Luas')
+                                        ->maxLength(255),
+                                ]),
+                            ]),
+
+                        Forms\Components\Section::make('Kategori & bentuk sediaan')
+                            ->schema([
+                                Forms\Components\Tabs::make('Bahasa')
+                                    ->tabs([
+                                        Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                            ->schema(static::contentFields('id')),
+                                        Forms\Components\Tabs\Tab::make('English')
+                                            ->schema(static::contentFields('en')),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        Forms\Components\Section::make('Gambar')
+                            ->schema([
+                                Forms\Components\FileUpload::make('image')
+                                    ->label('Foto fasilitas')
+                                    ->image(),
+                            ]),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
+    }
+
+    /**
+     * Kategori produk dan bentuk sediaan untuk satu bahasa.
+     *
+     * ⚠️ `category_id` di sini adalah kolom BAHASA INDONESIA, bukan foreign key
+     * ke tabel kategori — pasangannya `category_en`.
+     */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\TextInput::make("category_{$locale}")
+                ->label($isId ? 'Kategori Produk' : 'Product category')
+                ->maxLength(255)
+                ->columnSpanFull(),
+            Forms\Components\Textarea::make("detail_{$locale}")
+                ->label($isId ? 'Bentuk Sediaan' : 'Dosage form')
+                ->rows(4)
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table

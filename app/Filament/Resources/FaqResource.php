@@ -37,25 +37,39 @@ class FaqResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('question_id')
-                    ->label('Pertanyaan (ID)')
-                    ->required()
-                    ->rows(2)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('question_en')
-                    ->label('Question (EN)')
-                    ->rows(2)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('answer_id')
-                    ->label('Jawaban (ID)')
-                    ->rows(4)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('answer_en')
-                    ->label('Answer (EN)')
-                    ->rows(4)
-                    ->columnSpanFull(),
+                Forms\Components\Section::make('Tanya jawab')
+                    ->description('Tampil sebagai akordeon di tab Kontak pada halaman Karir & Kontak.')
+                    ->schema([
+                        Forms\Components\Tabs::make('Bahasa')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                    ->schema(static::contentFields('id')),
+                                Forms\Components\Tabs\Tab::make('English')
+                                    ->schema(static::contentFields('en')),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
+    }
+
+    /** Satu pasang pertanyaan dan jawaban untuk satu bahasa. */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\Textarea::make("question_{$locale}")
+                ->label($isId ? 'Pertanyaan' : 'Question')
+                ->required($isId)
+                ->rows(2)
+                ->columnSpanFull(),
+            Forms\Components\Textarea::make("answer_{$locale}")
+                ->label($isId ? 'Jawaban' : 'Answer')
+                ->rows(6)
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table

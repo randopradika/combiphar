@@ -24,12 +24,22 @@ trait HasGalleryToggle
     /**
      * Tampilan awal halaman ini sebelum editor memilih sendiri.
      * Halaman yang isinya bergambar memakai true; sisanya false.
+     *
+     * ⚠️ Halaman yang ingin berbeda harus menimpa galleryByDefault(), BUKAN
+     * properti ini: mendeklarasikan ulang properti trait dengan nilai bawaan
+     * yang berbeda adalah komposisi yang tidak sah di PHP dan langsung membuat
+     * halamannya fatal error.
      */
     protected static bool $galleryByDefault = true;
 
     public function isGallery(): bool
     {
-        return (bool) session()->get($this->gallerySessionKey(), static::$galleryByDefault);
+        return (bool) session()->get($this->gallerySessionKey(), $this->galleryByDefault());
+    }
+
+    protected function galleryByDefault(): bool
+    {
+        return static::$galleryByDefault;
     }
 
     public function toggleGallery(): void

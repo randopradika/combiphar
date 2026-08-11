@@ -43,24 +43,63 @@ class AwardResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Forms\Components\TextInput::make('title_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('title_en')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('year')
-                    ->label('Tahun')
-                    ->helperText('Mengelompokkan penghargaan pada popup "Pencapaian & Penghargaan" (filter Tahun).')
-                    ->numeric(),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
-                Forms\Components\Toggle::make('is_hero')
-                    ->label('Tampilkan sebagai logo unggulan')
-                    ->helperText('Logo tampil di bawah deskripsi "Pencapaian & Penghargaan" di halaman Tentang Kami (maksimal 7 pertama). Penghargaan lain tetap tampil di popup "Daftar Penghargaan".')
-                    ->default(false),
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Forms\Components\Section::make('Judul')
+                            ->schema([
+                                Forms\Components\Tabs::make('Bahasa')
+                                    ->tabs([
+                                        Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                            ->schema(static::contentFields('id')),
+                                        Forms\Components\Tabs\Tab::make('English')
+                                            ->schema(static::contentFields('en')),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+
+                        Forms\Components\Section::make('Gambar')
+                            ->schema([
+                                Forms\Components\FileUpload::make('image')
+                                    ->label('Sertifikat atau logo')
+                                    ->image(),
+                            ]),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        Forms\Components\Section::make('Penempatan')
+                            ->schema([
+                                Forms\Components\TextInput::make('year')
+                                    ->label('Tahun')
+                                    ->helperText('Mengelompokkan penghargaan pada popup "Pencapaian & Penghargaan" (filter Tahun).')
+                                    ->numeric(),
+                                Forms\Components\Toggle::make('is_hero')
+                                    ->label('Tampilkan sebagai logo unggulan')
+                                    ->helperText('Logo tampil di bawah deskripsi "Pencapaian & Penghargaan" di halaman Tentang Kami (maksimal 7 pertama). Penghargaan lain tetap tampil di popup "Daftar Penghargaan".')
+                                    ->default(false),
+                            ]),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
+    }
+
+    /** Judul penghargaan untuk satu bahasa. */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\TextInput::make("title_{$locale}")
+                ->label($isId ? 'Judul' : 'Title')
+                ->required($isId)
+                ->maxLength(255)
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table

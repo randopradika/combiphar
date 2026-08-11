@@ -57,33 +57,71 @@ class InvestorDocumentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Forms\Components\Select::make('category')
-                    ->label('Kategori')
-                    ->options(static::CATEGORIES)
-                    ->helperText('Menentukan di bagian mana dokumen ini tampil pada halaman Investor.')
-                    ->required()
-                    ->default('annual_report'),
-                Forms\Components\TextInput::make('title_id')
-                    ->label('Judul (ID)')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('title_en')
-                    ->label('Title (EN)')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('year')
-                    ->label('Tahun')
-                    ->numeric(),
-                Forms\Components\FileUpload::make('file_id')
-                    ->label('File (ID)')
-                    ->acceptedFileTypes(['application/pdf'])
-                    ->downloadable(),
-                Forms\Components\FileUpload::make('file_en')
-                    ->label('File (EN)')
-                    ->acceptedFileTypes(['application/pdf'])
-                    ->downloadable(),
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Forms\Components\Section::make('Dokumen')
+                            ->schema([
+                                // Judul DAN berkasnya dipisah per bahasa: satu
+                                // dokumen bisa punya PDF Indonesia dan PDF
+                                // Inggris yang berbeda, jadi keduanya berada di
+                                // dalam tab bahasa yang sama.
+                                Forms\Components\Tabs::make('Bahasa')
+                                    ->tabs([
+                                        Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                            ->schema(static::contentFields('id')),
+                                        Forms\Components\Tabs\Tab::make('English')
+                                            ->schema(static::contentFields('en')),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        Forms\Components\Section::make('Penempatan')
+                            ->schema([
+                                Forms\Components\Select::make('category')
+                                    ->label('Kategori')
+                                    ->options(static::CATEGORIES)
+                                    ->helperText('Menentukan di bagian mana dokumen ini tampil pada halaman Investor.')
+                                    ->required()
+                                    ->default('annual_report'),
+                                Forms\Components\TextInput::make('year')
+                                    ->label('Tahun')
+                                    ->numeric(),
+                            ]),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
+    }
+
+    /**
+     * Judul dan berkas untuk satu bahasa.
+     *
+     * ⚠️ `file_id` adalah berkas BAHASA INDONESIA, bukan kolom kunci — lihat
+     * pasangannya `file_en`.
+     */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\TextInput::make("title_{$locale}")
+                ->label($isId ? 'Judul' : 'Title')
+                ->required($isId)
+                ->maxLength(255)
+                ->columnSpanFull(),
+            Forms\Components\FileUpload::make("file_{$locale}")
+                ->label($isId ? 'Berkas PDF' : 'PDF file')
+                ->acceptedFileTypes(['application/pdf'])
+                ->downloadable()
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table

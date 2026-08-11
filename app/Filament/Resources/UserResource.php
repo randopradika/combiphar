@@ -45,41 +45,61 @@ class UserResource extends Resource
         return ['name', 'email'];
     }
 
+    /**
+     * Tidak ada bidang dwibahasa di sini; yang dipisahkan adalah identitas akun
+     * dari hak aksesnya, karena keduanya dijawab oleh orang yang berbeda.
+     */
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Nama')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->label('Email')
-                    ->email()
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('password')
-                    ->label('Kata sandi')
-                    ->password()
-                    ->revealable()
-                    ->helperText('Kosongkan untuk membiarkan kata sandi saat ini tidak berubah.')
-                    ->required(fn (string $operation) => $operation === 'create')
-                    // Kolomnya memakai cast 'hashed', jadi nilai polos di sini
-                    // otomatis di-hash saat disimpan.
-                    ->dehydrated(fn (?string $state) => filled($state))
-                    ->maxLength(255),
-                Forms\Components\Select::make('role')
-                    ->label('Peran')
-                    ->options(User::ROLES)
-                    ->default(User::ROLE_EDITOR)
-                    ->required()
-                    ->native(false)
-                    ->helperText('Administrator dan Editor dapat membuka CMS. "Nonaktif" mencabut akses tanpa menghapus akunnya — nama dan riwayatnya tetap utuh.')
-                    // Tanpa ini seorang administrator dapat menonaktifkan
-                    // dirinya sendiri dan langsung terkunci di luar panel.
-                    ->disabled(fn (?User $record) => $record?->is(auth()->user()) ?? false)
-                    ->dehydrated(fn (?User $record) => ! ($record?->is(auth()->user()) ?? false)),
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Forms\Components\Section::make('Akun')
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nama')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('email')
+                                    ->label('Email')
+                                    ->email()
+                                    ->required()
+                                    ->unique(ignoreRecord: true)
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('password')
+                                    ->label('Kata sandi')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Kosongkan untuk membiarkan kata sandi saat ini tidak berubah.')
+                                    ->required(fn (string $operation) => $operation === 'create')
+                                    // Kolomnya memakai cast 'hashed', jadi nilai polos di sini
+                                    // otomatis di-hash saat disimpan.
+                                    ->dehydrated(fn (?string $state) => filled($state))
+                                    ->maxLength(255),
+                            ]),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        Forms\Components\Section::make('Akses')
+                            ->schema([
+                                Forms\Components\Select::make('role')
+                                    ->label('Peran')
+                                    ->options(User::ROLES)
+                                    ->default(User::ROLE_EDITOR)
+                                    ->required()
+                                    ->native(false)
+                                    ->helperText('Administrator dan Editor dapat membuka CMS. "Nonaktif" mencabut akses tanpa menghapus akunnya — nama dan riwayatnya tetap utuh.')
+                                    // Tanpa ini seorang administrator dapat menonaktifkan
+                                    // dirinya sendiri dan langsung terkunci di luar panel.
+                                    ->disabled(fn (?User $record) => $record?->is(auth()->user()) ?? false)
+                                    ->dehydrated(fn (?User $record) => ! ($record?->is(auth()->user()) ?? false)),
+                            ]),
+                    ]),
             ]);
     }
 

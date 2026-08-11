@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard;
+use Filament\Resources\Pages\ManageRecords;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
@@ -108,6 +110,46 @@ class AdminPanelSmokeTest extends TestCase
         }
 
         $this->assertGreaterThan(15, $checked, 'Formulir yang teruji jauh lebih sedikit dari yang terdaftar.');
+    }
+
+    /**
+     * Empat resource memakai ManageRecords, sehingga formulirnya tampil di dalam
+     * MODAL dan bukan di halaman "buat" tersendiri. Test di atas melewatinya
+     * (hasPage('create') bernilai false), padahal justru formulir itu yang paling
+     * mudah rusak oleh perubahan tata letak -- dan kerusakannya baru terlihat
+     * ketika modalnya benar-benar dibuka.
+     */
+    public function test_setiap_formulir_modal_terbuka(): void
+    {
+        $panel = Filament::getPanel('admin');
+        $checked = 0;
+
+        foreach ($panel->getResources() as $resource) {
+            $registration = $resource::getPages()['index'] ?? null;
+
+            if (! $registration || ! is_subclass_of($registration->getPage(), ManageRecords::class)) {
+                continue;
+            }
+
+            $page = $registration->getPage();
+
+            if ($resource::canCreate()) {
+                Livewire::test($page)->mountAction('create')->assertSuccessful();
+            }
+
+            // Sebagian daftar berisi baris tetap dari migrasi; bila lingkungan
+            // ini kebetulan kosong, formulir sunting tidak dapat dibuka dan
+            // dilewati saja daripada membuat test gagal karena datanya.
+            $record = $resource::getModel()::query()->first();
+
+            if ($record) {
+                Livewire::test($page)->mountTableAction('edit', $record)->assertSuccessful();
+            }
+
+            $checked++;
+        }
+
+        $this->assertGreaterThan(2, $checked, 'Halaman ManageRecords yang teruji lebih sedikit dari yang terdaftar.');
     }
 
     public function test_setiap_halaman_kustom_terbuka(): void
