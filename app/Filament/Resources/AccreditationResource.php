@@ -70,7 +70,11 @@ class AccreditationResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada akreditasi')
+            ->emptyStateDescription('Daftar akreditasi dan lembaga penerbitnya di halaman Tentang Kami.')
+            ->emptyStateIcon('heroicon-o-check-badge')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

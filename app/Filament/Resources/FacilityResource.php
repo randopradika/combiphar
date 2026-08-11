@@ -89,6 +89,7 @@ class FacilityResource extends Resource
             ->emptyStateDescription('Fasilitas tampil pada popup "Fasilitas Produksi" di halaman Tentang Kami.')
             ->emptyStateIcon('heroicon-o-building-office-2')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

@@ -39,11 +39,15 @@ class ProductBannerResource extends Resource
             Tables\Columns\TextColumn::make('title_id')->label('Judul')->searchable(),
             Tables\Columns\ImageColumn::make('image'),
             Tables\Columns\TextColumn::make('sort')->numeric()->sortable(),
-        ])->actions([
-            Tables\Actions\EditAction::make(),
-        ])->bulkActions([
-            Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
-        ]);
+        ])->emptyStateHeading('Belum ada sorotan produk')
+            ->emptyStateDescription('Bento grid sorotan produk di halaman Beranda.')
+            ->emptyStateIcon('heroicon-o-squares-2x2')
+            ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
+                Tables\Actions\EditAction::make(),
+            ])->bulkActions([
+                Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
+            ]);
     }
 
     public static function getPages(): array

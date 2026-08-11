@@ -283,7 +283,11 @@ class PageResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada halaman')
+            ->emptyStateDescription('Setiap halaman situs punya satu record di sini untuk banner, teks dan meta SEO-nya.')
+            ->emptyStateIcon('heroicon-o-document-duplicate')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

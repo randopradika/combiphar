@@ -72,7 +72,11 @@ class MilestoneResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada linimasa')
+            ->emptyStateDescription('Slider perjalanan perusahaan di halaman Beranda.')
+            ->emptyStateIcon('heroicon-o-flag')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

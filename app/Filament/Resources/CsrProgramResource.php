@@ -350,7 +350,11 @@ class CsrProgramResource extends Resource
                     ->trueLabel('Terbit')
                     ->falseLabel('Draf'),
             ])
+            ->emptyStateHeading('Belum ada entri CSR')
+            ->emptyStateDescription('Kartu program, halaman detail, tim olahraga dan event untuk halaman Sustainability.')
+            ->emptyStateIcon('heroicon-o-sparkles')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('pratinjau')
                     ->label('Pratinjau')
@@ -381,7 +385,7 @@ class CsrProgramResource extends Resource
     public static function previewUrl(CsrProgram $record): string
     {
         return URL::temporarySignedRoute(
-            'csr.show.' . config('app.locale'),
+            'csr.show.'.config('app.locale'),
             now()->addDay(),
             ['slug' => $record->slug],
         );

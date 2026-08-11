@@ -83,7 +83,11 @@ class OfficeResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada kantor cabang')
+            ->emptyStateDescription('Daftar Lokasi Kami di halaman Tentang Kami.')
+            ->emptyStateIcon('heroicon-o-map-pin')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

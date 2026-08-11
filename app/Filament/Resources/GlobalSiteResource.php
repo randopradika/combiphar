@@ -77,7 +77,11 @@ class GlobalSiteResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada jangkauan bisnis')
+            ->emptyStateDescription('Negara tujuan ekspor pada section peta dunia di halaman Tentang Kami.')
+            ->emptyStateIcon('heroicon-o-globe-alt')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

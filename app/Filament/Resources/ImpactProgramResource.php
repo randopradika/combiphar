@@ -77,7 +77,11 @@ class ImpactProgramResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada program dampak')
+            ->emptyStateDescription('Slider Program Dampak di halaman Beranda.')
+            ->emptyStateIcon('heroicon-o-heart')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

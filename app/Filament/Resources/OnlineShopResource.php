@@ -75,7 +75,11 @@ class OnlineShopResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada toko online')
+            ->emptyStateDescription('Tombol Tersedia di pada popup detail produk.')
+            ->emptyStateIcon('heroicon-o-shopping-bag')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

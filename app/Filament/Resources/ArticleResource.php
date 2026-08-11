@@ -125,7 +125,11 @@ class ArticleResource extends Resource
                         fn (Builder $q) => $q->whereNull('published_at')->orWhere('published_at', '>', now()),
                     )),
             ])
+            ->emptyStateHeading('Belum ada artikel')
+            ->emptyStateDescription('Artikel tampil di halaman Berita dan tiga terbaru muncul di Beranda. Kosongkan tanggal terbit untuk menyimpannya sebagai draf.')
+            ->emptyStateIcon('heroicon-o-newspaper')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('pratinjau')
                     ->label('Pratinjau')

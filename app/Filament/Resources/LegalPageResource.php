@@ -76,7 +76,11 @@ class LegalPageResource extends Resource
                 Tables\Columns\TextColumn::make('title_id')->label('Judul')->searchable(),
                 Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable(),
             ])
+            ->emptyStateHeading('Belum ada halaman legal')
+            ->emptyStateDescription('Syarat & Ketentuan dan Kebijakan Privasi yang ditautkan dari footer.')
+            ->emptyStateIcon('heroicon-o-scale')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ]);
     }

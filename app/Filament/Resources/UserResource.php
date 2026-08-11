@@ -115,7 +115,11 @@ class UserResource extends Resource
                     ->label('Peran')
                     ->options(User::ROLES),
             ])
+            ->emptyStateHeading('Belum ada pengguna')
+            ->emptyStateDescription('Akun yang dapat masuk ke CMS. Peran Nonaktif mencabut akses tanpa menghapus akunnya.')
+            ->emptyStateIcon('heroicon-o-user-group')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->hidden(fn (User $record) => $record->is(auth()->user())),

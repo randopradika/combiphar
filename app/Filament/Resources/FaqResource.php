@@ -66,7 +66,11 @@ class FaqResource extends Resource
                 Tables\Columns\TextColumn::make('question_id')->label('Pertanyaan')->limit(70)->searchable(),
                 Tables\Columns\TextColumn::make('sort')->numeric()->sortable(),
             ])
+            ->emptyStateHeading('Belum ada pertanyaan umum')
+            ->emptyStateDescription('Daftar tanya jawab di tab Kontak pada halaman Karir & Kontak.')
+            ->emptyStateIcon('heroicon-o-question-mark-circle')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

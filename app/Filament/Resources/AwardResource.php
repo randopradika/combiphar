@@ -94,6 +94,7 @@ class AwardResource extends Resource
             ->emptyStateDescription('Penghargaan tampil pada popup "Pencapaian & Penghargaan" di halaman Tentang Kami. Tandai maksimal tujuh sebagai Unggulan agar logonya tampil langsung di halaman.')
             ->emptyStateIcon('heroicon-o-trophy')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

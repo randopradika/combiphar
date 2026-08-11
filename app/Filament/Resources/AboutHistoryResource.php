@@ -62,7 +62,11 @@ class AboutHistoryResource extends Resource
                 Tables\Columns\ImageColumn::make('photo'),
                 Tables\Columns\TextColumn::make('sort')->numeric()->sortable(),
             ])
+            ->emptyStateHeading('Belum ada entri sejarah')
+            ->emptyStateDescription('Linimasa perjalanan perusahaan di halaman Tentang Kami.')
+            ->emptyStateIcon('heroicon-o-clock')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

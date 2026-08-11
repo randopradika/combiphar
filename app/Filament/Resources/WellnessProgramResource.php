@@ -83,7 +83,11 @@ class WellnessProgramResource extends Resource
                 Tables\Columns\TextColumn::make('title_en')->label('Title (EN)')->searchable(),
                 Tables\Columns\TextColumn::make('body_id')->label('Deskripsi')->limit(60),
             ])
+            ->emptyStateHeading('Belum ada program kesejahteraan')
+            ->emptyStateDescription('Lingkaran program karyawan di tab Karir pada halaman Karir & Kontak.')
+            ->emptyStateIcon('heroicon-o-sun')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

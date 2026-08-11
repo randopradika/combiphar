@@ -137,6 +137,7 @@ class ProductResource extends Resource
             ->emptyStateDescription('Produk tampil di halaman Produk, dikelompokkan menurut kategori dan sub-kategorinya.')
             ->emptyStateIcon('heroicon-o-cube')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

@@ -79,7 +79,11 @@ class InvestorHubCardResource extends Resource
                 Tables\Columns\TextColumn::make('title_en')->label('Title (EN)')->searchable(),
                 Tables\Columns\IconColumn::make('is_visible')->label('Tampil')->boolean(),
             ])
+            ->emptyStateHeading('Belum ada kartu halaman investor')
+            ->emptyStateDescription('Kartu tautan di halaman Investor.')
+            ->emptyStateIcon('heroicon-o-rectangle-group')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ]);
     }

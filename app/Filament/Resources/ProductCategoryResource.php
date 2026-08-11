@@ -94,7 +94,11 @@ class ProductCategoryResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada kategori produk')
+            ->emptyStateDescription('Kategori mengelompokkan produk di halaman Produk. Isi Induk untuk membuatnya menjadi sub-kategori.')
+            ->emptyStateIcon('heroicon-o-tag')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

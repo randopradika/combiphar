@@ -125,7 +125,11 @@ class InvestorDocumentResource extends Resource
                     ->label('Kategori')
                     ->options(static::CATEGORIES),
             ])
+            ->emptyStateHeading('Belum ada dokumen investor')
+            ->emptyStateDescription('Laporan dan dokumen yang dapat diunduh di halaman Investor, dikelompokkan menurut kategorinya.')
+            ->emptyStateIcon('heroicon-o-document-text')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

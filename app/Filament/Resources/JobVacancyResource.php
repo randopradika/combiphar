@@ -116,7 +116,11 @@ class JobVacancyResource extends Resource
             ->filters([
                 //
             ])
+            ->emptyStateHeading('Belum ada lowongan kerja')
+            ->emptyStateDescription('Lowongan tampil di tab Karir pada halaman Karir & Kontak. Nonaktifkan status terbuka untuk menutup lowongan tanpa menghapusnya.')
+            ->emptyStateIcon('heroicon-o-briefcase')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

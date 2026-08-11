@@ -105,7 +105,7 @@ class NavItemResource extends Resource
                     ->label('Teks')
                     // Sub-item diberi indentasi agar susunannya terbaca sebagai
                     // pohon, bukan daftar datar.
-                    ->formatStateUsing(fn (NavItem $record, string $state) => $record->parent_id ? '— ' . $state : $state)
+                    ->formatStateUsing(fn (NavItem $record, string $state) => $record->parent_id ? '— '.$state : $state)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('label_en')
                     ->label('Text (EN)')
@@ -131,7 +131,11 @@ class NavItemResource extends Resource
                     ->label('Menu induk')
                     ->options(NavItem::SECTIONS),
             ])
+            ->emptyStateHeading('Belum ada item menu')
+            ->emptyStateDescription('Isi menu navigasi atas dan menu mobile. Bila daftar ini kosong, situs memakai menu bawaan dari berkas bahasa sehingga navigasi tidak pernah hilang.')
+            ->emptyStateIcon('heroicon-o-bars-3')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

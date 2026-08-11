@@ -69,7 +69,11 @@ class SocialLinkResource extends Resource
                 Tables\Columns\TextColumn::make('url')->searchable(),
                 Tables\Columns\TextColumn::make('sort')->numeric()->sortable(),
             ])
+            ->emptyStateHeading('Belum ada media sosial')
+            ->emptyStateDescription('Ikon media sosial di footer dan di menu mobile.')
+            ->emptyStateIcon('heroicon-o-share')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

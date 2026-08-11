@@ -115,6 +115,7 @@ class PersonResource extends Resource
             ->emptyStateDescription('Anggota tampil di halaman Tentang Kami, diurutkan menurut jabatan lalu urutan yang Anda susun di sini. Grup Komite Audit dan Corporate Secretary juga mengisi halaman CSR Komite Audit.')
             ->emptyStateIcon('heroicon-o-users')
             ->actions([
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
