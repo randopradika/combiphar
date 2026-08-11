@@ -85,6 +85,31 @@ class AdminPanelSmokeTest extends TestCase
         $this->assertGreaterThan(20, $checked, 'Resource yang teruji jauh lebih sedikit dari yang terdaftar.');
     }
 
+    /**
+     * Formulir hanya gagal ketika benar-benar dirender: komponen tata letak yang
+     * salah susun, enum yang belum diimpor, atau closure yang meminta argumen
+     * yang tidak pernah diberikan semuanya lolos dari php -l. Halaman "buat"
+     * adalah cara termurah merender setiap form() sekali.
+     */
+    public function test_setiap_form_create_terbuka(): void
+    {
+        $panel = Filament::getPanel('admin');
+        $checked = 0;
+
+        foreach ($panel->getResources() as $resource) {
+            if (! $resource::hasPage('create') || ! $resource::canCreate()) {
+                continue;
+            }
+
+            $this->get($resource::getUrl('create', panel: 'admin'))
+                ->assertSuccessful();
+
+            $checked++;
+        }
+
+        $this->assertGreaterThan(15, $checked, 'Formulir yang teruji jauh lebih sedikit dari yang terdaftar.');
+    }
+
     public function test_setiap_halaman_kustom_terbuka(): void
     {
         $panel = Filament::getPanel('admin');

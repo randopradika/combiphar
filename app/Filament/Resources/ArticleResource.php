@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class ArticleResource extends Resource
 {
@@ -35,41 +36,133 @@ class ArticleResource extends Resource
         return ['title_id', 'title_en'];
     }
 
+    /**
+     * Kolom isi di kiri, keputusan penerbitan di kanan.
+     *
+     * Sebelumnya sebelas bidang berbaris dalam satu kolom mengikuti urutan
+     * kolom database: yang pertama ditemui editor adalah `slug` -- alamat untuk
+     * mesin -- dan yang terakhir `is_featured`, dua layar di bawah, di balik dua
+     * editor teks kaya. Bahasa Indonesia dan Inggris juga ditumpuk berurutan,
+     * sehingga memeriksa terjemahan berarti menggulir melewati satu editor
+     * penuh lalu kembali lagi. Sekarang satu bahasa tampil pada satu waktu.
+     */
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Forms\Components\TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('title_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('title_en')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('excerpt_id')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('excerpt_en')
-                    ->columnSpanFull(),
-                Forms\Components\RichEditor::make('body_id')
-                    ->columnSpanFull(),
-                Forms\Components\RichEditor::make('body_en')
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('category')
-                    ->options([
-                        'pembaruan_korporasi' => 'Investor Update',
-                        'edukasi_gaya_hidup' => 'Health Information',
-                        'informasi_produk' => 'Product Info',
-                        'lainnya' => 'Others',
-                    ])
-                    ->required()
-                    ->default('edukasi_gaya_hidup'),
-                Forms\Components\FileUpload::make('cover_image')
-                    ->image(),
-                Forms\Components\DateTimePicker::make('published_at'),
-                Forms\Components\Toggle::make('is_featured')
-                    ->required(),
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\Tabs::make('Bahasa')
+                                    ->tabs([
+                                        Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                            ->schema(static::contentFields('id')),
+                                        Forms\Components\Tabs\Tab::make('English')
+                                            ->schema(static::contentFields('en')),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
+
+                Forms\Components\Group::make()
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        Forms\Components\Section::make('Penerbitan')
+                            ->description('Kosongkan tanggal untuk menyimpan sebagai draf.')
+                            ->schema([
+                                // Status tidak disimpan sebagai kolom sendiri: ia
+                                // disimpulkan dari published_at, persis seperti
+                                // yang dibaca scopePublished(). Ditampilkan di
+                                // sini supaya aturannya terbaca di layar tempat
+                                // ia ditentukan, bukan hanya di kolom daftar.
+                                Forms\Components\Placeholder::make('status')
+                                    ->label('Status saat ini')
+                                    ->content(fn (?Article $record) => match (true) {
+                                        $record === null => 'Draf (belum disimpan)',
+                                        $record->published_at === null => 'Draf — tidak tampil di situs',
+                                        ! $record->isPublished() => 'Terjadwal — tayang '.$record->published_at->translatedFormat('j F Y, H:i'),
+                                        default => 'Terbit',
+                                    }),
+                                Forms\Components\DateTimePicker::make('published_at')
+                                    ->label('Tanggal terbit')
+                                    ->helperText('Kosong = draf. Tanggal di masa depan = terjadwal; artikel muncul sendiri saat waktunya tiba.')
+                                    ->seconds(false)
+                                    ->native(false),
+                                Forms\Components\Select::make('category')
+                                    ->label('Kategori')
+                                    ->options([
+                                        'pembaruan_korporasi' => 'Investor Update',
+                                        'edukasi_gaya_hidup' => 'Health Information',
+                                        'informasi_produk' => 'Product Info',
+                                        'lainnya' => 'Others',
+                                    ])
+                                    ->required()
+                                    ->native(false)
+                                    ->default('edukasi_gaya_hidup'),
+                                Forms\Components\Toggle::make('is_featured')
+                                    ->label('Jadikan sorotan'),
+                            ]),
+
+                        Forms\Components\Section::make('Gambar sampul')
+                            ->schema([
+                                Forms\Components\FileUpload::make('cover_image')
+                                    ->label('')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->helperText('Tampil pada kartu berita dan sebagai gambar bagikan di media sosial.'),
+                            ]),
+
+                        Forms\Components\Section::make('Alamat halaman')
+                            ->description('Bagian teknis. Biasanya tidak perlu disentuh.')
+                            ->collapsed()
+                            ->schema([
+                                Forms\Components\TextInput::make('slug')
+                                    ->label('Slug')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->helperText('Alamat artikel: /berita/{slug}. Dibuat otomatis dari judul saat artikel baru. Mengubahnya pada artikel yang sudah tayang akan mematikan tautan lama.'),
+                            ]),
+                    ]),
             ]);
+    }
+
+    /**
+     * Bidang isi untuk satu bahasa. Dipanggil dua kali, sekali per tab, supaya
+     * pasangan _id/_en tidak lagi berbaris menumpuk dalam satu kolom.
+     */
+    private static function contentFields(string $locale): array
+    {
+        $isId = $locale === 'id';
+
+        return [
+            Forms\Components\TextInput::make("title_{$locale}")
+                ->label($isId ? 'Judul' : 'Title')
+                ->required($isId)
+                ->maxLength(255)
+                // Slug diisi dari judul HANYA saat membuat artikel baru:
+                // menimpanya saat menyunting akan memindahkan URL artikel yang
+                // sudah tayang tanpa ada yang memintanya.
+                ->live(onBlur: true)
+                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state, string $operation) use ($isId) {
+                    if (! $isId || $operation !== 'create' || blank($state) || filled($get('slug'))) {
+                        return;
+                    }
+
+                    $set('slug', Str::slug($state));
+                })
+                ->columnSpanFull(),
+            Forms\Components\Textarea::make("excerpt_{$locale}")
+                ->label($isId ? 'Ringkasan' : 'Excerpt')
+                ->rows(3)
+                ->helperText($isId ? 'Teks pendek pada kartu berita.' : null)
+                ->columnSpanFull(),
+            Forms\Components\RichEditor::make("body_{$locale}")
+                ->label($isId ? 'Isi artikel' : 'Body')
+                ->columnSpanFull(),
+        ];
     }
 
     public static function table(Table $table): Table
