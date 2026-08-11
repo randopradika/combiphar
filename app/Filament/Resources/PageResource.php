@@ -43,6 +43,7 @@ class PageResource extends Resource
             ->schema([
                 Forms\Components\Tabs::make('Halaman')
                     ->columnSpanFull()
+                    ->persistTabInQueryString()
                     ->tabs([
 
                         Forms\Components\Tabs\Tab::make('Banner')

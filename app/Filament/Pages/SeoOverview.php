@@ -65,7 +65,7 @@ class SeoOverview extends BasePage implements HasTable
                 Tables\Actions\Action::make('edit')
                     ->label('Sunting')
                     ->icon('heroicon-m-pencil-square')
-                    ->url(fn (Page $record) => PageResource::getUrl('edit', ['record' => $record])),
+                    ->url(fn (Page $record) => PageResource::getUrl('edit', ['record' => $record]).'?tab=seo'),
             ]);
     }
 

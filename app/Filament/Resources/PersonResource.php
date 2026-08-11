@@ -74,9 +74,39 @@ class PersonResource extends Resource
                     ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('role_id', Person::roleIdFor($state)))
                     ->live(),
                 Forms\Components\Hidden::make('role_id'),
-                Forms\Components\RichEditor::make('bio_id')->label('Bio (ID)')->columnSpanFull()->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo']),
-                Forms\Components\RichEditor::make('bio_en')->label('Bio (EN)')->columnSpanFull()->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo']),
-                Forms\Components\FileUpload::make('photo')->image()->imageEditor(),
+
+                Forms\Components\Section::make('Foto')
+                    ->schema([
+                        Forms\Components\FileUpload::make('photo')
+                            ->label('')
+                            ->image()
+                            ->imageEditor()
+                            ->helperText('Potret tegak. Tampil pada grid dewan di halaman Tentang Kami.'),
+                    ]),
+
+                Forms\Components\Section::make('Biografi')
+                    ->description('Tampil pada pop-up ketika nama anggota diklik.')
+                    ->schema([
+                        Forms\Components\Tabs::make('Bahasa')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('Bahasa Indonesia')
+                                    ->schema([
+                                        Forms\Components\RichEditor::make('bio_id')
+                                            ->label('')
+                                            ->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo'])
+                                            ->columnSpanFull(),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('English')
+                                    ->schema([
+                                        Forms\Components\RichEditor::make('bio_en')
+                                            ->label('')
+                                            ->toolbarButtons(['bold', 'italic', 'bulletList', 'orderedList', 'link', 'undo', 'redo'])
+                                            ->columnSpanFull(),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+
                 Forms\Components\Hidden::make('sort')->default(fn () => (static::getModel()::max('sort') ?? 0) + 1),
             ]);
     }
