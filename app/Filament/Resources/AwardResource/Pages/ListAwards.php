@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AwardResource\Pages;
 
+use App\Filament\Concerns\HasGalleryToggle;
 use App\Filament\Resources\AwardResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -10,11 +11,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListAwards extends ListRecords
 {
+    use HasGalleryToggle;
+
     protected static string $resource = AwardResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            $this->getGalleryToggleAction(),
             Actions\CreateAction::make(),
         ];
     }

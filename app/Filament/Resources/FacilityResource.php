@@ -3,15 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FacilityResource\Pages;
-use App\Filament\Resources\FacilityResource\RelationManagers;
 use App\Models\Facility;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class FacilityResource extends Resource
 {
@@ -69,32 +67,27 @@ class FacilityResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $livewire = $table->getLivewire();
+        $gallery = method_exists($livewire, 'isGallery') && $livewire->isGallery();
+
+        $table = $gallery
+            ? $table->columns(static::galleryColumns())->contentGrid(['sm' => 2, 'lg' => 3, '2xl' => 4])
+            : $table->columns(static::listColumns());
+
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('region')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('plants')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('area')
-                    ->searchable(),
-                Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\TextColumn::make('sort')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('region')
+                    ->label('Wilayah')
+                    ->options(fn () => static::getModel()::query()
+                        ->whereNotNull('region')
+                        ->distinct()
+                        ->orderBy('region')
+                        ->pluck('region', 'region')
+                        ->all()),
             ])
+            ->emptyStateHeading('Belum ada fasilitas produksi')
+            ->emptyStateDescription('Fasilitas tampil pada popup "Fasilitas Produksi" di halaman Tentang Kami.')
+            ->emptyStateIcon('heroicon-o-building-office-2')
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -103,6 +96,58 @@ class FacilityResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    private static function listColumns(): array
+    {
+        return [
+            Tables\Columns\ImageColumn::make('image')
+                ->label(''),
+            Tables\Columns\TextColumn::make('name')
+                ->label('Nama')
+                ->searchable()
+                ->weight(FontWeight::SemiBold)
+                ->wrap(),
+            Tables\Columns\TextColumn::make('region')
+                ->label('Wilayah')
+                ->badge()
+                ->color('gray')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('plants')
+                ->label('Pabrik')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('area')
+                ->label('Luas')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->label('Diperbarui')
+                ->since()
+                ->dateTimeTooltip()
+                ->sortable(),
+        ];
+    }
+
+    private static function galleryColumns(): array
+    {
+        return [
+            Tables\Columns\Layout\Stack::make([
+                Tables\Columns\ImageColumn::make('image')
+                    ->height(170)
+                    ->extraImgAttributes(['class' => 'w-full h-44 object-cover rounded-lg']),
+                Tables\Columns\Layout\Stack::make([
+                    Tables\Columns\TextColumn::make('name')
+                        ->weight(FontWeight::SemiBold)
+                        ->searchable()
+                        ->wrap(),
+                    Tables\Columns\TextColumn::make('region')
+                        ->badge()
+                        ->color('gray'),
+                    Tables\Columns\TextColumn::make('area')
+                        ->color('gray')
+                        ->placeholder(''),
+                ])->space(1),
+            ])->space(2),
+        ];
     }
 
     public static function getRelations(): array

@@ -2,7 +2,33 @@
 
 namespace App\Providers;
 
+use App\Models\AboutHistory;
+use App\Models\Accreditation;
+use App\Models\Article;
+use App\Models\Award;
+use App\Models\CsrProgram;
+use App\Models\Facility;
+use App\Models\Faq;
+use App\Models\GlobalSite;
+use App\Models\ImpactProgram;
+use App\Models\InvestorDocument;
+use App\Models\InvestorHubCard;
+use App\Models\JobVacancy;
+use App\Models\LegalPage;
+use App\Models\Milestone;
+use App\Models\NavItem;
+use App\Models\Office;
+use App\Models\OnlineShop;
+use App\Models\Page;
+use App\Models\Person;
+use App\Models\Product;
+use App\Models\ProductBanner;
+use App\Models\ProductCategory;
+use App\Models\SocialLink;
+use App\Models\User;
+use App\Models\WellnessProgram;
 use App\Observers\ActivityObserver;
+use Filament\Tables\Table;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +63,28 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->registerActivityLogging();
+        $this->registerFilamentTableDefaults();
+    }
+
+    /**
+     * Setelan tabel yang berlaku untuk SELURUH panel.
+     *
+     * Ditulis sekali di sini, bukan disalin ke 26 resource: filter, pencarian
+     * dan urutan sebelumnya hilang setiap kali editor meninggalkan halaman --
+     * termasuk saat menekan "kembali" sesudah membuka satu record -- sehingga
+     * filter harus dipasang ulang terus-menerus dan lama-lama tidak dipakai.
+     *
+     * Resource tetap bisa menimpanya: callback ini berjalan saat tabel dibuat,
+     * sebelum method table() milik resource dijalankan.
+     */
+    private function registerFilamentTableDefaults(): void
+    {
+        Table::configureUsing(function (Table $table): void {
+            $table
+                ->persistFiltersInSession()
+                ->persistSearchInSession()
+                ->persistSortInSession();
+        });
     }
 
     /**
@@ -51,33 +99,33 @@ class AppServiceProvider extends ServiceProvider
     private function registerActivityLogging(): void
     {
         $models = [
-            \App\Models\Page::class,
-            \App\Models\Article::class,
-            \App\Models\Product::class,
-            \App\Models\ProductCategory::class,
-            \App\Models\ProductBanner::class,
-            \App\Models\CsrProgram::class,
-            \App\Models\Person::class,
-            \App\Models\Award::class,
-            \App\Models\InvestorDocument::class,
-            \App\Models\InvestorHubCard::class,
-            \App\Models\JobVacancy::class,
-            \App\Models\WellnessProgram::class,
-            \App\Models\Faq::class,
-            \App\Models\NavItem::class,
-            \App\Models\LegalPage::class,
-            \App\Models\SocialLink::class,
-            \App\Models\Office::class,
-            \App\Models\OnlineShop::class,
-            \App\Models\Facility::class,
-            \App\Models\Accreditation::class,
-            \App\Models\Milestone::class,
-            \App\Models\AboutHistory::class,
-            \App\Models\ImpactProgram::class,
-            \App\Models\GlobalSite::class,
+            Page::class,
+            Article::class,
+            Product::class,
+            ProductCategory::class,
+            ProductBanner::class,
+            CsrProgram::class,
+            Person::class,
+            Award::class,
+            InvestorDocument::class,
+            InvestorHubCard::class,
+            JobVacancy::class,
+            WellnessProgram::class,
+            Faq::class,
+            NavItem::class,
+            LegalPage::class,
+            SocialLink::class,
+            Office::class,
+            OnlineShop::class,
+            Facility::class,
+            Accreditation::class,
+            Milestone::class,
+            AboutHistory::class,
+            ImpactProgram::class,
+            GlobalSite::class,
             // Perubahan peran justru yang paling perlu terlacak. Kata sandi
             // disamarkan di observer, jadi tidak ada hash yang masuk catatan.
-            \App\Models\User::class,
+            User::class,
         ];
 
         foreach ($models as $model) {

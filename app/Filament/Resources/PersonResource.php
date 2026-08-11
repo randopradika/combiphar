@@ -3,15 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PersonResource\Pages;
-use App\Filament\Resources\PersonResource\RelationManagers;
 use App\Models\Person;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PersonResource extends Resource
 {
@@ -85,34 +83,16 @@ class PersonResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Menyusun ulang dewan paling wajar dilakukan sambil melihat wajahnya,
+        // jadi halaman ini terbuka sebagai galeri foto yang tetap bisa diseret.
+        $livewire = $table->getLivewire();
+        $gallery = method_exists($livewire, 'isGallery') && $livewire->isGallery();
+
+        $table = $gallery
+            ? $table->columns(static::galleryColumns())->contentGrid(['sm' => 2, 'lg' => 3, '2xl' => 4])
+            : $table->columns(static::listColumns());
+
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('role_id')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('role_en')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('group')
-                    ->searchable(),
-                // Editable straight from the list — flipping it off takes the
-                // member off the page without deleting the record.
-                Tables\Columns\ToggleColumn::make('show_on_page')
-                    ->label('Tampil di halaman'),
-                Tables\Columns\ImageColumn::make('photo'),
-                Tables\Columns\TextColumn::make('sort')
-                    ->label('Urutan')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
             // Order is set by dragging the handle, not by typing a number:
             // ->reorderable writes `sort` for every affected row itself, so the
             // numbers stay contiguous and two members can never share one.
@@ -120,8 +100,20 @@ class PersonResource extends Resource
             ->reorderable('sort')
             ->paginated(false)
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('group')
+                    ->label('Grup')
+                    ->options([
+                        'commissioners' => 'Board of Commissioners',
+                        'directors' => 'Board of Directors',
+                        'audit_committee' => 'Komite Audit',
+                        'corporate_secretary' => 'Corporate Secretary',
+                    ]),
+                Tables\Filters\TernaryFilter::make('show_on_page')
+                    ->label('Tampil di halaman'),
             ])
+            ->emptyStateHeading('Belum ada anggota dewan')
+            ->emptyStateDescription('Anggota tampil di halaman Tentang Kami, diurutkan menurut jabatan lalu urutan yang Anda susun di sini. Grup Komite Audit dan Corporate Secretary juga mengisi halaman CSR Komite Audit.')
+            ->emptyStateIcon('heroicon-o-users')
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -130,6 +122,63 @@ class PersonResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    private static function listColumns(): array
+    {
+        return [
+            Tables\Columns\ImageColumn::make('photo')
+                ->label('')
+                ->circular(),
+            Tables\Columns\TextColumn::make('name')
+                ->label('Nama')
+                ->searchable()
+                ->weight(FontWeight::SemiBold),
+            Tables\Columns\TextColumn::make('role_id')
+                ->label('Jabatan')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('group')
+                ->label('Grup')
+                ->badge()
+                ->color('gray')
+                ->searchable(),
+            // Editable straight from the list — flipping it off takes the
+            // member off the page without deleting the record.
+            Tables\Columns\ToggleColumn::make('show_on_page')
+                ->label('Tampil di halaman'),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->label('Diperbarui')
+                ->since()
+                ->dateTimeTooltip()
+                ->sortable(),
+        ];
+    }
+
+    private static function galleryColumns(): array
+    {
+        return [
+            Tables\Columns\Layout\Stack::make([
+                Tables\Columns\ImageColumn::make('photo')
+                    ->height(190)
+                    ->extraImgAttributes(['class' => 'w-full h-48 object-cover rounded-lg']),
+                Tables\Columns\Layout\Stack::make([
+                    Tables\Columns\TextColumn::make('name')
+                        ->weight(FontWeight::SemiBold)
+                        ->searchable()
+                        ->wrap(),
+                    Tables\Columns\TextColumn::make('role_id')
+                        ->color('gray')
+                        ->wrap(),
+                    // Yang disembunyikan dari halaman harus terbaca dari kartunya,
+                    // atau satu-satunya petunjuk hilang bersama kolom toggle.
+                    Tables\Columns\TextColumn::make('show_on_page')
+                        ->badge()
+                        ->color('danger')
+                        ->state(fn (Person $record) => $record->show_on_page ? null : 'Disembunyikan')
+                        ->placeholder(''),
+                ])->space(1),
+            ])->space(2),
+        ];
     }
 
     public static function getRelations(): array

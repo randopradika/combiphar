@@ -3,15 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\OnlineShop;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
 {
@@ -42,24 +42,24 @@ class ProductResource extends Resource
             ->schema([
                 Forms\Components\Select::make('top_category_id')
                     ->label('Kategori')
-                    ->options(fn () => \App\Models\ProductCategory::whereNull('parent_id')->orderBy('sort')->pluck('name_id', 'id'))
+                    ->options(fn () => ProductCategory::whereNull('parent_id')->orderBy('sort')->pluck('name_id', 'id'))
                     ->required()
                     ->live()
-                    ->afterStateHydrated(function (Forms\Set $set, ?\App\Models\Product $record) {
+                    ->afterStateHydrated(function (Forms\Set $set, ?Product $record) {
                         if ($record && $record->category) {
                             $set('top_category_id', $record->category->parent_id ?? $record->category->id);
                         }
                     })
                     ->afterStateUpdated(function (Forms\Set $set, $state) {
-                        $hasChildren = \App\Models\ProductCategory::where('parent_id', $state)->exists();
+                        $hasChildren = ProductCategory::where('parent_id', $state)->exists();
                         $set('product_category_id', $hasChildren ? null : $state);
                     }),
                 Forms\Components\Select::make('product_category_id')
                     ->label('Sub-Kategori')
                     ->helperText('Pilih sub-kategori (hanya untuk kategori yang memiliki sub-kategori).')
-                    ->options(fn (Forms\Get $get) => \App\Models\ProductCategory::where('parent_id', $get('top_category_id'))->orderBy('sort')->pluck('name_id', 'id'))
-                    ->visible(fn (Forms\Get $get) => $get('top_category_id') && \App\Models\ProductCategory::where('parent_id', $get('top_category_id'))->exists())
-                    ->required(fn (Forms\Get $get) => $get('top_category_id') && \App\Models\ProductCategory::where('parent_id', $get('top_category_id'))->exists())
+                    ->options(fn (Forms\Get $get) => ProductCategory::where('parent_id', $get('top_category_id'))->orderBy('sort')->pluck('name_id', 'id'))
+                    ->visible(fn (Forms\Get $get) => $get('top_category_id') && ProductCategory::where('parent_id', $get('top_category_id'))->exists())
+                    ->required(fn (Forms\Get $get) => $get('top_category_id') && ProductCategory::where('parent_id', $get('top_category_id'))->exists())
                     ->dehydrated(true),
                 Forms\Components\TextInput::make('slug')
                     ->required()
@@ -89,8 +89,8 @@ class ProductResource extends Resource
                 Forms\Components\CheckboxList::make('shop_ids')
                     ->label('Toko Online')
                     ->helperText('Pilih toko tempat produk ini tersedia. Default: Tokopedia, Shopee, Blibli.')
-                    ->options(fn () => \App\Models\OnlineShop::orderBy('sort')->pluck('name', 'id'))
-                    ->formatStateUsing(fn ($state) => $state ?? \App\Models\OnlineShop::defaultIds())
+                    ->options(fn () => OnlineShop::orderBy('sort')->pluck('name', 'id'))
+                    ->formatStateUsing(fn ($state) => $state ?? OnlineShop::defaultIds())
                     ->bulkToggleable()
                     ->columns(2)
                     ->columnSpanFull(),
@@ -116,30 +116,16 @@ class ProductResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Katalog produk dikenali dari kemasannya. Galeri jadi tampilan awal;
+        // tabel tetap tersedia lewat tombol di header untuk kerja massal.
+        $livewire = $table->getLivewire();
+        $gallery = method_exists($livewire, 'isGallery') && $livewire->isGallery();
+
+        $table = $gallery
+            ? $table->columns(static::galleryColumns())->contentGrid(['sm' => 2, 'lg' => 3, '2xl' => 4])
+            : $table->columns(static::listColumns());
+
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('category.name_id')
-                    ->label('Kategori')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('name_id')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('name_en')
-                    ->searchable(),
-                Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\TextColumn::make('sort')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
                     ->label('Kategori')
@@ -147,6 +133,9 @@ class ProductResource extends Resource
                     ->searchable()
                     ->preload(),
             ])
+            ->emptyStateHeading('Belum ada produk')
+            ->emptyStateDescription('Produk tampil di halaman Produk, dikelompokkan menurut kategori dan sub-kategorinya.')
+            ->emptyStateIcon('heroicon-o-cube')
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -155,6 +144,56 @@ class ProductResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    private static function listColumns(): array
+    {
+        return [
+            Tables\Columns\ImageColumn::make('image')
+                ->label(''),
+            Tables\Columns\TextColumn::make('name_id')
+                ->label('Nama')
+                ->searchable()
+                ->wrap(),
+            Tables\Columns\TextColumn::make('name_en')
+                ->label('Name (EN)')
+                ->searchable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('category.name_id')
+                ->label('Kategori')
+                ->badge()
+                ->color('gray')
+                ->sortable(),
+            Tables\Columns\TextColumn::make('slug')
+                ->searchable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->label('Diperbarui')
+                ->since()
+                ->dateTimeTooltip()
+                ->sortable(),
+        ];
+    }
+
+    private static function galleryColumns(): array
+    {
+        return [
+            Tables\Columns\Layout\Stack::make([
+                Tables\Columns\ImageColumn::make('image')
+                    ->height(160)
+                    ->extraImgAttributes(['class' => 'w-full h-40 object-contain bg-white rounded-lg p-3']),
+                Tables\Columns\Layout\Stack::make([
+                    Tables\Columns\TextColumn::make('name_id')
+                        ->weight(FontWeight::SemiBold)
+                        ->searchable()
+                        ->wrap()
+                        ->limit(70),
+                    Tables\Columns\TextColumn::make('category.name_id')
+                        ->badge()
+                        ->color('gray'),
+                ])->space(1),
+            ])->space(2),
+        ];
     }
 
     public static function getRelations(): array

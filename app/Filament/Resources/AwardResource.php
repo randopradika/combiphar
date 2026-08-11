@@ -7,6 +7,7 @@ use App\Models\Award;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -64,35 +65,34 @@ class AwardResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Penghargaan dikenali dari sertifikat atau logonya, bukan dari judulnya,
+        // jadi halaman ini terbuka sebagai galeri. Tampilan tabel tetap ada di
+        // balik tombol "Tampilan tabel" untuk memilih banyak baris sekaligus.
+        $livewire = $table->getLivewire();
+        $gallery = method_exists($livewire, 'isGallery') && $livewire->isGallery();
+
+        $table = $gallery
+            ? $table->columns(static::galleryColumns())->contentGrid(['sm' => 2, 'lg' => 3, '2xl' => 4])
+            : $table->columns(static::listColumns());
+
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('title_id')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('title_en')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('year')
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('image'),
-                // Sama seperti "Tampil di halaman" pada Dewan: diubah langsung
-                // dari daftar, tanpa membuka recordnya.
-                Tables\Columns\ToggleColumn::make('is_hero')
-                    ->label('Unggulan'),
-                Tables\Columns\TextColumn::make('sort')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_hero')
                     ->label('Unggulan'),
+                // 97 penghargaan sejak 2005 tanpa satu pun penyaring: mencari
+                // "sertifikat 2019" sebelumnya berarti membaca baris satu per satu.
+                Tables\Filters\SelectFilter::make('year')
+                    ->label('Tahun')
+                    ->options(fn () => static::getModel()::query()
+                        ->whereNotNull('year')
+                        ->distinct()
+                        ->orderByDesc('year')
+                        ->pluck('year', 'year')
+                        ->all()),
             ])
+            ->emptyStateHeading('Belum ada penghargaan')
+            ->emptyStateDescription('Penghargaan tampil pada popup "Pencapaian & Penghargaan" di halaman Tentang Kami. Tandai maksimal tujuh sebagai Unggulan agar logonya tampil langsung di halaman.')
+            ->emptyStateIcon('heroicon-o-trophy')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -102,6 +102,75 @@ class AwardResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Tampilan tabel: dipertahankan untuk memilih banyak baris dan mengubah
+     * "Unggulan" satu klik tanpa membuka record.
+     */
+    private static function listColumns(): array
+    {
+        return [
+            Tables\Columns\ImageColumn::make('image')
+                ->label(''),
+            Tables\Columns\TextColumn::make('title_id')
+                ->label('Judul')
+                ->searchable()
+                ->wrap(),
+            Tables\Columns\TextColumn::make('title_en')
+                ->label('Title (EN)')
+                ->searchable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('year')
+                ->label('Tahun')
+                ->badge()
+                ->color('gray')
+                ->sortable(),
+            // Sama seperti "Tampil di halaman" pada Dewan: diubah langsung
+            // dari daftar, tanpa membuka recordnya.
+            Tables\Columns\ToggleColumn::make('is_hero')
+                ->label('Unggulan'),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->label('Diperbarui')
+                ->since()
+                ->dateTimeTooltip()
+                ->sortable(),
+        ];
+    }
+
+    /**
+     * Tampilan galeri: gambar dulu, judul di bawahnya.
+     *
+     * Judul EN sengaja tidak ikut -- pada kartu ia hanya mengulang judul ID
+     * dengan kata yang hampir sama dan menggandakan tinggi setiap kartu.
+     */
+    private static function galleryColumns(): array
+    {
+        return [
+            Tables\Columns\Layout\Stack::make([
+                Tables\Columns\ImageColumn::make('image')
+                    ->height(160)
+                    ->extraImgAttributes(['class' => 'w-full h-40 object-contain bg-white rounded-lg p-3']),
+                Tables\Columns\Layout\Stack::make([
+                    Tables\Columns\TextColumn::make('title_id')
+                        ->weight(FontWeight::SemiBold)
+                        ->searchable()
+                        ->wrap()
+                        ->limit(70),
+                    Tables\Columns\TextColumn::make('year')
+                        ->badge()
+                        ->color('gray')
+                        ->sortable(),
+                    // Hanya muncul pada yang diunggulkan; sisanya tidak perlu
+                    // baris kosong bertuliskan "bukan unggulan".
+                    Tables\Columns\TextColumn::make('is_hero')
+                        ->badge()
+                        ->color('warning')
+                        ->state(fn (Award $record) => $record->is_hero ? 'Unggulan' : null)
+                        ->placeholder(''),
+                ])->space(1),
+            ])->space(2),
+        ];
     }
 
     public static function getRelations(): array
