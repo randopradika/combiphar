@@ -255,6 +255,13 @@ class CsrProgramResource extends Resource
                             ->label('Galeri Foto')
                             ->helperText('Grid foto, 6 per halaman. Seret untuk mengubah urutan — urutan inilah yang menentukan isi Halaman 1, 2, dan seterusnya. Tata letak ini tidak menampilkan keterangan foto.')
                             ->image()->multiple()->reorderable()->appendFiles()
+                            // Tata letak grid, bukan daftar menurun. Baris Golf
+                            // menyimpan 30 foto; sebagai daftar vertikal satu
+                            // foto per baris, mencari satu foto berarti
+                            // menggulir 30 layar. Grid memberi 2 kolom, 3 pada
+                            // layar >= 1024px, dan Filament otomatis memakai
+                            // rasio 1:1 untuk petaknya (getItemPanelAspectRatio).
+                            ->panelLayout('grid')
                             ->visible($isBlock)
                             ->dehydrated($isBlock)
                             // Kolomnya bernama lain, jadi isinya diambil sendiri
@@ -291,7 +298,12 @@ class CsrProgramResource extends Resource
                                     ->label('Caption (EN)')
                                     ->maxLength(255),
                             ])
-                            ->columns(2)
+                            // `grid()` menata KARTU-nya berdampingan; `columns()`
+                            // menata isi di DALAM satu kartu. Kartu selebar
+                            // setengah layar terlalu sempit untuk dua kolom
+                            // keterangan, jadi isinya ditumpuk satu kolom.
+                            ->grid(2)
+                            ->columns(1)
                             ->reorderable()
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['caption_id'] ?? null)
