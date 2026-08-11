@@ -311,7 +311,9 @@ class PageController extends Controller
 
     public function csr()
     {
-        $all = CsrProgram::whereNull('parent_id')->orderBy('sort')->get();
+        // Kartu daftar selalu disaring, bahkan saat pratinjau: draf ditinjau
+        // lewat halaman detailnya sendiri, bukan dengan menyelipkannya ke daftar.
+        $all = CsrProgram::published()->whereNull('parent_id')->orderBy('sort')->get();
         $map = fn ($rows) => $rows->values()->map(fn ($p) => [
             'title' => $p->tr('title'), 'body' => $p->tr('body'), 'image' => $this->img($p->image),
             'link' => $p->link, 'slug' => $p->slug,
@@ -347,6 +349,12 @@ class PageController extends Controller
     public function csrShow(string $slug)
     {
         $program = CsrProgram::where('slug', $slug)->firstOrFail();
+
+        // Program yang belum terbit harus benar-benar 404 bagi publik, bukan
+        // tampil kosong -- kecuali pemintanya memegang tautan pratinjau.
+        if (! $program->is_published && ! $this->previewing()) {
+            abort(404);
+        }
 
         // Komite Audit has no standalone page — it lives as a tab on the
         // Governance sub-menu. Redirect the old detail URL to that tab.
@@ -474,10 +482,23 @@ class PageController extends Controller
         return Inertia::render('NotFound')->toResponse($request)->setStatusCode(404);
     }
 
+    /**
+     * Bolehkah permintaan ini melihat konten yang belum terbit?
+     *
+     * Dua jalan masuk, sengaja: tautan pratinjau bertanda tangan (kedaluwarsa,
+     * dan bisa dikirim ke orang yang tidak punya akun CMS), atau sesi panel yang
+     * sedang login. Satu-satunya akun di aplikasi ini adalah akun panel, jadi
+     * auth()->check() memang berarti "editor".
+     */
+    private function previewing(): bool
+    {
+        return request()->hasValidSignature() || auth()->check();
+    }
+
     public function sitemap()
     {
         $articles = Article::published()->get(['slug']);
-        $programs = CsrProgram::whereNotNull('slug')->get(['slug']);
+        $programs = CsrProgram::published()->whereNotNull('slug')->get(['slug']);
         $urls = [];
 
         foreach (['id', 'en'] as $loc) {
@@ -514,6 +535,13 @@ class PageController extends Controller
     public function newsShow(string $slug)
     {
         $article = Article::where('slug', $slug)->firstOrFail();
+
+        // Sebelumnya halaman ini TIDAK menyaring status terbit sama sekali:
+        // artikel draf maupun yang dijadwalkan tayang bulan depan sudah bisa
+        // dibuka siapa pun yang menebak slug-nya, walau tidak muncul di daftar.
+        if (! $article->isPublished() && ! $this->previewing()) {
+            abort(404);
+        }
 
         return Inertia::render('NewsDetail', [
             'article' => array_merge($this->articleCard($article), [

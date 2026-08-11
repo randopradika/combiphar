@@ -16,7 +16,14 @@ class CsrProgram extends Model
 
     protected $casts = [
         'gallery' => 'array',
+        'is_published' => 'boolean',
     ];
+
+    /** Hanya program yang sudah terbit -- dipakai di setiap query publik. */
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true);
+    }
 
     protected static function booted(): void
     {
@@ -38,9 +45,20 @@ class CsrProgram extends Model
         return $this->belongsTo(CsrProgram::class, 'parent_id');
     }
 
-    /** Sub-topics shown on the detail page. */
+    /**
+     * Sub-topics shown on the detail page.
+     *
+     * ⚠️ Constrained to published rows **on the relation itself**, not at each
+     * call site. Every consumer of this relation is public rendering — five
+     * places in PageController (sports/event blocks, the board check, governance
+     * topics and slides) — while the CMS queries `CsrProgram` directly and is
+     * unaffected. Filtering here is what makes it impossible to add a sixth
+     * render site later that quietly leaks a draft.
+     */
     public function children(): HasMany
     {
-        return $this->hasMany(CsrProgram::class, 'parent_id')->orderBy('sort');
+        return $this->hasMany(CsrProgram::class, 'parent_id')
+            ->where('is_published', true)
+            ->orderBy('sort');
     }
 }

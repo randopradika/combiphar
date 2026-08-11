@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\URL;
 
 /**
  * Semua baris csr_programs dalam satu daftar.
@@ -329,6 +330,11 @@ class CsrProgramResource extends Resource
                     ->label('Urutan')
                     ->numeric()
                     ->sortable(),
+                // Pola satu klik yang sama dengan "Unggulan" di Penghargaan dan
+                // "Tampil di halaman" di Dewan -- menerbitkan tidak perlu
+                // membuka record.
+                Tables\Columns\ToggleColumn::make('is_published')
+                    ->label('Terbit'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
@@ -338,9 +344,25 @@ class CsrProgramResource extends Resource
                         'health_campaign' => 'Health Campaign',
                         'sports' => 'Olahraga',
                     ]),
+                Tables\Filters\TernaryFilter::make('is_published')
+                    ->label('Status terbit')
+                    ->placeholder('Semua')
+                    ->trueLabel('Terbit')
+                    ->falseLabel('Draf'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('pratinjau')
+                    ->label('Pratinjau')
+                    ->icon('heroicon-m-eye')
+                    ->color('gray')
+                    // Tautan bertanda tangan, berlaku 24 jam: draf bisa
+                    // ditunjukkan ke orang yang tidak punya akun CMS tanpa
+                    // menerbitkannya lebih dulu.
+                    ->url(fn (CsrProgram $record) => static::previewUrl($record))
+                    ->openUrlInNewTab()
+                    // Program tanpa slug tidak punya halaman detail untuk dibuka.
+                    ->visible(fn (CsrProgram $record) => filled($record->slug)),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -348,6 +370,21 @@ class CsrProgramResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Tautan pratinjau bertanda tangan ke halaman detail CSR.
+     *
+     * Nama route bersufiks locale (csr.show.id / csr.show.en) sesuai
+     * CLAUDE.md §9 -- route('csr.show') sudah tidak ada.
+     */
+    public static function previewUrl(CsrProgram $record): string
+    {
+        return URL::temporarySignedRoute(
+            'csr.show.' . config('app.locale'),
+            now()->addDay(),
+            ['slug' => $record->slug],
+        );
     }
 
     public static function getRelations(): array

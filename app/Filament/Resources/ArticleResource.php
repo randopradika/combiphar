@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\URL;
 
 class ArticleResource extends Resource
 {
@@ -86,9 +87,27 @@ class ArticleResource extends Resource
                 Tables\Columns\TextColumn::make('category')
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('cover_image'),
+                // published_at sudah lama menentukan tayang atau tidak, tetapi
+                // tabelnya hanya menampilkan tanggal mentah -- kosong berarti
+                // draf, dan tanggal di masa depan berarti terjadwal, dua hal
+                // yang tidak terbaca dari kolom tanggal saja.
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->state(fn (Article $record) => match (true) {
+                        $record->published_at === null => 'Draf',
+                        ! $record->isPublished() => 'Terjadwal',
+                        default => 'Terbit',
+                    })
+                    ->color(fn (string $state) => match ($state) {
+                        'Draf' => 'gray',
+                        'Terjadwal' => 'warning',
+                        default => 'success',
+                    }),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('is_featured')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -101,16 +120,44 @@ class ArticleResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('draf')
+                    ->label('Belum tayang (draf & terjadwal)')
+                    ->query(fn (Builder $query) => $query->where(
+                        fn (Builder $q) => $q->whereNull('published_at')->orWhere('published_at', '>', now()),
+                    )),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('pratinjau')
+                    ->label('Pratinjau')
+                    ->icon('heroicon-m-eye')
+                    ->color('gray')
+                    // Tautan bertanda tangan 24 jam, sehingga artikel draf bisa
+                    // ditunjukkan ke orang tanpa akun CMS sebelum diterbitkan.
+                    ->url(fn (Article $record) => static::previewUrl($record))
+                    ->openUrlInNewTab()
+                    ->visible(fn (Article $record) => filled($record->slug)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Tautan pratinjau bertanda tangan ke halaman detail berita.
+     *
+     * Nama route bersufiks locale (news.show.id / news.show.en) sesuai
+     * CLAUDE.md §9 -- route('news.show') sudah tidak ada.
+     */
+    public static function previewUrl(Article $record): string
+    {
+        return URL::temporarySignedRoute(
+            'news.show.' . config('app.locale'),
+            now()->addDay(),
+            ['slug' => $record->slug],
+        );
     }
 
     public static function getRelations(): array
