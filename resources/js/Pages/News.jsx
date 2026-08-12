@@ -49,6 +49,7 @@ export default function News({
   product,
   others,
   investorUnderDevelopment = false,
+  showInvestorTab = false,
 }) {
   const {
     url,
@@ -60,9 +61,12 @@ export default function News({
   const [tab, setTab] = useState(() => {
     const asked = new URLSearchParams(url.split("?")[1] || "").get("tab")
 
-    return ["health", "product", "investor", "others"].includes(asked)
-      ? asked
-      : "health"
+    // "investor" is only reachable while its tab is switched on in the CMS.
+    const allowed = showInvestorTab
+      ? ["health", "product", "investor", "others"]
+      : ["health", "product", "others"]
+
+    return allowed.includes(asked) ? asked : "health"
   })
   const [pageNum, setPageNum] = useState(1)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -102,7 +106,9 @@ export default function News({
         ? "Other news and information from Combiphar."
         : "Berita dan informasi lainnya dari Combiphar.",
     },
-  ]
+    // The CMS gate (Artikel list header action) drops the Investor Update tab
+    // from the bar, the mobile dropdown, and the content switch all at once.
+  ].filter((x) => x.key !== "investor" || showInvestorTab)
 
   const active = tabs.find((x) => x.key === tab) || tabs[0]
   const totalPages = Math.max(1, Math.ceil(active.items.length / PER_PAGE))

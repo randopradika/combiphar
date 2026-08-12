@@ -525,6 +525,9 @@ class PageController extends Controller
             'page' => $this->page('news'),
             // The "Investor Update" tab mirrors the Investor page's toggle.
             'investorUnderDevelopment' => (bool) optional(Page::where('slug', 'investor')->first())->under_development,
+            // Whole-tab gate (default hidden) — flipped from the Artikel list's
+            // header action; HandleInertiaRequests hides the matching nav item.
+            'showInvestorTab' => (bool) optional(Page::where('slug', 'news')->first())->show_investor_tab,
             'investor' => $byCat('pembaruan_korporasi'),
             'health' => $byCat('edukasi_gaya_hidup'),
             'product' => $byCat('informasi_produk'),

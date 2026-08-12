@@ -36,6 +36,12 @@ class HandleInertiaRequests extends Middleware
                     $t['nav']['menus'] = $menus;
                 }
 
+                // Gerbang "Investor Update" Berita: menyaring DI SINI berarti
+                // dropdown desktop dan drill-down mobile sama-sama kehilangan
+                // butirnya, dari sumber mana pun menu itu dibangun (DB atau
+                // berkas bahasa).
+                $t['nav']['menus'] = $this->withoutInvestorUpdate($t['nav']['menus'] ?? []);
+
                 return $t;
             },
             'altUrls' => function () use ($request) {
@@ -102,6 +108,32 @@ class HandleInertiaRequests extends Middleware
      * yang belum menjalankan migrasinya, dan agar menu tidak pernah hilang
      * hanya karena tabelnya kosong.
      */
+    /**
+     * Membuang butir "Investor Update" (suffix `?tab=investor`) dari sub-menu
+     * Berita kecuali pages(news).show_investor_tab menyala — sakelarnya ada di
+     * header daftar Artikel. Dibungkus try/catch seperti navMenus() supaya
+     * lingkungan yang belum bermigrasi tetap merender menu apa adanya.
+     */
+    private function withoutInvestorUpdate(array $menus): array
+    {
+        try {
+            $show = (bool) Page::where('slug', 'news')->value('show_investor_tab');
+        } catch (\Throwable) {
+            return $menus;
+        }
+
+        if ($show || empty($menus['news'])) {
+            return $menus;
+        }
+
+        $menus['news'] = array_values(array_filter(
+            $menus['news'],
+            fn ($item) => ! str_contains($item['suffix'] ?? '', 'tab=investor'),
+        ));
+
+        return $menus;
+    }
+
     private function navMenus(): array
     {
         try {
