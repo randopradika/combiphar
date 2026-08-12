@@ -49,6 +49,8 @@ export default function Home({
             className="hero__img"
             src={page.heroImage}
             alt="Championing a Healthy Tomorrow"
+            fetchPriority="high"
+            decoding="async"
           />
         )}
         <div className="hero__inner">

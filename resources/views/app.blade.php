@@ -6,6 +6,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    {{-- FS Albert renders the nav + every heading on every page; preloading skips
+         the CSS-parse round trip before the fetch. crossorigin is mandatory for
+         font preloads even same-origin, or the browser fetches the file twice. --}}
+    <link rel="preload" href="/fonts/FSAlbert-Regular.otf" as="font" type="font/otf" crossorigin>
+    <link rel="preload" href="/fonts/FSAlbert-Bold.otf" as="font" type="font/otf" crossorigin>
     {{-- Barlow Condensed is used only by the recruitment-fraud headline (Figma 987:51); it rides on the existing request rather than opening a new one. --}}
     <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
     @if (app()->environment('production'))

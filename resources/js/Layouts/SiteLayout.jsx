@@ -311,6 +311,18 @@ export default function SiteLayout({ children, navMode = "solid" }) {
   return (
     <>
       <Head>
+        {/* Every page's LCP is its banner/hero, but banners are CSS backgrounds the
+            browser only discovers after layout — the SSR'd preload starts the fetch
+            with the HTML instead. */}
+        {seoPageImg && (
+          <link
+            head-key="lcp-img"
+            rel="preload"
+            as="image"
+            href={seoPageImg}
+            fetchPriority="high"
+          />
+        )}
         <meta head-key="description" name="description" content={seoDescription} />
         <link head-key="canonical" rel="canonical" href={altUrls[locale]} />
         <link head-key="alt-id" rel="alternate" hrefLang="id" href={altUrls.id} />
