@@ -47,22 +47,38 @@ class CmsSeeder extends Seeder
         Schema::enableForeignKeyConstraints();
 
         // ---- Pages (banners / meta) ----
+        // Meta descriptions mirror migration 2026_08_12_000001_fill_missing_page_meta
+        // (which fills them on already-seeded environments) — keep the two in step.
         $pages = [
-            ['about', 'Tentang Kami', 'About Us'],
-            ['products', 'Produk', 'Products'],
-            ['csr', 'Tanggung Jawab Sosial Perusahaan', 'Corporate Social Responsibility'],
-            ['investor', 'Investor Relations', 'Investor Relations'],
-            ['news', 'Berita dan Info Kesehatan', 'News and Health Information'],
-            ['contact', 'Karir dan Kontak', 'Careers and Contact'],
+            ['about', 'Tentang Kami', 'About Us',
+                'Kenali Combiphar — sejarah dan tonggak perjalanan sejak 1971, visi dan nilai, dewan komisaris dan direksi, fasilitas produksi, serta penghargaan kami.',
+                'Get to know Combiphar — our history and milestones since 1971, vision and values, boards of commissioners and directors, facilities, and awards.'],
+            ['products', 'Produk', 'Products',
+                'Jelajahi rangkaian produk Combiphar — obat dan produk kesehatan konsumen terpercaya untuk membantu keluarga Indonesia hidup lebih sehat setiap hari.',
+                "Explore Combiphar's range of trusted medicines and consumer healthcare products that help Indonesian families live healthier every day."],
+            ['csr', 'Tanggung Jawab Sosial Perusahaan', 'Corporate Social Responsibility',
+                'Komitmen keberlanjutan Combiphar — program lingkungan, edukasi, kampanye kesehatan, olahraga, serta tata kelola untuk Indonesia yang lebih sehat.',
+                "Combiphar's sustainability commitment — environmental, education, health campaign, sports, and governance programs for a healthier Indonesia."],
+            ['investor', 'Investor Relations', 'Investor Relations',
+                'Informasi investor Combiphar — laporan keuangan, laporan tahunan, keterbukaan informasi, dan dokumen tata kelola perusahaan.',
+                'Combiphar investor relations — financial statements, annual reports, information disclosures, and corporate governance documents.'],
+            ['news', 'Berita dan Info Kesehatan', 'News and Health Information',
+                'Berita dan artikel terbaru dari Combiphar — pembaruan korporasi, edukasi gaya hidup sehat, dan informasi produk untuk keluarga Indonesia.',
+                'The latest news and articles from Combiphar — corporate updates, healthy lifestyle education, and product information for Indonesian families.'],
+            ['contact', 'Karir dan Kontak', 'Careers and Contact',
+                'Hubungi Combiphar — kirim pesan, temukan lokasi kantor kami di seluruh Indonesia, dan jelajahi peluang karir bersama kami.',
+                'Contact Combiphar — send us a message, find our office locations across Indonesia, and explore career opportunities with us.'],
         ];
 
-        foreach ($pages as [$slug, $idT, $enT]) {
+        foreach ($pages as [$slug, $idT, $enT, $idD, $enD]) {
             Page::create([
                 'slug' => $slug,
                 'banner_title_id' => $idT,
                 'banner_title_en' => $enT,
                 'meta_title_id' => $idT . ' - Combiphar',
                 'meta_title_en' => $enT . ' - Combiphar',
+                'meta_description_id' => $idD,
+                'meta_description_en' => $enD,
             ]);
         }
 
@@ -88,6 +104,8 @@ class CmsSeeder extends Seeder
             'slug' => 'home',
             'meta_title_id' => 'Combiphar - Championing a Healthy Tomorrow',
             'meta_title_en' => 'Combiphar - Championing a Healthy Tomorrow',
+            'meta_description_id' => 'Combiphar — Championing a Healthy Tomorrow. Perusahaan farmasi dan kesehatan konsumen terkemuka di Indonesia dengan produk terpercaya untuk keluarga.',
+            'meta_description_en' => 'Combiphar — Championing a Healthy Tomorrow. A leading Indonesian pharmaceutical and consumer healthcare company with trusted products for families.',
             'hero_line1_id' => 'Championing a',
             'hero_line1_en' => 'Championing a',
             'hero_line2_id' => 'Healthy Tomorrow',
