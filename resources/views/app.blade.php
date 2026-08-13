@@ -41,6 +41,15 @@
     <script type="application/ld+json" nonce="{{ $cspNonce ?? '' }}">
     {!! $__ld !!}
     </script>
+    {{-- Skema per-halaman (NewsArticle, BreadcrumbList) dikirim controller lewat
+         ->withViewData(['jsonLd' => [...]]), jadi tidak ikut membengkakkan payload
+         Inertia. Halaman lain tidak menyetelnya sama sekali. --}}
+    @foreach ((array) ($jsonLd ?? []) as $__node)
+        @php $__nodeJson = json_encode($__node, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); @endphp
+        <script type="application/ld+json" nonce="{{ $cspNonce ?? '' }}">
+        {!! $__nodeJson !!}
+        </script>
+    @endforeach
 </head>
 <body>
     @inertia

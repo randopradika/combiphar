@@ -344,7 +344,7 @@ export default function Contact({ page, vacancies, faqs, wellness = [] }) {
 
   return (
     <>
-      <Head title={`${t.nav.contact} — Combiphar`} />
+      <Head title={page?.metaTitle || `${t.nav.contact} — Combiphar`} />
 
       <section
         className="banner banner--about"

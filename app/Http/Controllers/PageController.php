@@ -134,6 +134,81 @@ class PageController extends Controller
         ];
     }
 
+    /**
+     * Bundel SEO untuk halaman detail (artikel, program CSR) yang tidak punya
+     * baris `Page` sendiri. Tanpa ini SEMUA halaman detail memakai satu
+     * deskripsi generik yang sama di SiteLayout — dan preload LCP-nya ikut
+     * mati, karena keduanya membaca prop yang sama.
+     */
+    private function seo(?string $title, ?string $description, ?string $image, string $type = 'website', ?string $published = null): array
+    {
+        return array_filter([
+            'metaTitle' => $title ? $title.' — Combiphar' : null,
+            'metaDescription' => $this->metaSnippet($description),
+            'bannerImage' => $image,
+            'ogType' => $type,
+            'publishedTime' => $published,
+        ], fn ($v) => $v !== null);
+    }
+
+    /**
+     * Ringkas isi editor menjadi snippet meta description: buang HTML, rapatkan
+     * spasi, potong di batas kata. Batas 160 sama dengan ambang yang dipakai
+     * halaman Ringkasan SEO di panel.
+     */
+    private function metaSnippet(?string $html): ?string
+    {
+        $text = html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim(preg_replace('/\s+/u', ' ', $text));
+
+        if ($text === '') {
+            return null;
+        }
+
+        if (mb_strlen($text) <= 160) {
+            return $text;
+        }
+
+        $cut = mb_substr($text, 0, 157);
+        $space = mb_strrpos($cut, ' ');
+        if ($space !== false && $space > 100) {
+            $cut = mb_substr($cut, 0, $space);
+        }
+
+        // rtrim hanya atas karakter ASCII — memangkas byte multibyte di sini
+        // bisa merusak karakter terakhir.
+        return rtrim($cut, ' ,.;:-').'…';
+    }
+
+    /** Jadikan path storage/publik menjadi URL absolut untuk JSON-LD & og:image. */
+    private function absUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        return str_starts_with($path, 'http') ? $path : url($path);
+    }
+
+    /**
+     * BreadcrumbList untuk halaman detail. Remah visualnya sudah lama ada di
+     * CsrDetail (`.banner__crumb`); ini pasangan terstrukturnya.
+     */
+    private function breadcrumbs(array $trail): array
+    {
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => collect($trail)->values()
+                ->map(fn ($item, $i) => [
+                    '@type' => 'ListItem',
+                    'position' => $i + 1,
+                    'name' => $item['name'],
+                    'item' => $item['url'],
+                ])->all(),
+        ];
+    }
+
     public function home()
     {
         return Inertia::render('Home', [
@@ -362,6 +437,20 @@ class PageController extends Controller
             return redirect()->route('csr.show.'.app()->getLocale(), ['slug' => 'governance', 'topic' => 'komite-audit']);
         }
 
+        // Sama seperti halaman artikel: tanpa prop `seo` setiap program CSR
+        // memakai deskripsi generik yang sama, dan preload LCP-nya tidak jalan.
+        // Dihitung sekali di sini karena kedua cabang tata letak memakainya.
+        $csrSeo = $this->seo(
+            $program->tr('title'),
+            $program->tr('body') ?: $program->tr('content'),
+            $this->img($program->image),
+        );
+        $csrJsonLd = [$this->breadcrumbs([
+            ['name' => 'Combiphar', 'url' => Localize::url('home')],
+            ['name' => __('site.nav.csr'), 'url' => Localize::url('csr')],
+            ['name' => $program->tr('title'), 'url' => Localize::url('csr.show', null, ['slug' => $program->slug])],
+        ])];
+
         // Every sports programme uses this layout, and any other programme can
         // opt into it from the CMS ("Galeri Tim") — that is how Environmental
         // and Education get Basketball's banner + paginated 6-per-page grid.
@@ -392,7 +481,8 @@ class PageController extends Controller
                         ->filter()
                         ->values(),
                 ]),
-            ]);
+                'seo' => $csrSeo,
+            ])->withViewData(['jsonLd' => $csrJsonLd]);
         }
 
         $person = fn (Person $p) => [
@@ -450,7 +540,8 @@ class PageController extends Controller
             // Audit Committee + Corporate Secretary member grids.
             'auditCommittee' => $isBoard ? Person::visible()->where('group','audit_committee')->ordered()->get()->map($person) : [],
             'corporateSecretary' => $isBoard ? Person::visible()->where('group','corporate_secretary')->ordered()->get()->map($person) : [],
-        ]);
+            'seo' => $csrSeo,
+        ])->withViewData(['jsonLd' => $csrJsonLd]);
     }
 
     public function terms()
@@ -497,19 +588,49 @@ class PageController extends Controller
 
     public function sitemap()
     {
-        $articles = Article::published()->get(['slug']);
-        $programs = CsrProgram::published()->whereNotNull('slug')->get(['slug']);
+        $articles = Article::published()->get(['slug', 'published_at', 'updated_at']);
+        $programs = CsrProgram::published()->whereNotNull('slug')->get(['slug', 'updated_at']);
+        $pages = Page::query()->get(['slug', 'show_in_menu', 'updated_at'])->keyBy('slug');
+
+        // Halaman yang dimatikan dari menu lewat CMS — saat ini Investor, yang
+        // isinya masih "Segera Hadir" — tidak perlu diminta untuk diindeks.
+        // Halaman tanpa baris `Page` (syarat & ketentuan, kebijakan privasi)
+        // tetap masuk: tidak punya toggle bukan berarti disembunyikan.
+        $names = collect(['home', 'about', 'products', 'csr', 'news', 'investor', 'contact', 'terms', 'privacy'])
+            ->reject(function ($name) use ($pages) {
+                $row = $pages->get($name);
+
+                return $row && ! $row->show_in_menu;
+            });
+
+        $entry = function (string $base, string $loc, array $params, string $priority, $lastmod) {
+            $alt = [
+                'id' => Localize::url($base, 'id', $params),
+                'en' => Localize::url($base, 'en', $params),
+            ];
+
+            return [
+                'loc' => Localize::url($base, $loc, $params),
+                'priority' => $priority,
+                'lastmod' => $lastmod ? $lastmod->toAtomString() : null,
+                // Pasangan id/en sudah dinyatakan di <head> lewat hreflang;
+                // sitemap harus menyatakan hubungan yang sama, bukan dua URL
+                // yang tampak tidak berkaitan.
+                'alternates' => $alt + ['x-default' => $alt['en']],
+            ];
+        };
+
         $urls = [];
 
         foreach (['id', 'en'] as $loc) {
-            foreach (['home', 'about', 'products', 'csr', 'news', 'investor', 'contact', 'terms', 'privacy'] as $name) {
-                $urls[] = ['loc' => Localize::url($name, $loc), 'priority' => $name === 'home' ? '1.0' : '0.8'];
+            foreach ($names as $name) {
+                $urls[] = $entry($name, $loc, [], $name === 'home' ? '1.0' : '0.8', optional($pages->get($name))->updated_at);
             }
             foreach ($articles as $a) {
-                $urls[] = ['loc' => Localize::url('news.show', $loc, ['slug' => $a->slug]), 'priority' => '0.6'];
+                $urls[] = $entry('news.show', $loc, ['slug' => $a->slug], '0.6', $a->updated_at ?: $a->published_at);
             }
             foreach ($programs as $p) {
-                $urls[] = ['loc' => Localize::url('csr.show', $loc, ['slug' => $p->slug]), 'priority' => '0.6'];
+                $urls[] = $entry('csr.show', $loc, ['slug' => $p->slug], '0.6', $p->updated_at);
             }
         }
 
@@ -546,6 +667,10 @@ class PageController extends Controller
             abort(404);
         }
 
+        $cover = $this->img($article->cover_image);
+        $summary = $article->tr('excerpt') ?: $article->tr('body');
+        $url = Localize::url('news.show', null, ['slug' => $article->slug]);
+
         return Inertia::render('NewsDetail', [
             'article' => array_merge($this->articleCard($article), [
                 'body' => $article->tr('body'),
@@ -554,7 +679,38 @@ class PageController extends Controller
             ]),
             'others' => Article::published()->where('id', '!=', $article->id)->latest('published_at')->take(4)->get()
                 ->map(fn ($a) => $this->articleCard($a)),
-        ]);
+            // Halaman ini tidak punya baris `Page`, jadi tanpa prop ini setiap
+            // artikel mewarisi deskripsi generik yang sama.
+            'seo' => $this->seo(
+                $article->tr('title'),
+                $summary,
+                $cover,
+                'article',
+                optional($article->published_at)->toAtomString(),
+            ),
+        ])->withViewData(['jsonLd' => [
+            array_filter([
+                '@context' => 'https://schema.org',
+                '@type' => 'NewsArticle',
+                'headline' => $article->tr('title'),
+                'description' => $this->metaSnippet($summary),
+                'image' => $cover ? [$this->absUrl($cover)] : null,
+                'datePublished' => optional($article->published_at)->toAtomString(),
+                'dateModified' => optional($article->updated_at)->toAtomString(),
+                'mainEntityOfPage' => $url,
+                'inLanguage' => app()->getLocale(),
+                'publisher' => [
+                    '@type' => 'Organization',
+                    'name' => 'Combiphar',
+                    'logo' => ['@type' => 'ImageObject', 'url' => url('/img/logo-header.svg')],
+                ],
+            ], fn ($v) => $v !== null),
+            $this->breadcrumbs([
+                ['name' => 'Combiphar', 'url' => Localize::url('home')],
+                ['name' => __('site.nav.news'), 'url' => Localize::url('news')],
+                ['name' => $article->tr('title'), 'url' => $url],
+            ]),
+        ]]);
     }
 
     public function investor()

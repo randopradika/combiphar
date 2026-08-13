@@ -38,7 +38,9 @@ export default function Home({
 
   return (
     <>
-      <Head title="Combiphar — Championing a Healthy Tomorrow" />
+      <Head
+        title={page?.metaTitle || "Combiphar — Championing a Healthy Tomorrow"}
+      />
 
       <section
         className={"hero" + (page?.heroImage ? " hero--photo" : "")}

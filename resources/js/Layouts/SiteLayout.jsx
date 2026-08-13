@@ -295,13 +295,19 @@ export default function SiteLayout({ children, navMode = "solid" }) {
     (scrolled ? " nav--scrolled" : "") +
     (isHome ? " nav--home" : "")
 
+  // Halaman detail (artikel, program CSR) tidak punya baris `Page`, jadi
+  // controller mengirim prop `seo` dengan bentuk yang sama. Tanpa ini semua
+  // halaman detail memakai satu deskripsi generik yang identik — dan preload
+  // LCP di bawah ikut mati, karena membaca nilai yang sama.
+  const seoSrc = props.seo || props.page
   const seoDescription =
-    props.page?.metaDescription ||
+    seoSrc?.metaDescription ||
     "Combiphar — Championing a Healthy Tomorrow. Perusahaan farmasi dan kesehatan konsumen terkemuka di Indonesia."
   const seoTitle =
-    props.page?.metaTitle || "Combiphar — Championing a Healthy Tomorrow"
+    seoSrc?.metaTitle || "Combiphar — Championing a Healthy Tomorrow"
   const seoOrigin = altUrls?.en ? new URL(altUrls.en).origin : ""
-  const seoPageImg = props.page?.bannerImage || props.page?.heroImage || null
+  const seoPageImg = seoSrc?.bannerImage || seoSrc?.heroImage || null
+  const seoType = seoSrc?.ogType || "website"
   const seoImage = seoPageImg
     ? seoPageImg.startsWith("http")
       ? seoPageImg
@@ -333,7 +339,14 @@ export default function SiteLayout({ children, navMode = "solid" }) {
           hrefLang="x-default"
           href={altUrls.en}
         />
-        <meta head-key="og:type" property="og:type" content="website" />
+        <meta head-key="og:type" property="og:type" content={seoType} />
+        {seoType === "article" && seoSrc?.publishedTime && (
+          <meta
+            head-key="og:published"
+            property="article:published_time"
+            content={seoSrc.publishedTime}
+          />
+        )}
         <meta head-key="og:site_name" property="og:site_name" content="Combiphar" />
         <meta
           head-key="og:locale"
