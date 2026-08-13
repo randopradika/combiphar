@@ -586,6 +586,36 @@ class PageController extends Controller
         return request()->hasValidSignature() || auth()->check();
     }
 
+    /**
+     * Non-production hosts must not advertise the sitemap. Crawling stays
+     * allowed (no Disallow) so the NoIndexNonProduction X-Robots-Tag header
+     * is actually fetched and honoured — a robots-blocked page can still be
+     * indexed URL-only, which is how webdev.combiphar.com ended up in Google.
+     * (A controller method rather than a route closure so route:cache works.)
+     */
+    public function robots()
+    {
+        $lines = app()->environment('production')
+            ? "User-agent: *\nDisallow:\n\nSitemap: ".url('/sitemap.xml')."\n"
+            : "User-agent: *\nDisallow:\n";
+
+        return response($lines, 200, ['Content-Type' => 'text/plain']);
+    }
+
+    /**
+     * 301 for the old combiphar.com product-detail URLs. Product pages don't
+     * exist here — products open as a modal on the listing page via
+     * ?product={slug}; the slugs match because both sites share the combiphar
+     * API. A method rather than a route closure so route:cache works; the
+     * locale comes off the path prefix, keeping {slug} the only route param.
+     */
+    public function productRedirect(Request $request, string $slug)
+    {
+        $locale = str_starts_with($request->path(), 'en/') ? 'en' : 'id';
+
+        return redirect()->to(Localize::url('products', $locale, ['product' => $slug]), 301);
+    }
+
     public function sitemap()
     {
         $articles = Article::published()->get(['slug', 'published_at', 'updated_at']);

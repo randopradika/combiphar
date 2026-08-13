@@ -20,6 +20,10 @@ class Localize
     /** Strip the ".id"/".en" suffix from a route name: base('about.id') => 'about'. */
     public static function base(?string $routeName): ?string
     {
-        return $routeName ? preg_replace('/\.(id|en)$/', '', $routeName) : null;
+        // Only locale-suffixed names have a base. Anything else — including the
+        // "generated::" names route:cache assigns to the deliberately unnamed
+        // fallback routes — must come back null, so altUrls falls back to the
+        // locale homes instead of building a URL for a route that doesn't exist.
+        return $routeName && preg_match('/^(.+)\.(id|en)$/', $routeName, $m) ? $m[1] : null;
     }
 }

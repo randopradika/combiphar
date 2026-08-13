@@ -455,6 +455,8 @@ export default function About({
                   ? "Combiphar global presence map"
                   : "Peta kehadiran global Combiphar"
               }
+              loading="lazy"
+              decoding="async"
             />
             {pins.map((p, i) => (
               <span
@@ -463,7 +465,7 @@ export default function About({
                 style={{ left: p.l, top: p.tp }}
                 aria-hidden="true"
               >
-                <img src={p.icon} alt="" />
+                <img src={p.icon} alt="" loading="lazy" />
               </span>
             ))}
           </div>

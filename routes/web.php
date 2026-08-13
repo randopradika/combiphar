@@ -4,20 +4,16 @@ use App\Http\Controllers\PageController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect('/'.config('app.locale')));
+/*
+ * Every route in this file must stay closure-free — deploy.sh runs
+ * `route:cache`, and Laravel refuses to cache a closure route. Redirects use
+ * Route::redirect / permanentRedirect; anything with logic lives on a
+ * controller (robots.txt and the product 301s are on PageController).
+ */
+Route::redirect('/', '/'.config('app.locale'));
 
 Route::get('sitemap.xml', [PageController::class, 'sitemap']);
-Route::get('robots.txt', function () {
-    // Non-production hosts must not advertise the sitemap. Crawling stays
-    // allowed (no Disallow) so the NoIndexNonProduction X-Robots-Tag header
-    // is actually fetched and honoured — a robots-blocked page can still be
-    // indexed URL-only, which is how webdev.combiphar.com ended up in Google.
-    $lines = app()->environment('production')
-        ? "User-agent: *\nDisallow:\n\nSitemap: ".url('/sitemap.xml')."\n"
-        : "User-agent: *\nDisallow:\n";
-
-    return response($lines, 200, ['Content-Type' => 'text/plain']);
-});
+Route::get('robots.txt', [PageController::class, 'robots']);
 
 /*
  * Localized path per page: [id, en]. English URLs are unchanged; Indonesian URLs
@@ -77,11 +73,11 @@ Route::redirect('id/news', '/id/berita', 301);
 Route::redirect('id/contact', '/id/kontak-kami', 301);
 Route::redirect('id/terms-of-use', '/id/syarat-ketentuan', 301);
 Route::redirect('id/privacy-notice', '/id/kebijakan-privasi', 301);
-Route::get('id/csr/{slug}', fn ($slug) => redirect('/id/csr-komunitas/'.$slug, 301));
-Route::get('id/news/{slug}', fn ($slug) => redirect('/id/berita/'.$slug, 301));
+Route::permanentRedirect('id/csr/{slug}', '/id/csr-komunitas/{slug}');
+Route::permanentRedirect('id/news/{slug}', '/id/berita/{slug}');
 Route::redirect('en/csr', '/en/csr-community', 301);
 Route::redirect('en/privacy-notice', '/en/privacy-policy', 301);
-Route::get('en/csr/{slug}', fn ($slug) => redirect('/en/csr-community/'.$slug, 301));
+Route::permanentRedirect('en/csr/{slug}', '/en/csr-community/{slug}');
 
 /*
  * 301s for URLs Google has indexed from the old combiphar.com build that have
@@ -93,9 +89,9 @@ Route::get('en/csr/{slug}', fn ($slug) => redirect('/en/csr-community/'.$slug, 3
 Route::redirect('en/about-us', '/en/about', 301);
 Route::redirect('id/karir', '/id/kontak-kami', 301);
 Route::redirect('en/career', '/en/contact', 301);
-Route::get('id/product/{slug}', fn ($slug) => redirect('/id/produk?product='.$slug, 301));
-Route::get('id/produk/{slug}', fn ($slug) => redirect('/id/produk?product='.$slug, 301));
-Route::get('en/product/{slug}', fn ($slug) => redirect('/en/products?product='.$slug, 301));
+Route::get('id/product/{slug}', [PageController::class, 'productRedirect']);
+Route::get('id/produk/{slug}', [PageController::class, 'productRedirect']);
+Route::get('en/product/{slug}', [PageController::class, 'productRedirect']);
 
 /*
  * Unknown path with no locale prefix (e.g. /nope). Renders in the default locale;

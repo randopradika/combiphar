@@ -64,6 +64,12 @@ $EXEC php artisan optimize:clear
 # Cache the merged config (skips parsing .env + every config file per request).
 # Safe: no runtime env() calls outside config/ (APP_FORCE_HTTPS reads config).
 $EXEC php artisan config:cache
+# Routes and Blade views are cacheable too — web.php keeps every route
+# closure-free for exactly this. The deliberately unnamed fallback routes get
+# "generated::" names in the cache; Localize::base() maps those to null, so
+# 404 pages behave the same cached as uncached.
+$EXEC php artisan route:cache
+$EXEC php artisan view:cache
 $EXEC php artisan storage:link --force || true
 
 # The SSR daemon (started by the image CMD) caches the bundle at boot; restart

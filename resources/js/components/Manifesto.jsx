@@ -49,7 +49,13 @@ export default function ManifestoVideo({ page }) {
       }
     >
       {page?.manifestoImage && !playing && (
-        <img className="manifesto__img" src={page.manifestoImage} alt="" />
+        <img
+          className="manifesto__img"
+          src={page.manifestoImage}
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
       )}
 
       {isMp4 && (

@@ -731,7 +731,9 @@ export default function SiteLayout({ children, navMode = "solid" }) {
                     rel="noopener noreferrer"
                     aria-label={s.name}
                   >
-                    {s.icon && <img src={s.icon} alt={s.name || ""} />}
+                    {s.icon && (
+                      <img src={s.icon} alt={s.name || ""} loading="lazy" />
+                    )}
                   </a>
                 ))}
               </div>
@@ -751,6 +753,7 @@ export default function SiteLayout({ children, navMode = "solid" }) {
                   key={i}
                   src={l.src}
                   alt={l.alt || ""}
+                  loading="lazy"
                   style={{ "--logo-h": l.height }}
                 />
               ))}
