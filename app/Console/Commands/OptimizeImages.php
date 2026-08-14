@@ -50,12 +50,17 @@ class OptimizeImages extends Command
                 continue;
             }
 
-            $im = $ext === 'png' ? @imagecreatefrompng($abs) : @imagecreatefromjpeg($abs);
+            // Decode by content, not extension — CMS uploads include PNGs
+            // saved under a .jpg name, which imagecreatefromjpeg() rejects
+            // as unreadable (dev's 1.5 MB milestone slide, several seeds).
+            $im = @imagecreatefromstring((string) file_get_contents($abs));
             if (! $im) {
                 $this->warn("unreadable, skipped: {$rel}");
 
                 continue;
             }
+            $info = @getimagesize($abs);
+            $isPngBytes = ($info[2] ?? null) === IMAGETYPE_PNG;
 
             [$w, $h] = [imagesx($im), imagesy($im)];
             // Bound the LONGEST side, not just width — portrait uploads
@@ -72,7 +77,7 @@ class OptimizeImages extends Command
                 $im = $resized;
             }
 
-            $toJpeg = $ext !== 'png'
+            $toJpeg = ! $isPngBytes
                 || (! $this->option('no-convert') && ! $this->hasTransparency($im));
             $tmp = $abs.'.opt';
             if ($toJpeg) {
