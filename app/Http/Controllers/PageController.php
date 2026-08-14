@@ -588,16 +588,21 @@ class PageController extends Controller
 
     /**
      * Non-production hosts must not advertise the sitemap. Crawling stays
-     * allowed (no Disallow) so the NoIndexNonProduction X-Robots-Tag header
-     * is actually fetched and honoured — a robots-blocked page can still be
-     * indexed URL-only, which is how webdev.combiphar.com ended up in Google.
-     * (A controller method rather than a route closure so route:cache works.)
+     * allowed (no blanket Disallow) so the NoIndexNonProduction X-Robots-Tag
+     * header is actually fetched and honoured — a robots-blocked page can
+     * still be indexed URL-only, which is how webdev.combiphar.com ended up
+     * in Google. /admin is the one path no crawler needs on any host.
+     * (A controller method rather than a route closure so route:cache works.
+     * The old combiphar.com has no robots.txt to inherit — /robots.txt there
+     * returns the SPA's HTML catch-all; checked 2026-08-14.)
      */
     public function robots()
     {
-        $lines = app()->environment('production')
-            ? "User-agent: *\nDisallow:\n\nSitemap: ".url('/sitemap.xml')."\n"
-            : "User-agent: *\nDisallow:\n";
+        $lines = "User-agent: *\nDisallow: /admin\n";
+
+        if (app()->environment('production')) {
+            $lines .= "\nSitemap: ".url('/sitemap.xml')."\n";
+        }
 
         return response($lines, 200, ['Content-Type' => 'text/plain']);
     }
