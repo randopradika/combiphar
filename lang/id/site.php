@@ -33,8 +33,8 @@ return [
             ],
             'csr' => [
                 ['label' => 'ESG', 'suffix' => '#esg', 'head' => true, 'children' => [
-                    ['label' => 'Environmental', 'suffix' => '/environmental'],
-                    ['label' => 'Social', 'suffix' => '/social'],
+                    ['label' => 'Environmental', 'suffix' => '/environmental-care-action'],
+                    ['label' => 'Social', 'suffix' => '/social-care-action'],
                     ['label' => 'Governance', 'suffix' => '/governance'],
                 ]],
                 ['label' => 'Championing a Healthy Tomorrow', 'suffix' => '#health', 'head' => true, 'children' => [

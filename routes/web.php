@@ -16,17 +16,19 @@ Route::get('sitemap.xml', [PageController::class, 'sitemap']);
 Route::get('robots.txt', [PageController::class, 'robots']);
 
 /*
- * Localized path per page: [id, en]. English URLs are unchanged; Indonesian URLs
- * use the slugs from combiphar.com. Route names are suffixed with the locale
- * (e.g. "about.id" / "about.en"); generate URLs via App\Support\Localize::url().
+ * Localized path per page: [id, en]. Both locales mirror combiphar.com's page
+ * slugs (its /back/api/v1/pages table, checked 2026-08-18) — the URLs Google and
+ * external links already know. Investor has no counterpart there. Route names
+ * are suffixed with the locale (e.g. "about.id" / "about.en"); generate URLs via
+ * App\Support\Localize::url(), never by hand.
  */
 $slugs = [
-    'about' => ['id' => 'tentang-kami', 'en' => 'about'],
+    'about' => ['id' => 'tentang-kami', 'en' => 'about-us'],
     'products' => ['id' => 'produk', 'en' => 'products'],
     'csr' => ['id' => 'csr-komunitas', 'en' => 'csr-community'],
     'news' => ['id' => 'berita', 'en' => 'news'],
     'investor' => ['id' => 'investor', 'en' => 'investor'],
-    'contact' => ['id' => 'kontak-kami', 'en' => 'contact'],
+    'contact' => ['id' => 'kontak-kami', 'en' => 'contact-us'],
     'terms' => ['id' => 'syarat-ketentuan', 'en' => 'terms-of-use'],
     'privacy' => ['id' => 'kebijakan-privasi', 'en' => 'privacy-policy'],
 ];
@@ -63,8 +65,8 @@ foreach (SetLocale::SUPPORTED as $loc) {
 }
 
 /*
- * 301 redirects: old Indonesian (English-style) paths => new localized slugs.
- * English paths are unchanged, so only /id/* needs redirecting.
+ * 301 redirects: this site's own earlier paths (English-style Indonesian slugs,
+ * /en/about, /en/contact, /csr) => the combiphar.com-mirroring slugs above.
  */
 Route::redirect('id/about', '/id/tentang-kami', 301);
 Route::redirect('id/products', '/id/produk', 301);
@@ -75,20 +77,29 @@ Route::redirect('id/terms-of-use', '/id/syarat-ketentuan', 301);
 Route::redirect('id/privacy-notice', '/id/kebijakan-privasi', 301);
 Route::permanentRedirect('id/csr/{slug}', '/id/csr-komunitas/{slug}');
 Route::permanentRedirect('id/news/{slug}', '/id/berita/{slug}');
+Route::redirect('en/about', '/en/about-us', 301);
+Route::redirect('en/contact', '/en/contact-us', 301);
 Route::redirect('en/csr', '/en/csr-community', 301);
 Route::redirect('en/privacy-notice', '/en/privacy-policy', 301);
 Route::permanentRedirect('en/csr/{slug}', '/en/csr-community/{slug}');
 
 /*
- * 301s for URLs Google has indexed from the old combiphar.com build that have
- * no equivalent path here (verified via site:combiphar.com). Product detail
- * pages don't exist on this site — products open as a modal on the listing
- * page via ?product={slug}; the slugs match because both sites share the
- * combiphar API as the source.
+ * 301s for combiphar.com URLs that have no path of their own here:
+ * - Career is a page there (/id/karir, /en/career); here it is the Karir tab of
+ *   Kontak.
+ * - Home also answers to its page slug there (/id/beranda, /en/home).
+ * - Product detail pages don't exist on this site — products open as a modal on
+ *   the listing page via ?product={slug} (an even older combiphar.com build had
+ *   /product/{slug} pages that Google still lists).
+ * (Two CSR programme slugs were renamed to match combiphar.com by migration
+ * 2026_08_18_000003; their old slugs 301 inside PageController::csrShow(), since a
+ * static path here would lose to the earlier-registered csr-community/{slug}.
+ * Legacy ?id= / ?cat_id= query links are mapped in news() / products().)
  */
-Route::redirect('en/about-us', '/en/about', 301);
-Route::redirect('id/karir', '/id/kontak-kami', 301);
-Route::redirect('en/career', '/en/contact', 301);
+Route::redirect('id/karir', '/id/kontak-kami?tab=karir', 301);
+Route::redirect('en/career', '/en/contact-us?tab=karir', 301);
+Route::redirect('id/beranda', '/id', 301);
+Route::redirect('en/home', '/en', 301);
 Route::get('id/product/{slug}', [PageController::class, 'productRedirect']);
 Route::get('id/produk/{slug}', [PageController::class, 'productRedirect']);
 Route::get('en/product/{slug}', [PageController::class, 'productRedirect']);

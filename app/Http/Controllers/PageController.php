@@ -288,6 +288,12 @@ class PageController extends Controller
 
     public function products()
     {
+        // combiphar.com's product menu links /produk?cat_id={id}; ours is ?cat=[&sub=].
+        $legacy = request()->query('cat_id');
+        if ($legacy !== null && ! request()->has('cat') && isset(self::LEGACY_PRODUCT_CATEGORIES[(int) $legacy])) {
+            return redirect()->to(Localize::url('products').'?'.http_build_query(self::LEGACY_PRODUCT_CATEGORIES[(int) $legacy]), 301);
+        }
+
         $shops = OnlineShop::orderBy('sort')->get();
         $shopArr = fn ($s) => ['name' => $s->name, 'url' => $s->url, 'logo' => $this->img($s->logo), 'color' => $this->shopColor($s->name)];
         // Each product shows only its selected shops; null shop_ids falls back
@@ -422,9 +428,41 @@ class PageController extends Controller
         ]);
     }
 
+    /**
+     * Slug program CSR yang dulu dipakai di sini => slug combiphar.com (baris
+     * di-rename oleh migrasi 2026_08_18_000003; peta ini menjaga tautan lama
+     * tetap hidup lewat 301 — dan hanya dipakai bila slug lamanya sudah tidak
+     * ada, jadi lingkungan yang belum ter-migrasi tetap merender, bukan mati).
+     */
+    private const LEGACY_CSR_SLUGS = [
+        'environmental' => 'environmental-care-action',
+        'social' => 'social-care-action',
+    ];
+
+    /** Tautan lama combiphar.com: /berita?id={kategori} => tab halaman Berita kita. */
+    private const LEGACY_NEWS_TABS = [
+        1 => 'health',    // Info Kesehatan
+        2 => 'investor',  // Siaran Pers (tab disembunyikan → News.jsx jatuh ke health)
+    ];
+
+    /** Tautan lama combiphar.com: /produk?cat_id={kategori} => ?cat= / ?sub= kita. */
+    private const LEGACY_PRODUCT_CATEGORIES = [
+        2 => ['cat' => 'pharmaceutical'],
+        3 => ['cat' => 'consumer-health'],
+        5 => ['cat' => 'nutrition-herbal', 'sub' => 'nutrition-herbal-serealsnack'],
+        6 => ['cat' => 'nutrition-herbal', 'sub' => 'nutrition-herbal-honey'],
+        7 => ['cat' => 'nutrition-herbal', 'sub' => 'nutrition-herbal-herbal'],
+    ];
+
     public function csrShow(string $slug)
     {
-        $program = CsrProgram::where('slug', $slug)->firstOrFail();
+        $program = CsrProgram::where('slug', $slug)->first();
+
+        if (! $program && isset(self::LEGACY_CSR_SLUGS[$slug])) {
+            return redirect()->to(Localize::url('csr.show', null, ['slug' => self::LEGACY_CSR_SLUGS[$slug]]), 301);
+        }
+
+        abort_unless($program, 404);
 
         // Program yang belum terbit harus benar-benar 404 bagi publik, bukan
         // tampil kosong -- kecuali pemintanya memegang tautan pratinjau.
@@ -679,6 +717,12 @@ class PageController extends Controller
 
     public function news()
     {
+        // combiphar.com's news menu links /berita?id={kategori}; ours is ?tab=.
+        $legacy = request()->query('id');
+        if ($legacy !== null && ! request()->has('tab') && isset(self::LEGACY_NEWS_TABS[(int) $legacy])) {
+            return redirect()->to(Localize::url('news').'?tab='.self::LEGACY_NEWS_TABS[(int) $legacy], 301);
+        }
+
         $articles = Article::published()->latest('published_at')->get();
         $byCat = fn (string $c) => $articles->where('category', $c)->values()->map(fn ($a) => $this->articleCard($a));
 

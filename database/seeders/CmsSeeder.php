@@ -269,17 +269,20 @@ class CmsSeeder extends Seeder
         }
 
         // ---- CSR programs ----
+        // Slugs mirror combiphar.com's community slugs where one exists (see
+        // migration 2026_08_18_000003); null = auto-slug from the title.
         $csr = [
-            ['esg', 'Environmental', 'Environmental', 'Inisiatif keberlanjutan lingkungan Combiphar.', 'Combiphar environmental sustainability initiatives.'],
-            ['esg', 'Social', 'Social', 'Program pemberdayaan masyarakat dan kesehatan.', 'Community empowerment and health programs.'],
-            ['esg', 'Governance', 'Governance', 'Tata kelola perusahaan yang transparan dan akuntabel.', 'Transparent and accountable corporate governance.'],
-            ['health_campaign', 'Kampanye Hidup Sehat', 'Healthy Living Campaign', 'Edukasi kesehatan untuk masyarakat luas.', 'Health education for the wider community.'],
-            ['sports', 'Combiphar Sports', 'Combiphar Sports', 'Mendukung gaya hidup aktif melalui olahraga.', 'Supporting an active lifestyle through sports.'],
+            ['esg', 'Environmental', 'Environmental', 'Inisiatif keberlanjutan lingkungan Combiphar.', 'Combiphar environmental sustainability initiatives.', 'environmental-care-action'],
+            ['esg', 'Social', 'Social', 'Program pemberdayaan masyarakat dan kesehatan.', 'Community empowerment and health programs.', 'social-care-action'],
+            ['esg', 'Governance', 'Governance', 'Tata kelola perusahaan yang transparan dan akuntabel.', 'Transparent and accountable corporate governance.', null],
+            ['health_campaign', 'Kampanye Hidup Sehat', 'Healthy Living Campaign', 'Edukasi kesehatan untuk masyarakat luas.', 'Health education for the wider community.', null],
+            ['sports', 'Combiphar Sports', 'Combiphar Sports', 'Mendukung gaya hidup aktif melalui olahraga.', 'Supporting an active lifestyle through sports.', null],
         ];
 
-        foreach ($csr as $i => [$cat, $tId, $tEn, $bId, $bEn]) {
+        foreach ($csr as $i => [$cat, $tId, $tEn, $bId, $bEn, $slug]) {
             CsrProgram::create([
                 'category' => $cat,
+                'slug' => $slug,
                 'title_id' => $tId,
                 'title_en' => $tEn,
                 'body_id' => $bId,
