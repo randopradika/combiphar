@@ -16,9 +16,10 @@ use Illuminate\Support\Facades\Storage;
  *
  *   remote id  →  ID-locale slug (what `articles.slug` holds)  →  local Article  →  write *_en
  *
- * Only `title_en` / `excerpt_en` / `body_en` are written (plus `cover_image` when it is
- * still null). Indonesian columns, category, dates and slugs are never touched, so the
- * command is safe to re-run on any environment where editors may have edited ID copy.
+ * Only `title_en` / `excerpt_en` / `body_en` / `slug_en` are written (plus `cover_image`
+ * when it is still null). Indonesian columns, category, dates and the Indonesian `slug`
+ * are never touched, so the command is safe to re-run on any environment where editors
+ * may have edited ID copy.
  */
 class ImportCombipharNewsEnglish extends Command
 {
@@ -36,7 +37,7 @@ class ImportCombipharNewsEnglish extends Command
     {
         $dry = (bool) $this->option('dry-run');
 
-        $totals = ['updated' => 0, 'unchanged' => 0, 'missing_local' => 0, 'missing_en' => 0, 'untranslated' => 0, 'date_mismatch' => 0];
+        $totals = ['updated' => 0, 'unchanged' => 0, 'missing_local' => 0, 'missing_en' => 0, 'untranslated' => 0, 'date_mismatch' => 0, 'slug_collision' => 0];
 
         foreach (self::CATEGORIES as $remoteCategory) {
             $idRows = $this->fetchAll('id', $remoteCategory);
@@ -83,6 +84,22 @@ class ImportCombipharNewsEnglish extends Command
                     'body_en' => $body,
                 ], fn ($v) => $v !== '');
 
+                // English slug → /en/news/{slug_en}, mirroring combiphar.com's per-locale URLs.
+                // `slug_en` is unique, and an English slug that equals ANOTHER article's Indonesian
+                // slug would make the lookup ambiguous — skip (and say so) rather than throw mid-run.
+                $slugEn = trim($en['slug'] ?? '');
+                if ($slugEn !== '' && $slugEn !== $article->slug_en) {
+                    $taken = Article::where('id', '!=', $article->id)
+                        ->where(fn ($q) => $q->where('slug', $slugEn)->orWhere('slug_en', $slugEn))
+                        ->exists();
+                    if ($taken) {
+                        $totals['slug_collision']++;
+                        $this->warn("  [{$remoteId}] EN slug '{$slugEn}' already used by another article — slug_en left as is: {$id['slug']}");
+                    } else {
+                        $attrs['slug_en'] = $slugEn;
+                    }
+                }
+
                 if (! $article->cover_image && ! empty($en['image'])) {
                     $attrs['cover_image'] = $dry ? $en['image'] : $this->downloadImage($en['image']);
                 }
@@ -113,13 +130,14 @@ class ImportCombipharNewsEnglish extends Command
 
         $this->newLine();
         $this->info(($dry ? '[dry-run] ' : '').sprintf(
-            'updated=%d unchanged=%d missing_local=%d missing_en=%d untranslated_on_source=%d date_mismatch=%d',
+            'updated=%d unchanged=%d missing_local=%d missing_en=%d untranslated_on_source=%d date_mismatch=%d slug_collision=%d',
             $totals['updated'],
             $totals['unchanged'],
             $totals['missing_local'],
             $totals['missing_en'],
             $totals['untranslated'],
             $totals['date_mismatch'],
+            $totals['slug_collision'],
         ));
 
         return self::SUCCESS;

@@ -120,10 +120,15 @@ class ArticleResource extends Resource
                             ->collapsed()
                             ->schema([
                                 Forms\Components\TextInput::make('slug')
-                                    ->label('Slug')
+                                    ->label('Slug (Indonesia)')
                                     ->required()
                                     ->maxLength(255)
-                                    ->helperText('Alamat artikel: /berita/{slug}. Dibuat otomatis dari judul saat artikel baru. Mengubahnya pada artikel yang sudah tayang akan mematikan tautan lama.'),
+                                    ->helperText('Alamat artikel: /id/berita/{slug}. Dibuat otomatis dari judul Indonesia saat artikel baru. Mengubahnya pada artikel yang sudah tayang akan mematikan tautan lama.'),
+                                Forms\Components\TextInput::make('slug_en')
+                                    ->label('Slug (English)')
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true)
+                                    ->helperText('Alamat versi Inggris: /en/news/{slug_en}. Dibuat otomatis dari judul Inggris saat artikel baru; jika kosong, /en memakai slug Indonesia.'),
                             ]),
                     ]),
             ]);
@@ -144,14 +149,16 @@ class ArticleResource extends Resource
                 ->maxLength(255)
                 // Slug diisi dari judul HANYA saat membuat artikel baru:
                 // menimpanya saat menyunting akan memindahkan URL artikel yang
-                // sudah tayang tanpa ada yang memintanya.
+                // sudah tayang tanpa ada yang memintanya. Judul Indonesia mengisi
+                // `slug`, judul Inggris mengisi `slug_en` (URL /en/news/{slug_en}).
                 ->live(onBlur: true)
                 ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, ?string $state, string $operation) use ($isId) {
-                    if (! $isId || $operation !== 'create' || blank($state) || filled($get('slug'))) {
+                    $slugField = $isId ? 'slug' : 'slug_en';
+                    if ($operation !== 'create' || blank($state) || filled($get($slugField))) {
                         return;
                     }
 
-                    $set('slug', Str::slug($state));
+                    $set($slugField, Str::slug($state));
                 })
                 ->columnSpanFull(),
             Forms\Components\Textarea::make("excerpt_{$locale}")
@@ -171,6 +178,11 @@ class ArticleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('slug_en')
+                    ->label('Slug (EN)')
+                    ->searchable()
+                    ->placeholder('— (pakai slug Indonesia)')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('title_id')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('title_en')
@@ -249,10 +261,13 @@ class ArticleResource extends Resource
      */
     public static function previewUrl(Article $record): string
     {
+        // Slug mengikuti bahasa route-nya: pratinjau /en memakai slug_en (kalau
+        // ada). Slug bahasa lain memang dialihkan 301, tetapi itu akan
+        // menggugurkan tanda tangannya — dan pratinjau draf butuh tanda tangan.
         return URL::temporarySignedRoute(
             'news.show.'.config('app.locale'),
             now()->addDay(),
-            ['slug' => $record->slug],
+            ['slug' => $record->slugFor(config('app.locale'))],
         );
     }
 

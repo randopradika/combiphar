@@ -130,7 +130,8 @@ class PageController extends Controller
             'excerpt' => $a->tr('excerpt'),
             'cover' => $this->img($a->cover_image),
             'date' => optional($a->published_at)->translatedFormat('j F Y'),
-            'url' => Localize::url('news.show', null, ['slug' => $a->slug]),
+            // Per-locale slug (slug on /id, slug_en on /en), like combiphar.com.
+            'url' => Localize::url('news.show', null, ['slug' => $a->slugFor()]),
         ];
     }
 
@@ -378,7 +379,7 @@ class PageController extends Controller
                 'type' => 'article',
                 'title' => $a->tr('title'),
                 'image' => $this->img($a->cover_image),
-                'url' => Localize::url('news.show', $locale, ['slug' => $a->slug]),
+                'url' => Localize::url('news.show', $locale, ['slug' => $a->slugFor($locale)]),
             ]);
 
         return response()->json(['products' => $products, 'articles' => $articles]);
@@ -623,7 +624,7 @@ class PageController extends Controller
 
     public function sitemap()
     {
-        $articles = Article::published()->get(['slug', 'published_at', 'updated_at']);
+        $articles = Article::published()->get(['slug', 'slug_en', 'published_at', 'updated_at']);
         $programs = CsrProgram::published()->whereNotNull('slug')->get(['slug', 'updated_at']);
         $pages = Page::query()->get(['slug', 'show_in_menu', 'updated_at'])->keyBy('slug');
 
@@ -638,14 +639,18 @@ class PageController extends Controller
                 return $row && ! $row->show_in_menu;
             });
 
-        $entry = function (string $base, string $loc, array $params, string $priority, $lastmod) {
+        // $params boleh berupa closure(locale) — slug artikel berbeda per bahasa
+        // (slug vs slug_en), jadi loc dan tiap alternate harus memakai slug
+        // bahasanya masing-masing.
+        $entry = function (string $base, string $loc, array|\Closure $params, string $priority, $lastmod) {
+            $p = fn (string $l) => $params instanceof \Closure ? $params($l) : $params;
             $alt = [
-                'id' => Localize::url($base, 'id', $params),
-                'en' => Localize::url($base, 'en', $params),
+                'id' => Localize::url($base, 'id', $p('id')),
+                'en' => Localize::url($base, 'en', $p('en')),
             ];
 
             return [
-                'loc' => Localize::url($base, $loc, $params),
+                'loc' => Localize::url($base, $loc, $p($loc)),
                 'priority' => $priority,
                 'lastmod' => $lastmod ? $lastmod->toAtomString() : null,
                 // Pasangan id/en sudah dinyatakan di <head> lewat hreflang;
@@ -662,7 +667,7 @@ class PageController extends Controller
                 $urls[] = $entry($name, $loc, [], $name === 'home' ? '1.0' : '0.8', optional($pages->get($name))->updated_at);
             }
             foreach ($articles as $a) {
-                $urls[] = $entry('news.show', $loc, ['slug' => $a->slug], '0.6', $a->updated_at ?: $a->published_at);
+                $urls[] = $entry('news.show', $loc, fn (string $l) => ['slug' => $a->slugFor($l)], '0.6', $a->updated_at ?: $a->published_at);
             }
             foreach ($programs as $p) {
                 $urls[] = $entry('csr.show', $loc, ['slug' => $p->slug], '0.6', $p->updated_at);
@@ -693,7 +698,23 @@ class PageController extends Controller
 
     public function newsShow(string $slug)
     {
-        $article = Article::where('slug', $slug)->firstOrFail();
+        $locale = app()->getLocale();
+
+        // Slug per bahasa seperti combiphar.com: /id/berita/{slug} dan
+        // /en/news/{slug_en}. Slug bahasa lain tetap dikenali (tautan lama
+        // /en/news/{slug-indonesia} tidak mati), tetapi dialihkan 301 ke slug
+        // kanonis locale ini supaya satu artikel tidak terindeks di dua URL.
+        $article = Article::findBySlug($slug, $locale) ?? abort(404);
+        $canonicalSlug = $article->slugFor($locale);
+
+        if ($slug !== $canonicalSlug && ! request()->hasValidSignature()) {
+            $query = request()->getQueryString();
+
+            return redirect()->to(
+                Localize::url('news.show', $locale, ['slug' => $canonicalSlug]).($query ? '?'.$query : ''),
+                301,
+            );
+        }
 
         // Sebelumnya halaman ini TIDAK menyaring status terbit sama sekali:
         // artikel draf maupun yang dijadwalkan tayang bulan depan sudah bisa
@@ -702,9 +723,17 @@ class PageController extends Controller
             abort(404);
         }
 
+        // Tombol ganti bahasa + canonical/hreflang membaca `altUrls`, yang
+        // secara default memakai parameter route apa adanya — di sini slug-nya
+        // berbeda per bahasa, jadi ditimpa dengan pasangan yang benar.
+        Inertia::share('altUrls', [
+            'id' => Localize::url('news.show', 'id', ['slug' => $article->slugFor('id')]),
+            'en' => Localize::url('news.show', 'en', ['slug' => $article->slugFor('en')]),
+        ]);
+
         $cover = $this->img($article->cover_image);
         $summary = $article->tr('excerpt') ?: $article->tr('body');
-        $url = Localize::url('news.show', null, ['slug' => $article->slug]);
+        $url = Localize::url('news.show', null, ['slug' => $canonicalSlug]);
 
         return Inertia::render('NewsDetail', [
             'article' => array_merge($this->articleCard($article), [
