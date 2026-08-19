@@ -353,7 +353,10 @@ class PageController extends Controller
     /** Live site search across products + articles (JSON). */
     public function search(Request $request)
     {
-        $q = trim((string) $request->query('q', ''));
+        // Guard the type: `?q[]=x` makes query('q') an array, and (string) on an
+        // array raises "Array to string conversion" -> unhandled 500 (WP-06).
+        $raw = $request->query('q', '');
+        $q = is_string($raw) ? trim($raw) : '';
         if (mb_strlen($q) < 2) {
             return response()->json(['products' => [], 'articles' => []]);
         }

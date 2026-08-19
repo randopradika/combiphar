@@ -39,6 +39,10 @@ class SecurityHeaders
         $headers->set('X-Frame-Options', 'SAMEORIGIN');
         $headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
+        // Deny powerful browser features the site never uses. Empty allow-list
+        // `()` blocks the feature for this document and every embedded frame.
+        $headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()');
+
         // Advertise HSTS only when the request actually arrived over TLS
         // (directly, or via a trusted proxy / an APP_FORCE_HTTPS host) — never
         // on plain-http local dev.
