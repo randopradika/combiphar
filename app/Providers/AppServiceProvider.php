@@ -55,6 +55,19 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        // WP-01 (defense in depth): a debug error page must NEVER render on a
+        // hosted environment, whatever the box .env says — it leaks source
+        // paths, versions and stack traces. Debug is allowed only for genuine
+        // local development: APP_ENV=local over plain HTTP. Any non-local env,
+        // or a TLS / APP_FORCE_HTTPS host, forces it off. This is keyed on
+        // server-side config, not the Host header, so it cannot be spoofed.
+        // (CLI/tinker keep debug; config:cache is not affected.)
+        if (! $this->app->runningInConsole()
+            && config('app.debug')
+            && ! self::debugAllowed($this->app->environment('local'), (bool) config('app.force_https'))) {
+            config(['app.debug' => false]);
+        }
+
         // Trust X-Forwarded-* only from config('app.trusted_proxies') — never
         // '*': the app port is published directly, and a wildcard would let any
         // client spoof its IP past every per-IP rate limiter.
@@ -65,6 +78,17 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerActivityLogging();
         $this->registerFilamentTableDefaults();
+    }
+
+    /**
+     * WP-01: may debug error pages render? Only in genuine local development —
+     * APP_ENV=local served over plain HTTP. A hosted context (non-local env, or
+     * a TLS / APP_FORCE_HTTPS host) is never allowed to expose stack traces.
+     * Pure predicate so the truth table is unit-testable.
+     */
+    public static function debugAllowed(bool $isLocalEnv, bool $forceHttps): bool
+    {
+        return $isLocalEnv && ! $forceHttps;
     }
 
     /**

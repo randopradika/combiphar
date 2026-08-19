@@ -24,6 +24,15 @@ class SecurityHeaders
 
     public function handle(Request $request, Closure $next): Response
     {
+        // WP-05: /up (health check) reveals app liveness and exists only for the
+        // load balancer. nginx restricts it to the VPC in prod; the artisan-serve
+        // dev box does not, so enforce it here too — allow only private/loopback
+        // client IPs (the ALB lives in the VPC; local runs come from the bridge).
+        if ($request->is('up')
+            && filter_var($request->ip(), FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+            abort(404);
+        }
+
         // The nonce has to exist BEFORE the view renders, so it is generated up
         // front and handed to Vite (which stamps its own script/style tags) and
         // shared with Blade for the two hand-written inline scripts. Note this
@@ -34,6 +43,12 @@ class SecurityHeaders
 
         $response = $next($request);
         $headers = $response->headers;
+
+        // WP-05: strip PHP's version banner. nginx hides it in prod
+        // (fastcgi_hide_header); the artisan-serve dev box leaks it, so remove
+        // it here too — both from the response bag and PHP's own auto header.
+        header_remove('X-Powered-By');
+        $headers->remove('X-Powered-By');
 
         $headers->set('X-Content-Type-Options', 'nosniff');
         $headers->set('X-Frame-Options', 'SAMEORIGIN');

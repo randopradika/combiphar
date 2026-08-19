@@ -54,6 +54,16 @@ if ($uri !== '/' && strpos($uri, '..') === false && is_file($file)) {
         }
 
         header('Content-Type: '.$types[$ext]);
+        header('X-Content-Type-Options: nosniff');
+
+        // WP-02: an SVG uploaded to the CMS lands under /storage and, when
+        // NAVIGATED TO, renders as a document and runs any script inside it in
+        // this origin (stored XSS — any CMS user can upload one). Force it to
+        // download instead, matching the nginx build. Repo-shipped art under
+        // /img and /build is trusted and stays inline.
+        if ($ext === 'svg' && strpos($uri, '/storage/') === 0) {
+            header('Content-Disposition: attachment');
+        }
 
         $textual = in_array($ext, ['js', 'css', 'svg', 'json', 'map', 'txt', 'xml'], true);
         if ($textual && strpos($_SERVER['HTTP_ACCEPT_ENCODING'] ?? '', 'gzip') !== false) {
