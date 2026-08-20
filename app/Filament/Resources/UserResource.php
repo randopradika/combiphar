@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Validation\Rules\Password;
 
 /**
  * Kelola akun CMS.
@@ -73,8 +74,12 @@ class UserResource extends Resource
                                     ->label('Kata sandi')
                                     ->password()
                                     ->revealable()
-                                    ->helperText('Kosongkan untuk membiarkan kata sandi saat ini tidak berubah.')
+                                    ->helperText('Minimal 8 karakter dengan huruf besar, huruf kecil, angka, dan simbol. Kosongkan untuk membiarkan kata sandi saat ini tidak berubah.')
                                     ->required(fn (string $operation) => $operation === 'create')
+                                    // Kebijakan terpusat dari AppServiceProvider. Syaratnya
+                                    // hanya dicek saat ada isian — mengedit akun tanpa
+                                    // mengganti kata sandi harus tetap bisa disimpan.
+                                    ->rule(Password::defaults(), fn (?string $state): bool => filled($state))
                                     // Kolomnya memakai cast 'hashed', jadi nilai polos di sini
                                     // otomatis di-hash saat disimpan.
                                     ->dehydrated(fn (?string $state) => filled($state))

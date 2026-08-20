@@ -24,7 +24,9 @@ use App\Models\Product;
 use App\Models\ProductBanner;
 use App\Models\ProductCategory;
 use App\Models\SocialLink;
+use App\Models\User;
 use App\Models\WellnessProgram;
+use App\Support\Html;
 use App\Support\Localize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -89,7 +91,7 @@ class PageController extends Controller
                 'items' => collect($p->scam_items ?? [])
                     ->map(fn ($i) => [
                         'icon' => $this->img($i['icon'] ?? null),
-                        'text' => trim($i['text_'.app()->getLocale()] ?? '') ?: trim($i['text_id'] ?? ''),
+                        'text' => Html::clean(trim($i['text_'.app()->getLocale()] ?? '') ?: trim($i['text_id'] ?? '')),
                     ])
                     ->filter(fn ($i) => $i['text'] !== '' || $i['icon'])
                     ->values()
@@ -99,13 +101,13 @@ class PageController extends Controller
             // Each note is a bilingual pair; hand the page the active locale
             // (falling back to ID) and drop notes an admin left empty.
             'fraudItems' => collect($p->fraud_items ?? [])
-                ->map(fn ($i) => trim($i['text_'.app()->getLocale()] ?? '') ?: trim($i['text_id'] ?? ''))
+                ->map(fn ($i) => Html::clean(trim($i['text_'.app()->getLocale()] ?? '') ?: trim($i['text_id'] ?? '')))
                 ->filter()
                 ->values()
                 ->all(),
             'vision' => $p->tr('vision'),
             'mission' => $p->tr('mission'),
-            'values' => $p->tr('values'),
+            'values' => Html::clean($p->tr('values')),
             'presenceDesc' => $p->tr('presence_desc'),
             'presenceImage' => $this->img($p->presence_image),
             'presencePopupText' => $p->tr('presence_popup_text'),
@@ -233,7 +235,7 @@ class PageController extends Controller
     public function about()
     {
         $person = fn (Person $p) => [
-            'name' => $p->name, 'role' => $p->tr('role'), 'bio' => $p->tr('bio'), 'photo' => $this->img($p->photo),
+            'name' => $p->name, 'role' => $p->tr('role'), 'bio' => Html::clean($p->tr('bio')), 'photo' => $this->img($p->photo),
         ];
 
         return Inertia::render('About', [
@@ -241,10 +243,10 @@ class PageController extends Controller
             'milestones' => AboutHistory::orderBy('sort')->get()->map(fn ($m) => [
                 'year' => $m->year, 'caption' => $m->tr('caption'), 'photo' => $this->img($m->photo),
             ]),
-            'commissioners' => Person::visible()->where('group','commissioners')->ordered()->get()->map($person),
-            'directors' => Person::visible()->where('group','directors')->ordered()->get()->map($person),
-            'auditCommittee' => Person::visible()->where('group','audit_committee')->ordered()->get()->map($person),
-            'corporateSecretary' => Person::visible()->where('group','corporate_secretary')->ordered()->get()->map($person),
+            'commissioners' => Person::visible()->where('group', 'commissioners')->ordered()->get()->map($person),
+            'directors' => Person::visible()->where('group', 'directors')->ordered()->get()->map($person),
+            'auditCommittee' => Person::visible()->where('group', 'audit_committee')->ordered()->get()->map($person),
+            'corporateSecretary' => Person::visible()->where('group', 'corporate_secretary')->ordered()->get()->map($person),
             'awards' => Award::orderBy('sort')->get()->map(fn ($a) => [
                 'title' => $a->tr('title'), 'year' => $a->year, 'image' => $this->img($a->image),
                 'is_hero' => (bool) $a->is_hero,
@@ -513,7 +515,7 @@ class PageController extends Controller
                 ],
                 'teams' => $blocks->map(fn ($c) => [
                     'title' => $isSelfBlock ? null : $c->tr('title'),
-                    'body' => $c->tr('content') ?: $c->tr('body'),
+                    'body' => Html::clean($c->tr('content') ?: $c->tr('body')),
                     'logo' => $isSelfBlock ? null : $this->img($c->image),
                     // Sports galleries are plain path strings; CSR galleries are
                     // {image, caption_*} objects. This layout shows no captions,
@@ -528,7 +530,7 @@ class PageController extends Controller
         }
 
         $person = fn (Person $p) => [
-            'name' => $p->name, 'role' => $p->tr('role'), 'bio' => $p->tr('bio'), 'photo' => $this->img($p->photo),
+            'name' => $p->name, 'role' => $p->tr('role'), 'bio' => Html::clean($p->tr('bio')), 'photo' => $this->img($p->photo),
         ];
         $isBoard = $program->layout === 'board'
             || $program->children->contains(fn ($c) => $c->layout === 'board');
@@ -537,11 +539,11 @@ class PageController extends Controller
             'program' => [
                 'title' => $program->tr('title'),
                 'subtitle' => $program->tr('body'),
-                'body' => $program->tr('content') ?: $program->tr('body'),
+                'body' => Html::clean($program->tr('content') ?: $program->tr('body')),
                 // Raw "Isi Halaman Detail" (may be empty) — rendered above the
                 // photo grid in the gallery layout so the detail content shows
                 // there too, not only in the default/slider layouts.
-                'content' => $program->tr('content'),
+                'content' => Html::clean($program->tr('content')),
                 'image' => $this->img($program->image),
                 'category' => $program->category,
                 'layout' => $program->layout,
@@ -561,16 +563,16 @@ class PageController extends Controller
                 })->values(),
                 'seeAll' => $program->link,
                 // Second rich block rendered below the member grids (board layout).
-                'content2' => $program->tr('content2'),
+                'content2' => Html::clean($program->tr('content2')),
             ],
             'topics' => $program->children->map(fn ($c) => [
                 'title' => $c->tr('title'),
-                'body' => $c->tr('content') ?: $c->tr('body'),
+                'body' => Html::clean($c->tr('content') ?: $c->tr('body')),
                 'slug' => $c->slug,
                 // A "board" sub-topic (mis. Komite Audit) renders its member grids
                 // inline in this sub-menu tab instead of an article + contact form.
                 'layout' => $c->layout,
-                'content2' => $c->tr('content2'),
+                'content2' => Html::clean($c->tr('content2')),
             ]),
             // Slider layout (mis. Social Care): each sub-program becomes a slide.
             'slides' => $program->children->map(fn ($c) => [
@@ -580,8 +582,8 @@ class PageController extends Controller
             ])->values(),
             // "Board" layout (Figma 967:78 — Komite Audit): reuse the About page
             // Audit Committee + Corporate Secretary member grids.
-            'auditCommittee' => $isBoard ? Person::visible()->where('group','audit_committee')->ordered()->get()->map($person) : [],
-            'corporateSecretary' => $isBoard ? Person::visible()->where('group','corporate_secretary')->ordered()->get()->map($person) : [],
+            'auditCommittee' => $isBoard ? Person::visible()->where('group', 'audit_committee')->ordered()->get()->map($person) : [],
+            'corporateSecretary' => $isBoard ? Person::visible()->where('group', 'corporate_secretary')->ordered()->get()->map($person) : [],
             'seo' => $csrSeo,
         ])->withViewData(['jsonLd' => $csrJsonLd]);
     }
@@ -602,7 +604,7 @@ class PageController extends Controller
 
         return Inertia::render('Legal', [
             'title' => $lp->tr('title'),
-            'body' => $lp->tr('body'),
+            'body' => Html::clean($lp->tr('body')),
         ]);
     }
 
@@ -619,13 +621,20 @@ class PageController extends Controller
      * Bolehkah permintaan ini melihat konten yang belum terbit?
      *
      * Dua jalan masuk, sengaja: tautan pratinjau bertanda tangan (kedaluwarsa,
-     * dan bisa dikirim ke orang yang tidak punya akun CMS), atau sesi panel yang
-     * sedang login. Satu-satunya akun di aplikasi ini adalah akun panel, jadi
-     * auth()->check() memang berarti "editor".
+     * dan bisa dikirim ke orang yang tidak punya akun CMS), atau sesi login
+     * yang perannya masih boleh membuka CMS. Sekadar auth()->check() tidak
+     * cukup: akun berperan 'disabled' masih terautentikasi selama sesinya
+     * hidup, padahal aksesnya justru sedang dicabut.
      */
     private function previewing(): bool
     {
-        return request()->hasValidSignature() || auth()->check();
+        if (request()->hasValidSignature()) {
+            return true;
+        }
+
+        $user = auth()->user();
+
+        return $user instanceof User && $user->hasCmsRole();
     }
 
     /**
@@ -784,7 +793,7 @@ class PageController extends Controller
 
         return Inertia::render('NewsDetail', [
             'article' => array_merge($this->articleCard($article), [
-                'body' => $article->tr('body'),
+                'body' => Html::clean($article->tr('body')),
                 'category' => $article->category,
                 'datetime' => optional($article->published_at)->translatedFormat('l, j F Y - g:i A'),
             ]),
@@ -857,8 +866,8 @@ class PageController extends Controller
             'vacancies' => JobVacancy::where('is_open', true)->orderBy('sort')->get()->map(fn ($v) => [
                 'title' => $v->tr('title'), 'department' => $v->tr('department'),
                 'location' => $v->location, 'summary' => $v->tr('summary'),
-                'description' => $v->tr('description'),
-                'requirements' => $v->tr('requirements'), 'applyUrl' => $v->apply_url,
+                'description' => Html::clean($v->tr('description')),
+                'requirements' => Html::clean($v->tr('requirements')), 'applyUrl' => $v->apply_url,
             ]),
             'faqs' => Faq::orderBy('sort')->get()->map(fn ($f) => [
                 'question' => $f->tr('question'), 'answer' => $f->tr('answer'),

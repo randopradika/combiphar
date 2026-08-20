@@ -33,6 +33,19 @@ class SecurityHeaders
             abort(404);
         }
 
+        // Enforce HTTPS with a real redirect wherever plain http is
+        // DETECTABLE. On an APP_FORCE_HTTPS host the proxy hides the scheme —
+        // every request would "look" insecure and the redirect would loop — so
+        // that host relies on HSTS + upgrade-insecure-requests (and
+        // forceScheme'd URLs) instead. /up is exempt: the load balancer
+        // health-checks it over plain http and follows no redirects.
+        if (! $request->secure()
+            && ! config('app.force_https')
+            && ! app()->environment('local', 'testing')
+            && ! $request->is('up')) {
+            return redirect()->secure($request->getRequestUri(), 301);
+        }
+
         // The nonce has to exist BEFORE the view renders, so it is generated up
         // front and handed to Vite (which stamps its own script/style tags) and
         // shared with Blade for the two hand-written inline scripts. Note this

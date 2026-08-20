@@ -47,7 +47,11 @@ return [
     |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    // Encrypt the server-side session PAYLOAD at rest (defence-in-depth for a
+    // DB/file session-store leak — the cookie itself is already encrypted by
+    // EncryptCookies). Default on; a host may still opt out via .env. Rotating
+    // APP_KEY invalidates live sessions, which is acceptable.
+    'encrypt' => env('SESSION_ENCRYPT', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +173,15 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // Default ON for any host that serves over TLS (APP_URL https, or an
+    // APP_FORCE_HTTPS box whose proxy hides the scheme) — without the Secure
+    // flag the session cookie rides along on any plain-http request and can
+    // be sniffed. Plain-http local dev stays off, or login would break.
+    // SESSION_SECURE_COOKIE in .env still overrides both ways.
+    'secure' => env(
+        'SESSION_SECURE_COOKIE',
+        env('APP_FORCE_HTTPS', false) || str_starts_with((string) env('APP_URL', ''), 'https://')
+    ),
 
     /*
     |--------------------------------------------------------------------------

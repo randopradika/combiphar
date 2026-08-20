@@ -46,6 +46,17 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
+        return $this->hasCmsRole();
+    }
+
+    /**
+     * Peran yang boleh membuka CMS — dipakai juga di luar Filament (mis.
+     * gerbang pratinjau konten draf), yang tidak punya instance Panel untuk
+     * memanggil canAccessPanel(). auth()->check() saja tidak memadai di sana:
+     * akun 'disabled' masih terautentikasi sampai sesinya berakhir.
+     */
+    public function hasCmsRole(): bool
+    {
         return in_array($this->role, self::PANEL_ROLES, true);
     }
 

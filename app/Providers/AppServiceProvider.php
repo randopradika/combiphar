@@ -33,6 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -75,6 +76,16 @@ class AppServiceProvider extends ServiceProvider
         if ($proxies !== '') {
             TrustProxies::at($proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
         }
+
+        // Kebijakan kata sandi baku seluruh aplikasi: panjang minimum 8 +
+        // campuran huruf besar-kecil, angka, dan simbol. Dipusatkan lewat
+        // Password::defaults() supaya formulir mana pun (UserResource, atau
+        // formulir lain kelak) memakai aturan yang sama tanpa menyalinnya.
+        Password::defaults(fn () => Password::min(8)
+            ->letters()
+            ->mixedCase()
+            ->numbers()
+            ->symbols());
 
         $this->registerActivityLogging();
         $this->registerFilamentTableDefaults();

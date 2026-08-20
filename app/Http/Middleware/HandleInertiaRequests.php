@@ -6,6 +6,7 @@ use App\Models\FooterSetting;
 use App\Models\NavItem;
 use App\Models\Page;
 use App\Models\SocialLink;
+use App\Support\Html;
 use App\Support\Localize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -84,7 +85,7 @@ class HandleInertiaRequests extends Middleware
                         'icon' => $s->icon ? Storage::url($s->icon) : null,
                     ]),
                     'followLabel' => $f?->tr('follow_label'),
-                    'copyright' => $f?->tr('copyright'),
+                    'copyright' => Html::clean($f?->tr('copyright')),
                     'logos' => collect($f?->logos ?? [])
                         ->filter(fn ($l) => ! empty($l['image']))
                         ->map(fn ($l) => [
